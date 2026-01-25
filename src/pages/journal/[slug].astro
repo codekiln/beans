@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('journal');
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<BaseLayout title={entry.data.title}>
+  <article>
+    <h2 class="section-title">{entry.data.title}</h2>
+    <p class="meta">
+      {entry.data.date.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })}
+      {entry.data.mood ? ` · ${entry.data.mood}` : ''}
+      {entry.data.brew ? ` · ${entry.data.brew}` : ''}
+    </p>
+
+    <div class="card-grid" style="margin: 16px 0;">
+      {entry.data.recipe ? (
+        <div class="card">
+          <h3>Recipe</h3>
+          <p>{entry.data.recipe}</p>
+          <a href={`/beans/recipes/${entry.data.recipe}`}>Open recipe →</a>
+        </div>
+      ) : null}
+      {entry.data.gear?.length ? (
+        <div class="card">
+          <h3>Gear used</h3>
+          <ul>
+            {entry.data.gear.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+
+    <Content />
+    <div>
+      {entry.data.tags.map((tag) => (
+        <span class="tag">{tag}</span>
+      ))}
+    </div>
+  </article>
+</BaseLayout>

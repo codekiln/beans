@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const recipes = await getCollection('recipes');
+---
+
+<BaseLayout title="Recipes">
+  <section>
+    <h2 class="section-title">Brew recipes</h2>
+    <p class="meta">
+      Ratios, timings, and techniques—linked back to daily journal notes.
+    </p>
+    <div class="card-grid">
+      {recipes.map((recipe) => (
+        <article class="card">
+          <h3>{recipe.data.title}</h3>
+          <p class="meta">
+            {recipe.data.brewMethod} · {recipe.data.ratio} · {recipe.data.time}
+          </p>
+          <p>{recipe.data.grind}</p>
+          <a href={`/beans/recipes/${recipe.slug}`}>Open recipe →</a>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

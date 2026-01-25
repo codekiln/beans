@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&family=Source+Serif+4:opsz,wght@8..60,300;8..60,500&display=swap');
+
+:root {
+  color-scheme: light;
+  --ink: #2e261c;
+  --paper: #f5f1e8;
+  --paper-deep: #efe7d8;
+  --accent: #6b4e3d;
+  --accent-light: #b7926f;
+  --graph: rgba(116, 97, 74, 0.18);
+  --shadow: rgba(46, 38, 28, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Source Serif 4', 'Times New Roman', serif;
+  color: var(--ink);
+  background-color: var(--paper-deep);
+  background-image:
+    linear-gradient(to right, var(--graph) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--graph) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+.page {
+  max-width: 980px;
+  margin: 32px auto 40px;
+  padding: 32px 36px 40px;
+  background: var(--paper);
+  box-shadow: 0 12px 30px var(--shadow);
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.page::before,
+.page::after {
+  content: '';
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(182, 120, 72, 0.28), transparent 70%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.page::before {
+  top: -80px;
+  right: -60px;
+}
+
+.page::after {
+  bottom: -90px;
+  left: -70px;
+}
+
+.header {
+  display: flex;
+  gap: 24px;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  border-bottom: 2px dashed var(--accent-light);
+  padding-bottom: 20px;
+}
+
+.eyebrow {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin: 0 0 8px;
+}
+
+.site-title {
+  font-family: 'Shadows Into Light', cursive;
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  margin: 0 0 6px;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 520px;
+  font-size: 1rem;
+}
+
+.nav {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.nav a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+}
+
+.nav a:hover {
+  border-color: var(--accent);
+}
+
+.content {
+  padding: 24px 0 0;
+  display: grid;
+  gap: 28px;
+}
+
+.section-title {
+  font-family: 'Shadows Into Light', cursive;
+  font-size: 1.9rem;
+  margin-bottom: 6px;
+}
+
+.card-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(107, 78, 61, 0.2);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 6px 8px 0 rgba(107, 78, 61, 0.1);
+}
+
+.card h3 {
+  margin-top: 0;
+  font-family: 'Shadows Into Light', cursive;
+}
+
+.meta {
+  font-size: 0.9rem;
+  color: rgba(46, 38, 28, 0.7);
+}
+
+.listing {
+  display: grid;
+  gap: 16px;
+}
+
+.listing article {
+  padding-bottom: 16px;
+  border-bottom: 1px dashed rgba(107, 78, 61, 0.25);
+}
+
+.tag {
+  display: inline-block;
+  margin: 6px 6px 0 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: rgba(107, 78, 61, 0.1);
+}
+
+.footer {
+  margin-top: 32px;
+  font-size: 0.85rem;
+  text-align: center;
+  color: rgba(46, 38, 28, 0.7);
+}
+
+@media (max-width: 720px) {
+  .page {
+    margin: 16px;
+    padding: 24px;
+  }
+
+  .header {
+    align-items: flex-start;
+  }
+}

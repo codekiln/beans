@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const recipes = await getCollection('recipes');
+  return recipes.map((recipe) => ({
+    params: { slug: recipe.slug },
+    props: { recipe },
+  }));
+}
+
+const { recipe } = Astro.props;
+const { Content } = await recipe.render();
+---
+
+<BaseLayout title={recipe.data.title}>
+  <article>
+    <h2 class="section-title">{recipe.data.title}</h2>
+    <div class="card-grid" style="margin-bottom: 16px;">
+      <div class="card">
+        <h3>Ratio</h3>
+        <p>{recipe.data.ratio}</p>
+      </div>
+      <div class="card">
+        <h3>Grind</h3>
+        <p>{recipe.data.grind}</p>
+      </div>
+      <div class="card">
+        <h3>Water temp</h3>
+        <p>{recipe.data.waterTemp}</p>
+      </div>
+      <div class="card">
+        <h3>Time</h3>
+        <p>{recipe.data.time}</p>
+      </div>
+    </div>
+    <Content />
+    <div>
+      {recipe.data.tags.map((tag) => (
+        <span class="tag">{tag}</span>
+      ))}
+    </div>
+  </article>
+</BaseLayout>

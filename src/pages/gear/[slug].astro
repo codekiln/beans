@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const items = await getCollection('gear');
+  return items.map((item) => ({
+    params: { slug: item.slug },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content } = await item.render();
+---
+
+<BaseLayout title={item.data.title}>
+  <article>
+    <h2 class="section-title">{item.data.title}</h2>
+    <p class="meta">Category: {item.data.category}</p>
+    {item.data.acquired ? (
+      <p class="meta">Acquired: {item.data.acquired}</p>
+    ) : null}
+    <Content />
+  </article>
+</BaseLayout>

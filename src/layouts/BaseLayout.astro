@@ -1,0 +1,48 @@
+---
+import "../styles/global.css";
+
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} · Beans` : 'Beans';
+const pageDescription =
+  description ||
+  'A coffee journal and knowledge garden for daily brews, recipes, and gear.';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={pageDescription} />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <div>
+          <p class="eyebrow">codekiln · beans</p>
+          <h1 class="site-title">Coffee Notes & Knowledge Garden</h1>
+          <p class="subtitle">
+            A quiet place for brewing logs, gear catalogs, and the ideas that
+            arrive between sips.
+          </p>
+        </div>
+        <nav class="nav">
+          <a href="/beans/">Home</a>
+          <a href="/beans/journal">Journal</a>
+          <a href="/beans/recipes">Recipes</a>
+          <a href="/beans/gear">Gear</a>
+        </nav>
+      </header>
+
+      <main class="content">
+        <slot />
+      </main>
+
+      <footer class="footer">
+        <p>
+          Built with Astro · Published to GitHub Pages · Alias: codekiln
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const journalEntries = (await getCollection('journal'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+const recipes = (await getCollection('recipes')).slice(0, 2);
+const gear = (await getCollection('gear')).slice(0, 2);
+---
+
+<BaseLayout title="Home">
+  <section>
+    <h2 class="section-title">Latest journal entries</h2>
+    <div class="listing">
+      {journalEntries.map((entry) => (
+        <article>
+          <h3>{entry.data.title}</h3>
+          <p class="meta">
+            {entry.data.date.toLocaleDateString('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+            {entry.data.mood ? ` · ${entry.data.mood}` : ''}
+          </p>
+          <p>{entry.body.slice(0, 140)}...</p>
+          <a href={`/beans/journal/${entry.slug}`}>Read entry →</a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Today’s brewing map</h2>
+    <div class="card-grid">
+      <article class="card">
+        <h3>Daily capture</h3>
+        <p>
+          Speak into ChatGPT, export the notes, and drop a new markdown file
+          into <strong>src/content/journal</strong>.
+        </p>
+        <p class="meta">CI will publish to codekiln.github.io/beans.</p>
+      </article>
+      <article class="card">
+        <h3>Knowledge garden</h3>
+        <p>
+          Each journal entry links to gear and recipes, so patterns emerge over
+          time.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Illustrated memories</h3>
+        <p>
+          Photos become line-work illustrations before publishing, keeping the
+          space gently anonymous.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Featured recipes</h2>
+    <div class="card-grid">
+      {recipes.map((recipe) => (
+        <article class="card">
+          <h3>{recipe.data.title}</h3>
+          <p class="meta">
+            {recipe.data.brewMethod} · {recipe.data.ratio} · {recipe.data.time}
+          </p>
+          <a href={`/beans/recipes/${recipe.slug}`}>Open recipe →</a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Recent gear</h2>
+    <div class="card-grid">
+      {gear.map((item) => (
+        <article class="card">
+          <h3>{item.data.title}</h3>
+          <p class="meta">{item.data.category}</p>
+          <a href={`/beans/gear/${item.slug}`}>Gear details →</a>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const entries = (await getCollection('journal')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<BaseLayout title="Journal">
+  <section>
+    <h2 class="section-title">Journal entries</h2>
+    <p class="meta">
+      Daily brewing notes, reflections, and a few caffeinated tangents.
+    </p>
+    <div class="listing">
+      {entries.map((entry) => (
+        <article>
+          <h3>{entry.data.title}</h3>
+          <p class="meta">
+            {entry.data.date.toLocaleDateString('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+            {entry.data.mood ? ` · ${entry.data.mood}` : ''}
+          </p>
+          <p>{entry.body.slice(0, 160)}...</p>
+          <a href={`/beans/journal/${entry.slug}`}>Read entry →</a>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

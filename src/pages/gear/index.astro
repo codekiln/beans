@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const items = await getCollection('gear');
+---
+
+<BaseLayout title="Gear">
+  <section>
+    <h2 class="section-title">Gear catalog</h2>
+    <p class="meta">
+      Brewhardware, filters, and tools tracked alongside the journal entries.
+    </p>
+    <div class="card-grid">
+      {items.map((item) => (
+        <article class="card">
+          <h3>{item.data.title}</h3>
+          <p class="meta">Category: {item.data.category}</p>
+          <p>{item.data.notes}</p>
+          <a href={`/beans/gear/${item.slug}`}>Gear details →</a>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
