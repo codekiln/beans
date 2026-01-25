@@ -1,0 +1,101 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const journals = (await getCollection("journal")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const recent = journals.slice(0, 3);
+const gears = await getCollection("gear");
+const recipes = await getCollection("recipes");
+---
+<BaseLayout
+  title="Beans | Coffee notes"
+  description="A handwritten-style coffee journal for brewing notes, gear, and recipes."
+>
+  <section class="section-card">
+    <h2 class="section-title">Coffee logbook</h2>
+    <p>
+      This site is a living notebook: daily brewing notes, gear settings, and
+      reflections on how coffee changes the way I think. It is structured like a
+      knowledge garden — recipes, tools, and journal entries all linked together
+      to make patterns show up over time.
+    </p>
+    <div class="split-grid">
+      <div class="note">
+        <h3>Daily flow</h3>
+        <p>
+          Each day starts with spoken notes in my private ChatGPT project. Those
+          notes are transformed into a structured entry: tasting notes, technique
+          tweaks, and how the brew felt.
+        </p>
+        <p class="highlight">Intentional, repeatable, and gentle.</p>
+      </div>
+      <div class="note">
+        <h3>Illustrations instead of photos</h3>
+        <p>
+          Photos are translated into soft illustrations before publishing. The
+          originals stay private; the public sees a sketch-like memory.
+        </p>
+        <div class="illustration-frame">
+          <div class="illustration-placeholder">Illustration preview zone</div>
+          <p>Use stylized images here in place of originals.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-card">
+    <h2 class="section-title">Recent journal entries</h2>
+    <div class="split-grid">
+      {recent.map((entry) => (
+        <article class="note">
+          <h3>
+            <a href={`/beans/journal/${entry.slug}`}>{entry.data.title}</a>
+          </h3>
+          <time datetime={entry.data.date.toISOString()}>
+            {entry.data.date.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </time>
+          <p>{entry.body.slice(0, 120)}...</p>
+          <div class="badge-row">
+            {entry.data.tags.map((tag) => (
+              <span class="badge">{tag}</span>
+            ))}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section-card">
+    <h2 class="section-title">Gear + recipes snapshot</h2>
+    <div class="split-grid">
+      <div class="note">
+        <h3>Gear catalog</h3>
+        <ul class="inline-list">
+          {gears.map((item) => (
+            <li>
+              <span>{item.data.title}</span>
+              <span>{item.data.category}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="note">
+        <h3>Favorite recipes</h3>
+        <ul class="inline-list">
+          {recipes.map((recipe) => (
+            <li>
+              <span>{recipe.data.title}</span>
+              <span>{recipe.data.method}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

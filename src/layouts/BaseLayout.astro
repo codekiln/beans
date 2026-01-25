@@ -1,0 +1,35 @@
+---
+const { title, description } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="stylesheet" href="/beans/styles/global.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="site-header">
+        <div>
+          <p class="site-kicker">codekiln/beans</p>
+          <h1 class="site-title">Beans</h1>
+          <p class="site-subtitle">Coffee notes for brewing, thinking, and tasting.</p>
+        </div>
+        <nav class="site-nav">
+          <a href="/beans/">Journal</a>
+          <a href="/beans/gear">Gear</a>
+          <a href="/beans/recipes">Recipes</a>
+        </nav>
+      </header>
+      <main>
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <p>Handwritten notes for a quieter caffeine life. Pseudonymous, public, and lightly stained.</p>
+      </footer>
+    </div>
+  </body>
+</html>

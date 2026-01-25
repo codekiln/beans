@@ -1,0 +1,240 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Space+Mono:wght@400;700&display=swap");
+
+:root {
+  color-scheme: light;
+  --ink: #2f2922;
+  --accent: #7a4a2a;
+  --accent-soft: rgba(122, 74, 42, 0.12);
+  --paper: #f7f1e8;
+  --graph: rgba(122, 74, 42, 0.12);
+  --shadow: rgba(0, 0, 0, 0.08);
+  --radius: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Mono", ui-monospace, monospace;
+  color: var(--ink);
+  background: #d9cfbf;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 32px 16px 48px;
+}
+
+.page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.site-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px;
+  background: var(--paper);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 40px var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.site-header::before,
+.site-header::after {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(122, 74, 42, 0.3), rgba(122, 74, 42, 0));
+  opacity: 0.4;
+}
+
+.site-header::before {
+  top: -60px;
+  right: -40px;
+}
+
+.site-header::after {
+  bottom: -90px;
+  left: -60px;
+}
+
+.site-kicker {
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.site-title {
+  margin: 4px 0 0;
+  font-family: "Caveat", cursive;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+}
+
+.site-subtitle {
+  margin: 8px 0 0;
+  font-size: 1rem;
+}
+
+.site-nav {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+}
+
+.site-nav a {
+  text-decoration: none;
+  color: var(--ink);
+  border-bottom: 2px solid transparent;
+  padding-bottom: 4px;
+}
+
+.site-nav a:hover,
+.site-nav a:focus {
+  border-color: var(--accent);
+}
+
+.section-card {
+  background: var(--paper);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: 0 18px 40px var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.section-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--graph) 1px, transparent 1px),
+    linear-gradient(90deg, var(--graph) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.section-card > * {
+  position: relative;
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-family: "Caveat", cursive;
+  font-size: 2rem;
+}
+
+.split-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.note {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px dashed var(--accent);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.note h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.note time {
+  font-size: 0.85rem;
+  color: rgba(47, 41, 34, 0.7);
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badge {
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  background: var(--accent-soft);
+}
+
+.highlight {
+  font-family: "Caveat", cursive;
+  font-size: 1.2rem;
+}
+
+.inline-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.inline-list li {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--accent);
+  padding-bottom: 6px;
+}
+
+.illustration-frame {
+  border: 2px dashed rgba(122, 74, 42, 0.6);
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.illustration-placeholder {
+  height: 180px;
+  background: linear-gradient(130deg, rgba(122, 74, 42, 0.25), rgba(255, 255, 255, 0.3));
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: rgba(47, 41, 34, 0.6);
+  font-size: 0.85rem;
+}
+
+.recipe-steps {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.site-footer {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+@media (min-width: 800px) {
+  .site-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

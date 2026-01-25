@@ -1,0 +1,57 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("journal");
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+<BaseLayout title={`Beans | ${entry.data.title}`} description={entry.data.title}>
+  <section class="section-card">
+    <h2 class="section-title">{entry.data.title}</h2>
+    <p class="badge-row">
+      <span class="badge">{entry.data.brewMethod ?? "Brew log"}</span>
+      {entry.data.mood && <span class="badge">Mood: {entry.data.mood}</span>}
+      {entry.data.caffeineMg && (
+        <span class="badge">{entry.data.caffeineMg}mg caffeine</span>
+      )}
+    </p>
+    <time datetime={entry.data.date.toISOString()}>
+      {entry.data.date.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })}
+    </time>
+    <div class="badge-row">
+      {entry.data.tags.map((tag) => (
+        <span class="badge">{tag}</span>
+      ))}
+    </div>
+    <article class="note">
+      <Content />
+    </article>
+    <div class="split-grid">
+      <div class="note">
+        <h3>Gear referenced</h3>
+        <ul>
+          {(entry.data.gear ?? []).map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </div>
+      <div class="note">
+        <h3>Recipe reference</h3>
+        <p>{entry.data.recipe ?? "Drafting a recipe link."}</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

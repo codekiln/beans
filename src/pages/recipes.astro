@@ -1,0 +1,45 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const recipes = await getCollection("recipes");
+---
+<BaseLayout title="Beans | Recipes" description="Core coffee recipes and brew ratios.">
+  <section class="section-card">
+    <h2 class="section-title">Brew recipes</h2>
+    <p>
+      These are the anchor recipes that I reference when logging journal entries.
+      Each recipe is tuned to a brewer and kept alongside tasting outcomes so
+      the process stays consistent.
+    </p>
+    <div class="split-grid">
+      {recipes.map((recipe) => (
+        <article class="note">
+          <h3>{recipe.data.title}</h3>
+          <p>
+            <strong>Method:</strong> {recipe.data.method}
+          </p>
+          <p>
+            <strong>Ratio:</strong> {recipe.data.ratio}
+          </p>
+          <p>
+            <strong>Grind:</strong> {recipe.data.grind}
+          </p>
+          <p>
+            <strong>Water:</strong> {recipe.data.waterTemp}
+          </p>
+          <p>
+            <strong>Brew time:</strong> {recipe.data.brewTime}
+          </p>
+          {recipe.data.steps && (
+            <ol class="recipe-steps">
+              {recipe.data.steps.map((step) => (
+                <li>{step}</li>
+              ))}
+            </ol>
+          )}
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

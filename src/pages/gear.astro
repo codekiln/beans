@@ -1,0 +1,27 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const gears = await getCollection("gear");
+---
+<BaseLayout title="Beans | Gear" description="Coffee gear catalog and settings.">
+  <section class="section-card">
+    <h2 class="section-title">Gear catalog</h2>
+    <p>
+      A working list of the gear that shows up in the journal. Each item links
+      to brews and recipes so that changes in grind size, filter, or brewer are
+      easy to trace.
+    </p>
+    <div class="split-grid">
+      {gears.map((item) => (
+        <article class="note">
+          <h3>{item.data.title}</h3>
+          <div class="badge-row">
+            <span class="badge">{item.data.category}</span>
+          </div>
+          <p>{item.data.notes}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
