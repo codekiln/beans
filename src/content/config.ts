@@ -18,7 +18,7 @@ const gear = defineCollection({
   schema: z.object({
     title: z.string(),
     category: z.enum(['grinder', 'brewer', 'filter', 'scale', 'kettle', 'other']),
-    acquired: z.string().optional(),
+    acquired: z.coerce.date().optional(),
     notes: z.string().optional(),
   }),
 });
