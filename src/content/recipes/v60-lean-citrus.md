@@ -1,10 +1,10 @@
 ---
 title: V60 Lean Citrus
 brewMethod: V60
-ratio: 1:16
+ratio: "1:16"
 grind: Medium-fine (Ode Gen 2 · 4.1)
 waterTemp: 94°C
-time: 3:10
+time: "3:10"
 yield: 320g
 tags:
   - citrus
