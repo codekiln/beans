@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BeanEntry from "../components/BeanEntry.astro";
+import { beans } from "../data/beans";
+
+const initialCommand = `$ bean log ${beans[0].date} ${beans[0].beanKey}`;
+---
+<BaseLayout title="Beans" description="A CLI-inspired coffee log." initialCommand={initialCommand}>
+  <section class="hero">
+    <h1>Beans: a coffee log in CLI form.</h1>
+    <p>
+      A knowledge garden for cups, tools, and attention. The command line is a metaphor; the
+      writing is the record.
+    </p>
+    <p>
+      <a href="/about/">[about]</a> · <a href="/equipment/">[equipment]</a>
+    </p>
+  </section>
+  {beans.map((bean) => (
+    <BeanEntry bean={bean} />
+  ))}
+</BaseLayout>

@@ -1,0 +1,84 @@
+---
+const { bean } = Astro.props;
+import TagRow from "./TagRow.astro";
+
+const command = `$ bean log ${bean.date} ${bean.beanKey}`;
+const cupEntries = Object.entries(bean.cup);
+const labelWidth = Math.max(
+  4,
+  ...cupEntries.map(([label]) => label.length)
+);
+const cupLines = [
+  "CUP",
+  ...cupEntries.map(([label, value]) => `${label.toUpperCase().padEnd(labelWidth)} ${value}`)
+];
+const innerWidth = Math.max(...cupLines.map((line) => line.length));
+const border = "─".repeat(innerWidth + 2);
+const asciiCup = [
+  `┌${border}┐`,
+  ...cupLines.map((line) => `│ ${line.padEnd(innerWidth)} │`),
+  `└${border}┘`
+].join("\n");
+---
+<article class="bean-entry" id={bean.slug} data-cli={command}>
+  <div class="ascii-block" aria-hidden="true">
+    <pre>{command}</pre>
+  </div>
+  <div class="bean-grid">
+    <div class="bean-main window">
+      <header>
+        <h2>{`BEAN ${bean.date} / ${bean.time}`}</h2>
+        <p class="ascii-block" aria-hidden="true">======================</p>
+      </header>
+      <TagRow tags={bean.tags} />
+      <section>
+        <h3 class="section-title">Coffee</h3>
+        <p>{bean.coffee.name}</p>
+        {bean.coffee.roast && <p>Roast: {bean.coffee.roast}</p>}
+        {bean.coffee.profile && <p>Profile: {bean.coffee.profile}</p>}
+        {bean.coffee.blend && <p>Blend: {bean.coffee.blend}</p>}
+      </section>
+      <section>
+        <h3 class="section-title">Brew</h3>
+        {bean.brew.brewer && <p>Brewer: {bean.brew.brewer}</p>}
+        {bean.brew.method && <p>Method: {bean.brew.method}</p>}
+      </section>
+      <section>
+        <h3 class="section-title">Observations</h3>
+        <ul>
+          {bean.observations.map((line) => (
+            <li>{line}</li>
+          ))}
+        </ul>
+      </section>
+    </div>
+    <aside class="bean-side" aria-label="Bean support panes">
+      <section class="window">
+        <table class="cup-table">
+          <caption>CUP</caption>
+          <tbody>
+            {cupEntries.map(([label, value]) => (
+              <tr>
+                <th scope="row">{label.toUpperCase()}</th>
+                <td>{value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div class="ascii-block" aria-hidden="true">
+          <pre>{asciiCup}</pre>
+        </div>
+      </section>
+      <section class="window">
+        <h3 class="section-title">Gear references</h3>
+        <ul>
+          {bean.gear.map((item) => (
+            <li>
+              {item.label}: <a href={`/equipment/${item.slug}/`}>{item.value}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </aside>
+  </div>
+</article>

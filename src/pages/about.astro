@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="About · Beans" description="About the beans log." initialCommand="$ bean about">
+  <section class="about-bean" aria-hidden="true">
+    <pre>
+        .-"""-.
+      .'  _   _ '.
+     /   (o) (o)  \
+    |     .-"-.    |
+    |    /     \   |
+     \   \     /  /
+      '._'---'_.'
+    </pre>
+  </section>
+  <section class="window">
+    <h1>About</h1>
+    <p>
+      Beans is a log of coffee, tools, attention, and mornings. Each bean marks a single
+      moment — a cup with a record of choices, weather, and how it landed.
+    </p>
+    <p>
+      The interface borrows from command-line notation, but the goal is readability and
+      clarity. Observations are written as plainly as possible, with structure that makes
+      change easy to notice.
+    </p>
+  </section>
+</BaseLayout>

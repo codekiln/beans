@@ -1,0 +1,13 @@
+---
+const { tags } = Astro.props;
+---
+<p class="tag-row" aria-label="Bean tags">
+  [
+  {tags.map((tag, index) => (
+    <Fragment>
+      <a class="tag-link" href={`/tags/${tag}/`}>{tag}</a>
+      {index < tags.length - 1 && " · "}
+    </Fragment>
+  ))}
+  ]
+</p>

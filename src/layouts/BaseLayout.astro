@@ -1,0 +1,79 @@
+---
+const {
+  title = "Beans",
+  description = "A coffee log.",
+  initialCommand = "$ bean log 2026-01-25 bean1"
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en" data-theme="auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" />
+    <link rel="stylesheet" href="/styles/global.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="cli-float">
+      <div class="cli-command" data-cli-command aria-hidden="true">{initialCommand}</div>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme">
+        <span aria-hidden="true">🫘</span>
+        <span class="theme-toggle-text">Theme</span>
+      </button>
+    </header>
+    <main id="main" class="page-shell">
+      <slot />
+    </main>
+    <footer class="page-shell footer">
+      <p>$ beans · a coffee log rendered as a lab notebook.</p>
+    </footer>
+    <script>
+      const root = document.documentElement;
+      const storedTheme = localStorage.getItem("beans-theme");
+      const media = window.matchMedia("(prefers-color-scheme: dark)");
+      const applyTheme = (value) => {
+        root.dataset.theme = value;
+      };
+      if (storedTheme) {
+        applyTheme(storedTheme);
+      } else {
+        applyTheme(media.matches ? "dark" : "light");
+      }
+      const toggle = document.querySelector("[data-theme-toggle]");
+      const toggleText = document.querySelector(".theme-toggle-text");
+      if (toggle) {
+        const updateLabel = () => {
+          if (toggleText) {
+            toggleText.textContent = root.dataset.theme === "dark" ? "Dark" : "Light";
+          }
+        };
+        updateLabel();
+        toggle.addEventListener("click", () => {
+          const next = root.dataset.theme === "dark" ? "light" : "dark";
+          applyTheme(next);
+          localStorage.setItem("beans-theme", next);
+          updateLabel();
+        });
+      }
+      const commandEl = document.querySelector("[data-cli-command]");
+      const entries = document.querySelectorAll("[data-cli]");
+      if (commandEl && entries.length) {
+        const observer = new IntersectionObserver(
+          (items) => {
+            const visible = items
+              .filter((item) => item.isIntersecting)
+              .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+            if (visible[0]) {
+              commandEl.textContent = visible[0].target.dataset.cli || commandEl.textContent;
+            }
+          },
+          { rootMargin: "-30% 0px -60% 0px", threshold: [0.3, 0.6, 1] }
+        );
+        entries.forEach((entry) => observer.observe(entry));
+      }
+    </script>
+  </body>
+</html>

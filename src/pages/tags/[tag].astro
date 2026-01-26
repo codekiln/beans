@@ -1,0 +1,24 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BeanEntry from "../../components/BeanEntry.astro";
+import { beans, allTags } from "../../data/beans";
+
+export function getStaticPaths() {
+  return allTags.map((tag) => ({ params: { tag } }));
+}
+
+const { tag } = Astro.params;
+const taggedBeans = beans.filter((bean) => bean.tags.includes(tag));
+---
+<BaseLayout title={`Tag: ${tag} · Beans`} description={`Beans tagged with ${tag}.`} initialCommand={`$ bean tag ${tag}`}>
+  <section class="hero">
+    <h1>Tag: {tag}</h1>
+    <p>{taggedBeans.length} bean(s) match this tag.</p>
+    <p>
+      <a href="/">[back to all beans]</a>
+    </p>
+  </section>
+  {taggedBeans.map((bean) => (
+    <BeanEntry bean={bean} />
+  ))}
+</BaseLayout>
