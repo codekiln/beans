@@ -1,0 +1,74 @@
+---
+import TagRow from "./TagRow.astro";
+
+const { bean } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
+const command = `$ bean log ${bean.date} ${bean.beanKey}`;
+const brewEntries = Object.entries(bean.brewTable);
+---
+<article class="bean-entry" id={bean.slug} data-cli={command}>
+  <div class="ascii-block" aria-hidden="true">
+    <pre>{command}</pre>
+  </div>
+  <div class="bean-grid">
+    <div class="bean-main window">
+      <header>
+        <h2>{`BEAN ${bean.date} / ${bean.time}`}</h2>
+        <p class="ascii-block" aria-hidden="true">======================</p>
+      </header>
+      <section>
+        <h3 class="section-title">Observations</h3>
+        <ul>
+          {bean.observations.map((line) => (
+            <li>{line}</li>
+          ))}
+        </ul>
+      </section>
+    </div>
+    <aside class="bean-side" aria-label="Bean support panes">
+      <section class="window">
+        <h3 class="section-title">Brew</h3>
+        <table class="cup-table">
+          <caption>Brew specifics</caption>
+          <tbody>
+            {brewEntries.map(([label, value]) => (
+              <tr>
+                <th scope="row">{label.toUpperCase()}</th>
+                <td>{value}</td>
+              </tr>
+            ))}
+            <tr>
+              <th scope="row">RECIPE</th>
+              <td>
+                <a href={`${baseUrl}recipes/${bean.brew.recipe.slug}/`}>{bean.brew.recipe.name}</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <h4 class="section-title">Brew notes</h4>
+          <ul>
+            {bean.brew.notes.map((note) => (
+              <li>{note}</li>
+            ))}
+          </ul>
+        </div>
+        <TagRow tags={bean.tags} />
+      </section>
+      <section class="window">
+        <h3 class="section-title">Gear</h3>
+        {bean.gear.length > 0 ? (
+          <ul>
+            {bean.gear.map((item) => (
+              <li>
+                {item.label}: <a href={`${baseUrl}equipment/${item.slug}/`}>{item.value}</a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No gear logged for this bean.</p>
+        )}
+      </section>
+    </aside>
+  </div>
+</article>

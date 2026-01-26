@@ -1,0 +1,30 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { equipment, equipmentTypes } from "../../data/equipment";
+
+const grouped = equipmentTypes.map((type) => ({
+  type,
+  items: equipment.filter((item) => item.type === type)
+}));
+const baseUrl = import.meta.env.BASE_URL;
+---
+<BaseLayout title="Equipment · Beans" description="Coffee gear references." initialCommand="$ bean equipment">
+  <section class="hero">
+    <h1>Equipment namespaces</h1>
+    <p>Grinders, brewers, and tools referenced by beans.</p>
+  </section>
+  {grouped.map((group) => (
+    <section class="window" aria-labelledby={`equipment-${group.type}`}>
+      <h2 id={`equipment-${group.type}`} class="section-title">
+        {group.type}
+      </h2>
+      <ul class="table-list">
+        {group.items.map((item) => (
+          <li>
+            <a href={`${baseUrl}equipment/${item.slug}/`}>[{item.name}]</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</BaseLayout>

@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { recipes } from "../../data/recipes";
+
+const baseUrl = import.meta.env.BASE_URL;
+---
+<BaseLayout title="Recipes · Beans" description="Brew recipes." initialCommand="$ bean recipes">
+  <section class="hero">
+    <h1>Recipes</h1>
+    <p>Brewing recipes referenced across the garden.</p>
+  </section>
+  <section class="window">
+    <ul class="table-list">
+      {recipes.map((recipe) => (
+        <li>
+          <a href={`${baseUrl}recipes/${recipe.slug}/`}>[{recipe.name}]</a>
+          <p>{recipe.summary}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
