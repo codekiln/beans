@@ -1,5 +1,97 @@
 export const beans = [
   {
+    id: "2026-01-26-bean2",
+    beanKey: "bean2",
+    slug: "2026-01-26-bean2",
+    date: "2026-01-26",
+    time: "06:13",
+    title: "Balanced cup, snow-day focus",
+    tags: ["balance", "snow", "debussy", "sweetness"],
+    coffee: {
+      roaster: { name: "Parable Coffee Co.", slug: "parable-coffee-co" },
+      roast: { name: "Mocha Java", slug: "mocha-java" },
+      roastLevel: "medium-dark",
+      profile: "dense · earthy berry · complete"
+    },
+    brew: {
+      brewer: { name: "Hario Switch", slug: "hario-switch" },
+      method: "Easy Immersion (closed switch)",
+      recipe: { name: "Easy Immersion", slug: "easy-immersion" },
+      notes: [
+        "Paper filter fully seated and pressed to cone walls.",
+        "Fast, confident clockwise pour; ~200 mL in quickly, all water in by ~1:00.",
+        "Switch closed during pour with no early drip-through.",
+        "Switch depressed at 2:30; drawdown complete by 3:48.",
+        "Grounds clung to the catchment, likely from residual moisture."
+      ]
+    },
+    brewDetails: {
+      dose: "16.1 g (16.0 g ground)",
+      water: "255.5 g",
+      ratio: "~1 : 15.9",
+      grinder: { name: "Timemore C5 ESP Pro", slug: "timemore-c5-esp-pro" },
+      grind: "1.8.3",
+      temp: "preheated, just off boil",
+      release: "2:30",
+      total: "3:48"
+    },
+    observations: [
+      "First sip: nutty, dense, immediately more balanced than cup 1.",
+      "Bitterness present but controlled, no longer gating the flavor.",
+      "A slight zingle sits adjacent to sweetness.",
+      "Later sips reveal emerging sweetness.",
+      "A faint berry note appears on the mid-palate.",
+      "Finish evokes burnt sienna and warm earth tones.",
+      "Blizzard aftermath: sidewalks freshly cleared, powdery snow drifting down.",
+      "Cars across the street snowed in up to the wheels.",
+      "On-campus work canceled for a snow day; Debussy in the background."
+    ],
+    gear: []
+  },
+  {
+    id: "2026-01-26-bean1",
+    beanKey: "bean1",
+    slug: "2026-01-26-bean1",
+    date: "2026-01-26",
+    time: "05:02",
+    title: "Coarser probe, early drip-through",
+    tags: ["drip-through", "coarser", "switch"],
+    coffee: {
+      roaster: { name: "Parable Coffee Co.", slug: "parable-coffee-co" },
+      roast: { name: "Mocha Java", slug: "mocha-java" },
+      roastLevel: "medium-dark",
+      profile: "dense · earthy berry · complete"
+    },
+    brew: {
+      brewer: { name: "Hario Switch", slug: "hario-switch" },
+      method: "Easy Immersion",
+      recipe: { name: "Easy Immersion", slug: "easy-immersion" },
+      notes: [
+        "Patagonia mug preheated before the brew.",
+        "Single clockwise pour with all water in by 1:40.",
+        "Switch was accidentally open at the start; minor drip-through in the first ~10 seconds.",
+        "Switch closed at ~2:34; drawdown after switch ~1:06.",
+        "Slightly coarser grind to probe flavor impact after yesterday."
+      ]
+    },
+    brewDetails: {
+      dose: "16.3 g",
+      water: "257.1 g",
+      ratio: "~1 : 15.8",
+      grinder: { name: "Timemore C5 ESP Pro", slug: "timemore-c5-esp-pro" },
+      grind: "1.8.3 (one click coarser than yesterday)",
+      temp: "just off boil (reheated after mug preheat)",
+      release: "~2:34",
+      total: "3:40"
+    },
+    observations: [
+      "Bed looks mostly even with a slight density gradient.",
+      "Curious whether early drip-through subtly affects extraction.",
+      "Intent was a controlled coarser probe after strong results yesterday."
+    ],
+    gear: []
+  },
+  {
     id: "2026-01-25-bean1",
     beanKey: "bean1",
     slug: "2026-01-25-bean1",
@@ -8,8 +100,9 @@ export const beans = [
     title: "Reference cup, gentle balance",
     tags: ["bitterness", "balance", "cooling"],
     coffee: {
-      name: "Parable Coffee Co. — Mocha Java",
-      roast: "medium-dark",
+      roaster: { name: "Parable Coffee Co.", slug: "parable-coffee-co" },
+      roast: { name: "Mocha Java", slug: "mocha-java" },
+      roastLevel: "medium-dark",
       profile: "dense · earthy berry · complete"
     },
     brew: {
@@ -46,7 +139,10 @@ export const beans = [
     title: "Mocha edge with synesthesia",
     tags: ["mocha", "synesthesia", "weather"],
     coffee: {
-      name: "Parable Coffee Co. — Mocha Java"
+      roaster: { name: "Parable Coffee Co.", slug: "parable-coffee-co" },
+      roast: { name: "Mocha Java", slug: "mocha-java" },
+      roastLevel: "medium-dark",
+      profile: "dense · earthy berry · complete"
     },
     brew: {
       brewer: { name: "Hario Switch", slug: "hario-switch" },
@@ -87,7 +183,8 @@ export const beans = [
     title: "Cold walk, music, grounded cup",
     tags: ["cold", "walking", "music"],
     coffee: {
-      name: "Parable Coffee Co.",
+      roaster: { name: "Parable Coffee Co.", slug: "parable-coffee-co" },
+      roast: { name: "Sourdough / Cold Winter Blend", slug: "sourdough-cold-winter-blend" },
       blend: "70% Sourdough · 30% Cold Winter"
     },
     brew: {
@@ -99,6 +196,7 @@ export const beans = [
     brewDetails: {
       dose: "25.0 g",
       water: "354.4 g",
+      ratio: "~1 : 14.2",
       time: "5:27"
     },
     observations: [

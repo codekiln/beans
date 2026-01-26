@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { roasters } from "../../data/roasters";
+import { withBase } from "../../utils/paths";
+---
+<BaseLayout title="Roasters · Beans" description="Coffee roasters referenced in the log." initialCommand="$ bean roasters">
+  <section class="hero">
+    <h1>Roaster index</h1>
+    <p>Roasters referenced by beans and their cataloged coffees.</p>
+  </section>
+  <section class="window">
+    <h2 class="section-title">Roasters</h2>
+    <ul class="table-list">
+      {roasters.map((roaster) => (
+        <li>
+          <a href={withBase(`/roasters/${roaster.slug}/`)}>[{roaster.name}]</a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

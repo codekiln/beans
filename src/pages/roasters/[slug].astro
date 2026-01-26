@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { roasters } from "../../data/roasters";
+import { coffees } from "../../data/coffees";
+import { withBase } from "../../utils/paths";
+
+export function getStaticPaths() {
+  return roasters.map((roaster) => ({ params: { slug: roaster.slug } }));
+}
+
+const { slug } = Astro.params;
+const roaster = roasters.find((entry) => entry.slug === slug);
+const roasterCoffees = coffees.filter((coffee) => coffee.roaster === slug);
+---
+<BaseLayout
+  title={`${roaster?.name ?? "Roaster"} · Beans`}
+  description={`Roaster profile for ${roaster?.name ?? "coffee"}.`}
+  initialCommand={`$ bean roaster ${roaster?.slug ?? ""}`.trim()}
+>
+  <section class="hero">
+    <h1>{roaster?.name}</h1>
+    <p>
+      <a href={withBase("/roasters/")}>[back to roasters]</a>
+    </p>
+  </section>
+  {roaster?.notes?.length ? (
+    <section class="window">
+      <h2 class="section-title">Notes</h2>
+      <ul>
+        {roaster.notes.map((note) => (
+          <li>{note}</li>
+        ))}
+      </ul>
+    </section>
+  ) : null}
+  <section class="window">
+    <h2 class="section-title">Roasts</h2>
+    {roasterCoffees.length ? (
+      <ul class="table-list">
+        {roasterCoffees.map((coffee) => (
+          <li>
+            <a href={withBase(`/coffees/${coffee.slug}/`)}>[{coffee.name}]</a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No roasts logged yet.</p>
+    )}
+  </section>
+</BaseLayout>
