@@ -1,12 +1,13 @@
 ---
+import { withBase } from "../utils/paths";
+
 const { tags } = Astro.props;
-const baseUrl = import.meta.env.BASE_URL;
 ---
 <p class="tag-row" aria-label="Bean tags">
   [
   {tags.map((tag, index) => (
     <Fragment>
-      <a class="tag-link" href={`${baseUrl}tags/${tag}/`}>{tag}</a>
+      <a class="tag-link" href={withBase(`/tags/${tag}/`)}>{tag}</a>
       {index < tags.length - 1 && " · "}
     </Fragment>
   ))}

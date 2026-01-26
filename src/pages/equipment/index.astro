@@ -1,12 +1,12 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { equipment, equipmentTypes } from "../../data/equipment";
+import { withBase } from "../../utils/paths";
 
 const grouped = equipmentTypes.map((type) => ({
   type,
   items: equipment.filter((item) => item.type === type)
 }));
-const baseUrl = import.meta.env.BASE_URL;
 ---
 <BaseLayout title="Equipment · Beans" description="Coffee gear references." initialCommand="$ bean equipment">
   <section class="hero">
@@ -21,7 +21,7 @@ const baseUrl = import.meta.env.BASE_URL;
       <ul class="table-list">
         {group.items.map((item) => (
           <li>
-            <a href={`${baseUrl}equipment/${item.slug}/`}>[{item.name}]</a>
+            <a href={withBase(`/equipment/${item.slug}/`)}>[{item.name}]</a>
           </li>
         ))}
       </ul>

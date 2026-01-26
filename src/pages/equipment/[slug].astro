@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { equipment } from "../../data/equipment";
+import { withBase } from "../../utils/paths";
 
 export function getStaticPaths() {
   return equipment.map((item) => ({ params: { slug: item.slug } }));
@@ -9,7 +10,6 @@ export function getStaticPaths() {
 const { slug } = Astro.params;
 const item = equipment.find((entry) => entry.slug === slug);
 const related = equipment.filter((entry) => item?.related.includes(entry.slug));
-const baseUrl = import.meta.env.BASE_URL;
 ---
 <BaseLayout
   title={`${item?.name ?? "Equipment"} · Beans`}
@@ -20,7 +20,7 @@ const baseUrl = import.meta.env.BASE_URL;
     <h1>{item?.name}</h1>
     <p>Namespace: {item?.type}</p>
     <p>
-      <a href={`${baseUrl}equipment/`}>[back to equipment]</a>
+      <a href={withBase("/equipment/")}>[back to equipment]</a>
     </p>
   </section>
   <section class="window">
@@ -37,7 +37,7 @@ const baseUrl = import.meta.env.BASE_URL;
       <ul>
         {related.map((entry) => (
           <li>
-            <a href={`${baseUrl}equipment/${entry.slug}/`}>[{entry.name}]</a>
+            <a href={withBase(`/equipment/${entry.slug}/`)}>[{entry.name}]</a>
           </li>
         ))}
       </ul>

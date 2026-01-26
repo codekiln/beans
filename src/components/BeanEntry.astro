@@ -1,8 +1,8 @@
 ---
 import TagRow from "./TagRow.astro";
+import { withBase } from "../utils/paths";
 
 const { bean } = Astro.props;
-const baseUrl = import.meta.env.BASE_URL;
 const command = `$ bean log ${bean.date} ${bean.beanKey}`;
 const brewEntries = Object.entries(bean.brewTable);
 ---
@@ -40,7 +40,7 @@ const brewEntries = Object.entries(bean.brewTable);
             <tr>
               <th scope="row">RECIPE</th>
               <td>
-                <a href={`${baseUrl}recipes/${bean.brew.recipe.slug}/`}>{bean.brew.recipe.name}</a>
+                <a href={withBase(`/recipes/${bean.brew.recipe.slug}/`)}>{bean.brew.recipe.name}</a>
               </td>
             </tr>
           </tbody>
@@ -61,7 +61,7 @@ const brewEntries = Object.entries(bean.brewTable);
           <ul>
             {bean.gear.map((item) => (
               <li>
-                {item.label}: <a href={`${baseUrl}equipment/${item.slug}/`}>{item.value}</a>
+                {item.label}: <a href={withBase(`/equipment/${item.slug}/`)}>{item.value}</a>
               </li>
             ))}
           </ul>

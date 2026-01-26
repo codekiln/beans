@@ -2,9 +2,9 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BeanEntry from "../components/BeanEntry.astro";
 import { beans } from "../data/beans";
+import { withBase } from "../utils/paths";
 
 const initialCommand = `$ bean log ${beans[0].date} ${beans[0].beanKey}`;
-const baseUrl = import.meta.env.BASE_URL;
 ---
 <BaseLayout title="Beans" description="A CLI-inspired coffee log." initialCommand={initialCommand}>
   <section class="hero">
@@ -14,8 +14,8 @@ const baseUrl = import.meta.env.BASE_URL;
       writing is the record.
     </p>
     <p>
-      <a href={`${baseUrl}about/`}>[about]</a> · <a href={`${baseUrl}equipment/`}>[equipment]</a> ·{" "}
-      <a href={`${baseUrl}recipes/`}>[recipes]</a>
+      <a href={withBase("/about/")}>[about]</a> · <a href={withBase("/equipment/")}>[equipment]</a> ·{" "}
+      <a href={withBase("/recipes/")}>[recipes]</a>
     </p>
   </section>
   {beans.map((bean) => (

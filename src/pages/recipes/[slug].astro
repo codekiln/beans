@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { recipes } from "../../data/recipes";
+import { withBase } from "../../utils/paths";
 
 export function getStaticPaths() {
   return recipes.map((recipe) => ({ params: { slug: recipe.slug } }));
@@ -8,7 +9,6 @@ export function getStaticPaths() {
 
 const { slug } = Astro.params;
 const recipe = recipes.find((entry) => entry.slug === slug);
-const baseUrl = import.meta.env.BASE_URL;
 ---
 <BaseLayout
   title={`${recipe?.name ?? "Recipe"} · Beans`}
@@ -19,7 +19,7 @@ const baseUrl = import.meta.env.BASE_URL;
     <h1>{recipe?.name}</h1>
     <p>{recipe?.summary}</p>
     <p>
-      <a href={`${baseUrl}recipes/`}>[back to recipes]</a>
+      <a href={withBase("/recipes/")}>[back to recipes]</a>
     </p>
   </section>
   <section class="window">

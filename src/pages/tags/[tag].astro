@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import BeanEntry from "../../components/BeanEntry.astro";
 import { beans, allTags } from "../../data/beans";
+import { withBase } from "../../utils/paths";
 
 export function getStaticPaths() {
   return allTags.map((tag) => ({ params: { tag } }));
@@ -9,14 +10,13 @@ export function getStaticPaths() {
 
 const { tag } = Astro.params;
 const taggedBeans = beans.filter((bean) => bean.tags.includes(tag));
-const baseUrl = import.meta.env.BASE_URL;
 ---
 <BaseLayout title={`Tag: ${tag} · Beans`} description={`Beans tagged with ${tag}.`} initialCommand={`$ bean tag ${tag}`}>
   <section class="hero">
     <h1>Tag: {tag}</h1>
     <p>{taggedBeans.length} bean(s) match this tag.</p>
     <p>
-      <a href={`${baseUrl}`}>[back to all beans]</a>
+      <a href={withBase("/")}>[back to all beans]</a>
     </p>
   </section>
   {taggedBeans.map((bean) => (
