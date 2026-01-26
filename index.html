@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Beans — Coffee Log</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="sticky-command" aria-hidden="true">
+      <div class="prompt">$ bean log 2026-01-25 bean2</div>
+    </header>
+
+    <button class="theme-toggle" type="button" aria-label="Toggle theme">
+      <span aria-hidden="true">🫘</span>
+    </button>
+
+    <main id="main">
+      <section class="intro window" aria-labelledby="intro-title">
+        <h1 id="intro-title">Beans</h1>
+        <p>
+          A CLI-inspired coffee log: one bean at a time, two cups a day,
+          structured data alongside quiet observations.
+        </p>
+        <p class="meta">
+          Default theme follows system preference. Manual toggle is the bean.
+        </p>
+      </section>
+
+      <section class="tag-filter window" aria-live="polite">
+        <h2>Tags</h2>
+        <p id="tag-status">Showing all beans.</p>
+        <p>
+          Choose a tag to filter. Clear the filter with
+          <a href="#">[ all beans ]</a>.
+        </p>
+      </section>
+
+      <section class="bean-list" aria-label="Bean log">
+        <article
+          class="bean"
+          id="bean-2026-01-25-1"
+          data-command="$ bean log 2026-01-25 bean1"
+          data-tags="bitterness,balance,cooling"
+        >
+          <header class="bean-header">
+            <p class="bean-command">$ bean log 2026-01-25 bean1</p>
+            <h2>BEAN 2026-01-25 / 05:33</h2>
+            <p class="tags">
+              <a class="tag" href="#tag-bitterness">[ bitterness ]</a>
+              <a class="tag" href="#tag-balance">[ balance ]</a>
+              <a class="tag" href="#tag-cooling">[ cooling ]</a>
+            </p>
+          </header>
+
+          <div class="window-grid">
+            <section class="window narrative" aria-labelledby="bean1-notes">
+              <h3 id="bean1-notes">Observations</h3>
+              <p>
+                Very even bed at finish. Drawdown was clean and unremarkable —
+                in a good way.
+              </p>
+              <p>
+                The cup opened sparkly. Balanced acidity up front, nothing sharp.
+                As it cooled, nutty overtones came forward and stayed.
+              </p>
+              <p>
+                This felt like a reference cup. Nothing exaggerated. Everything
+                in proportion.
+              </p>
+            </section>
+
+            <aside class="window support" aria-label="Coffee and brew data">
+              <section>
+                <h3>Coffee</h3>
+                <p>Parable Coffee Co. — Mocha Java</p>
+                <p>Roast: medium-dark</p>
+                <p>Profile: dense · earthy berry · complete</p>
+              </section>
+              <section>
+                <h3>Brew</h3>
+                <p>
+                  Brewer:
+                  <a href="/equipment/brewers/hario-switch/">Hario Switch</a>
+                </p>
+                <p>Method: Easy Immersion</p>
+                <pre class="ascii-box" aria-label="Cup stats">
+┌──────────────────────────┐
+│ CUP                      │
+│ DOSE     15.9 g           │
+│ WATER    250.3 g          │
+│ RATIO    ~1 : 15.7        │
+│ GRIND    (same as prior)  │
+│ RELEASE  2:30             │
+│ TOTAL    3:37             │
+└──────────────────────────┘
+                </pre>
+              </section>
+            </aside>
+          </div>
+        </article>
+
+        <article
+          class="bean"
+          id="bean-2026-01-25-2"
+          data-command="$ bean log 2026-01-25 bean2"
+          data-tags="mocha,synesthesia,weather"
+        >
+          <header class="bean-header">
+            <p class="bean-command">$ bean log 2026-01-25 bean2</p>
+            <h2>BEAN 2026-01-25 / 07:01</h2>
+            <p class="tags">
+              <a class="tag" href="#tag-mocha">[ mocha ]</a>
+              <a class="tag" href="#tag-synesthesia">[ synesthesia ]</a>
+              <a class="tag" href="#tag-weather">[ weather ]</a>
+            </p>
+          </header>
+
+          <div class="window-grid">
+            <section class="window narrative" aria-labelledby="bean2-notes">
+              <h3 id="bean2-notes">Notes</h3>
+              <p>
+                Simulated RDT — beans contacted residual water in the mug.
+              </p>
+              <p>
+                First sip was mocha-forward. A small, delicate burst right on the
+                tongue. Slightly hotter than the earlier cup.
+              </p>
+              <p>
+                Bitterness dropped into the range I like. When I pressed my
+                tongue to the roof of my mouth while swishing, the bitterness
+                registered as a high-pitched tone — felt behind the eyes rather
+                than on the tongue.
+              </p>
+              <p>
+                Overcast. Snowstorm imminent but not yet started. The cup felt
+                alert, not heavy.
+              </p>
+            </section>
+
+            <aside class="window support" aria-label="Coffee and brew data">
+              <section>
+                <h3>Coffee</h3>
+                <p>Parable Coffee Co. — Mocha Java</p>
+              </section>
+              <section>
+                <h3>Brew</h3>
+                <p>
+                  Brewer:
+                  <a href="/equipment/brewers/hario-switch/">Hario Switch</a>
+                </p>
+                <p>Method: Easy Immersion (minor workflow variations)</p>
+                <p>
+                  Grinder:
+                  <a href="/equipment/grinders/timemore-c5-esp-pro/"
+                    >Timemore C5 ESP Pro</a
+                  >
+                </p>
+                <pre class="ascii-box" aria-label="Cup stats">
+┌──────────────────────────┐
+│ CUP                      │
+│ DOSE     16.0 g           │
+│ WATER    256.8 g          │
+│ RATIO    1 : 16           │
+│ GRINDER  Timemore C5 ESP  │
+│ SETTING  1.8.1 (coarser)  │
+│ TEMP     ~90 °C           │
+│ RELEASE  2:30             │
+│ TOTAL    3:28             │
+└──────────────────────────┘
+                </pre>
+              </section>
+            </aside>
+          </div>
+        </article>
+
+        <article
+          class="bean"
+          id="bean-2026-01-24-2"
+          data-command="$ bean log 2026-01-24 bean2"
+          data-tags="cold,walking,music"
+        >
+          <header class="bean-header">
+            <p class="bean-command">$ bean log 2026-01-24 bean2</p>
+            <h2>BEAN 2026-01-24 / 06:15</h2>
+            <p class="tags">
+              <a class="tag" href="#tag-cold">[ cold ]</a>
+              <a class="tag" href="#tag-walking">[ walking ]</a>
+              <a class="tag" href="#tag-music">[ music ]</a>
+            </p>
+          </header>
+
+          <div class="window-grid">
+            <section class="window narrative" aria-labelledby="bean3-notes">
+              <h3 id="bean3-notes">Context</h3>
+              <p>Walking outside. ~10°F. Pink and purple on the horizon.</p>
+              <p>
+                Listening to the final minutes of Rachmaninoff Piano Concerto
+                No. 3. Eyes watered while drinking. Then Bach: Partita No. 2 in
+                C minor. Wanted to sit down and play.
+              </p>
+              <h3>Taste</h3>
+              <p>
+                The cold sharpened everything. The coffee felt grounding against
+                the music — less about flavor notes, more about staying present
+                in the body.
+              </p>
+            </section>
+
+            <aside class="window support" aria-label="Coffee and brew data">
+              <section>
+                <h3>Coffee</h3>
+                <p>Parable Coffee Co.</p>
+                <p>Blend: 70% Sourdough · 30% Cold Winter</p>
+              </section>
+              <section>
+                <h3>Brew</h3>
+                <p>Metal cone filter (no paper)</p>
+                <pre class="ascii-box" aria-label="Cup stats">
+┌──────────────────────────┐
+│ CUP                      │
+│ DOSE     25.0 g           │
+│ WATER    354.4 g          │
+│ TIME     5:27             │
+└──────────────────────────┘
+                </pre>
+              </section>
+            </aside>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer window">
+      <p>
+        <a href="/about/">About</a> ·
+        <a href="/equipment/">Equipment</a> ·
+        <a href="mailto:hello@codekiln.test">Contact</a>
+      </p>
+    </footer>
+
+    <script src="/script.js"></script>
+  </body>
+</html>
