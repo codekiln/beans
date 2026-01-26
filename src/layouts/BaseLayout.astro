@@ -1,5 +1,5 @@
 ---
-import { withBase } from "../utils/paths";
+import "../styles/global.css";
 
 const {
   title = "Beans",
@@ -15,7 +15,6 @@ const {
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" />
-    <link rel="stylesheet" href={withBase("/styles/global.css")} />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
