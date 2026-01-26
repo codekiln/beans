@@ -1,8 +1,7 @@
-import { base } from "astro:config";
-
 export const withBase = (path: string) => {
-  if (!base || base === "/") {
+  const base = import.meta.env.BASE_URL || "/";
+  if (base === "/") {
     return path;
   }
-  return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+  return `${base.replace(/\\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 };
