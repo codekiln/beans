@@ -68,10 +68,9 @@ const gearItems = [
             <li>{line}</li>
           ))}
         </ul>
+        <TagRow tags={bean.tags} />
       </section>
-    </div>
-    <aside class="bean-side" aria-label="Bean support panes">
-      <section class="window">
+      <section>
         <h3 class="section-title">Brew notes</h3>
         {bean.brew.notes?.length > 0 ? (
           <ul>
@@ -83,6 +82,8 @@ const gearItems = [
           <p>No brew notes logged for this cup.</p>
         )}
       </section>
+    </div>
+    <aside class="bean-side" aria-label="Bean support panes">
       <section class="window">
         <table class="cup-table">
           <caption>COFFEE</caption>
@@ -129,7 +130,6 @@ const gearItems = [
         ) : (
           <p>No additional gear logged for this cup.</p>
         )}
-        <TagRow tags={bean.tags} />
       </section>
     </aside>
   </div>
