@@ -3,5 +3,6 @@ export const withBase = (path: string) => {
   if (base === "/") {
     return path;
   }
-  return `${base.replace(/\\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+  const suffix = path.startsWith("/") ? path : `/${path}`;
+  return `${base.replace(/\\/$/, "")}${suffix}`;
 };
