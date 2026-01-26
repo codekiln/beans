@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { coffees } from "../../data/coffees";
+import { roasters } from "../../data/roasters";
+import { withBase } from "../../utils/paths";
+
+export function getStaticPaths() {
+  return coffees.map((coffee) => ({ params: { slug: coffee.slug } }));
+}
+
+const { slug } = Astro.params;
+const coffee = coffees.find((entry) => entry.slug === slug);
+const roaster = roasters.find((entry) => entry.slug === coffee?.roaster);
+---
+<BaseLayout
+  title={`${coffee?.name ?? "Coffee"} · Beans`}
+  description={`Coffee profile for ${coffee?.name ?? "roast"}.`}
+  initialCommand={`$ bean coffee ${coffee?.slug ?? ""}`.trim()}
+>
+  <section class="hero">
+    <h1>{coffee?.name}</h1>
+    {roaster ? (
+      <p>
+        Roaster: <a href={withBase(`/roasters/${roaster.slug}/`)}>{roaster.name}</a>
+      </p>
+    ) : null}
+    <p>
+      <a href={withBase("/coffees/")}>[back to coffees]</a>
+    </p>
+  </section>
+  <section class="window">
+    <h2 class="section-title">Details</h2>
+    <table class="cup-table">
+      <tbody>
+        <tr>
+          <th scope="row">ROAST LEVEL</th>
+          <td>{coffee?.roastLevel ?? "not recorded"}</td>
+        </tr>
+        <tr>
+          <th scope="row">PROFILE</th>
+          <td>{coffee?.profile ?? "not recorded"}</td>
+        </tr>
+        <tr>
+          <th scope="row">BLEND</th>
+          <td>{coffee?.blend ?? "not recorded"}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</BaseLayout>

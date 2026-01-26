@@ -1,0 +1,15 @@
+---
+import { withBase } from "../utils/paths";
+
+const { tags } = Astro.props;
+---
+<p class="tag-row" aria-label="Bean tags">
+  [
+  {tags.map((tag, index) => (
+    <Fragment>
+      <a class="tag-link" href={withBase(`/tags/${tag}/`)}>{tag}</a>
+      {index < tags.length - 1 && " · "}
+    </Fragment>
+  ))}
+  ]
+</p>

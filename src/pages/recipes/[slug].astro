@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { recipes } from "../../data/recipes";
+import { withBase } from "../../utils/paths";
+
+export function getStaticPaths() {
+  return recipes.map((recipe) => ({ params: { slug: recipe.slug } }));
+}
+
+const { slug } = Astro.params;
+const recipe = recipes.find((entry) => entry.slug === slug);
+---
+<BaseLayout
+  title={`${recipe?.name ?? "Recipe"} · Beans`}
+  description={`Recipe details for ${recipe?.name ?? "brew"}.`}
+  initialCommand={`$ bean recipe ${recipe?.slug ?? ""}`.trim()}
+>
+  <section class="hero">
+    <h1>{recipe?.name}</h1>
+    <p>{recipe?.summary}</p>
+    <p>
+      <a href={withBase("/recipes/")}>[back to recipes]</a>
+    </p>
+  </section>
+  <section class="window">
+    <h2 class="section-title">Steps</h2>
+    <ol>
+      {recipe?.steps.map((step) => (
+        <li>{step}</li>
+      ))}
+    </ol>
+  </section>
+</BaseLayout>

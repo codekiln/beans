@@ -1,0 +1,27 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { coffees } from "../../data/coffees";
+import { roasters } from "../../data/roasters";
+import { withBase } from "../../utils/paths";
+
+const roasterBySlug = Object.fromEntries(roasters.map((roaster) => [roaster.slug, roaster]));
+---
+<BaseLayout title="Coffees · Beans" description="Coffee roasts referenced in the log." initialCommand="$ bean coffees">
+  <section class="hero">
+    <h1>Coffee catalog</h1>
+    <p>Roasts and blends referenced by beans.</p>
+  </section>
+  <section class="window">
+    <h2 class="section-title">Coffees</h2>
+    <ul class="table-list">
+      {coffees.map((coffee) => (
+        <li>
+          <a href={withBase(`/coffees/${coffee.slug}/`)}>[{coffee.name}]</a>
+          {roasterBySlug[coffee.roaster] ? (
+            <> · <a href={withBase(`/roasters/${coffee.roaster}/`)}>{roasterBySlug[coffee.roaster].name}</a></>
+          ) : null}
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

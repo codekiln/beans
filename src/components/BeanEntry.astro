@@ -1,0 +1,136 @@
+---
+import TagRow from "./TagRow.astro";
+import { withBase } from "../utils/paths";
+
+const { bean } = Astro.props;
+const command = `$ bean log ${bean.date} ${bean.beanKey}`;
+
+const coffeeRows = [
+  bean.coffee.roaster && {
+    label: "roaster",
+    value: bean.coffee.roaster.name,
+    href: withBase(`/roasters/${bean.coffee.roaster.slug}/`)
+  },
+  bean.coffee.roast && {
+    label: "coffee",
+    value: bean.coffee.roast.name,
+    href: withBase(`/coffees/${bean.coffee.roast.slug}/`)
+  },
+  bean.coffee.roastLevel && { label: "roast level", value: bean.coffee.roastLevel },
+  bean.coffee.profile && { label: "profile", value: bean.coffee.profile },
+  bean.coffee.blend && { label: "blend", value: bean.coffee.blend }
+].filter(Boolean);
+
+const grindValue = bean.brewDetails.grind ?? bean.brewDetails.setting;
+const brewDetailsRows = [
+  {
+    label: "recipe",
+    value: bean.brew.recipe?.name ?? "unspecified",
+    href: bean.brew.recipe ? withBase(`/recipes/${bean.brew.recipe.slug}/`) : null
+  },
+  { label: "dose", value: bean.brewDetails.dose ?? "not recorded" },
+  { label: "grind", value: grindValue ?? "not recorded" },
+  { label: "water", value: bean.brewDetails.water ?? "not recorded" },
+  { label: "ratio", value: bean.brewDetails.ratio ?? "not recorded" },
+  { label: "temp", value: bean.brewDetails.temp ?? "not recorded" },
+  { label: "release", value: bean.brewDetails.release ?? "not recorded" },
+  { label: "total", value: bean.brewDetails.total ?? "not recorded" }
+];
+
+const gearItems = [
+  bean.brew.brewer && {
+    label: "brewer",
+    value: bean.brew.brewer.name,
+    slug: bean.brew.brewer.slug
+  },
+  bean.brewDetails.grinder && {
+    label: "grinder",
+    value: bean.brewDetails.grinder.name,
+    slug: bean.brewDetails.grinder.slug
+  },
+  ...(bean.gear ?? [])
+].filter(Boolean);
+---
+<article class="bean-entry" id={bean.slug} data-cli={command}>
+  <div class="ascii-block" aria-hidden="true">
+    <pre>{command}</pre>
+  </div>
+  <div class="bean-grid">
+    <div class="bean-main window">
+      <header>
+        <h2>{`BEAN ${bean.date} / ${bean.time}`}</h2>
+        <p class="ascii-block" aria-hidden="true">======================</p>
+      </header>
+      <section>
+        <h3 class="section-title">Observations</h3>
+        <ul>
+          {bean.observations.map((line) => (
+            <li>{line}</li>
+          ))}
+        </ul>
+        <TagRow tags={bean.tags} />
+      </section>
+      <section>
+        <h3 class="section-title">Brew notes</h3>
+        {bean.brew.notes?.length > 0 ? (
+          <ul>
+            {bean.brew.notes.map((note) => (
+              <li>{note}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No brew notes logged for this cup.</p>
+        )}
+      </section>
+    </div>
+    <aside class="bean-side" aria-label="Bean support panes">
+      <section class="window">
+        <table class="cup-table">
+          <caption>COFFEE</caption>
+          <tbody>
+            {coffeeRows.map((row) => (
+              <tr>
+                <th scope="row">{row.label.toUpperCase()}</th>
+                <td>
+                  {row.href ? <a href={row.href}>{row.value}</a> : row.value}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+      <section class="window">
+        <table class="cup-table">
+          <caption>BREW DETAILS</caption>
+          <tbody>
+            {brewDetailsRows.map((row) => (
+              <tr>
+                <th scope="row">{row.label.toUpperCase()}</th>
+                <td>{row.href ? <a href={row.href}>{row.value}</a> : row.value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+      <section class="window">
+        <h3 class="section-title">Gear</h3>
+        {gearItems.length ? (
+          <ul>
+            {gearItems.map((item) => (
+              <li>
+                {item.label}:{" "}
+                {item.slug ? (
+                  <a href={withBase(`/equipment/${item.slug}/`)}>{item.value}</a>
+                ) : (
+                  item.value
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No additional gear logged for this cup.</p>
+        )}
+      </section>
+    </aside>
+  </div>
+</article>

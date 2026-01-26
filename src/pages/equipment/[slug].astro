@@ -1,0 +1,46 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { equipment } from "../../data/equipment";
+import { withBase } from "../../utils/paths";
+
+export function getStaticPaths() {
+  return equipment.map((item) => ({ params: { slug: item.slug } }));
+}
+
+const { slug } = Astro.params;
+const item = equipment.find((entry) => entry.slug === slug);
+const related = equipment.filter((entry) => item?.related.includes(entry.slug));
+---
+<BaseLayout
+  title={`${item?.name ?? "Equipment"} · Beans`}
+  description={`Equipment reference for ${item?.name ?? "gear"}.`}
+  initialCommand={`$ bean ${item?.type ?? "equipment"} ${item?.slug ?? ""}`.trim()}
+>
+  <section class="hero">
+    <h1>{item?.name}</h1>
+    <p>Namespace: {item?.type}</p>
+    <p>
+      <a href={withBase("/equipment/")}>[back to equipment]</a>
+    </p>
+  </section>
+  <section class="window">
+    <h2 class="section-title">Notes</h2>
+    <ul>
+      {item?.notes.map((note) => (
+        <li>{note}</li>
+      ))}
+    </ul>
+  </section>
+  {related.length > 0 && (
+    <section class="window">
+      <h2 class="section-title">Related</h2>
+      <ul>
+        {related.map((entry) => (
+          <li>
+            <a href={withBase(`/equipment/${entry.slug}/`)}>[{entry.name}]</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</BaseLayout>

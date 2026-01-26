@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { recipes } from "../../data/recipes";
+import { withBase } from "../../utils/paths";
+---
+<BaseLayout title="Recipes · Beans" description="Brew recipes used in the beans log." initialCommand="$ bean recipes">
+  <section class="hero">
+    <h1>Recipes</h1>
+    <p>Documented brew workflows referenced by beans.</p>
+  </section>
+  <section class="window">
+    <ul class="table-list">
+      {recipes.map((recipe) => (
+        <li>
+          <a href={withBase(`/recipes/${recipe.slug}/`)}>[{recipe.name}]</a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
