@@ -23,27 +23,27 @@ const coffeeRows = [
 
 const grindValue = bean.brewDetails.grind ?? bean.brewDetails.setting;
 const brewDetailsRows = [
-  {
+  bean.brew.recipe && {
     label: "recipe",
-    value: bean.brew.recipe?.name ?? "unspecified",
-    href: bean.brew.recipe ? withBase(`/recipes/${bean.brew.recipe.slug}/`) : null
+    value: bean.brew.recipe.name,
+    href: withBase(`/recipes/${bean.brew.recipe.slug}/`)
   },
-  { label: "dose", value: bean.brewDetails.dose ?? "not recorded" },
-  { label: "grind", value: grindValue ?? "not recorded" },
-  { label: "water", value: bean.brewDetails.water ?? "not recorded" },
-  { label: "ratio", value: bean.brewDetails.ratio ?? "not recorded" },
-  { label: "temp", value: bean.brewDetails.temp ?? "not recorded" },
-  {
+  bean.brewDetails.dose && { label: "dose", value: bean.brewDetails.dose },
+  grindValue && { label: "grind", value: grindValue },
+  bean.brewDetails.water && { label: "water", value: bean.brewDetails.water },
+  bean.brewDetails.ratio && { label: "ratio", value: bean.brewDetails.ratio },
+  bean.brewDetails.temp && { label: "temp", value: bean.brewDetails.temp },
+  bean.brewDetails.release && {
     label: "release time",
-    value: bean.brewDetails.release ?? "not recorded",
+    value: bean.brewDetails.release,
     definition: "Time when the brew valve is opened or the release step begins."
   },
-  {
+  bean.brewDetails.total && {
     label: "total brew time",
-    value: bean.brewDetails.total ?? "not recorded",
+    value: bean.brewDetails.total,
     definition: "Total time from first pour to the end of drawdown."
   }
-];
+].filter(Boolean);
 
 const gearItems = [
   bean.brew.brewer && {
@@ -93,40 +93,48 @@ const gearItems = [
     </div>
     <aside class="bean-side" aria-label="Bean support panes">
       <section class="window">
-        <table class="cup-table">
-          <caption>COFFEE</caption>
-          <tbody>
-            {coffeeRows.map((row) => (
-              <tr>
-                <th scope="row">{row.label.toUpperCase()}</th>
-                <td>
-                  {row.href ? <a href={row.href}>{row.value}</a> : row.value}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {coffeeRows.length > 0 ? (
+          <table class="cup-table">
+            <caption>COFFEE</caption>
+            <tbody>
+              {coffeeRows.map((row) => (
+                <tr>
+                  <th scope="row">{row.label.toUpperCase()}</th>
+                  <td>
+                    {row.href ? <a href={row.href}>{row.value}</a> : row.value}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No coffee details logged for this cup.</p>
+        )}
       </section>
       <section class="window">
-        <table class="cup-table">
-          <caption>BREW DETAILS</caption>
-          <tbody>
-            {brewDetailsRows.map((row) => (
-              <tr>
-                <th scope="row">
-                  <span>{row.label.toUpperCase()}</span>
-                  {row.definition && (
-                    <details>
-                      <summary aria-label={`Definition: ${row.label}`}>ⓘ</summary>
-                      <p>{row.definition}</p>
-                    </details>
-                  )}
-                </th>
-                <td>{row.href ? <a href={row.href}>{row.value}</a> : row.value}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {brewDetailsRows.length > 0 ? (
+          <table class="cup-table">
+            <caption>BREW DETAILS</caption>
+            <tbody>
+              {brewDetailsRows.map((row) => (
+                <tr>
+                  <th scope="row">
+                    <span>{row.label.toUpperCase()}</span>
+                    {row.definition && (
+                      <details>
+                        <summary aria-label={`Definition: ${row.label}`}>ⓘ</summary>
+                        <p>{row.definition}</p>
+                      </details>
+                    )}
+                  </th>
+                  <td>{row.href ? <a href={row.href}>{row.value}</a> : row.value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No brew details logged for this cup.</p>
+        )}
       </section>
       <section class="window">
         <h3 class="section-title">Gear</h3>
