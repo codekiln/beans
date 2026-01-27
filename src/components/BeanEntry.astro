@@ -33,8 +33,16 @@ const brewDetailsRows = [
   { label: "water", value: bean.brewDetails.water ?? "not recorded" },
   { label: "ratio", value: bean.brewDetails.ratio ?? "not recorded" },
   { label: "temp", value: bean.brewDetails.temp ?? "not recorded" },
-  { label: "release", value: bean.brewDetails.release ?? "not recorded" },
-  { label: "total", value: bean.brewDetails.total ?? "not recorded" }
+  {
+    label: "release time",
+    value: bean.brewDetails.release ?? "not recorded",
+    definition: "Time when the brew valve is opened or the release step begins."
+  },
+  {
+    label: "total brew time",
+    value: bean.brewDetails.total ?? "not recorded",
+    definition: "Total time from first pour to the end of drawdown."
+  }
 ];
 
 const gearItems = [
@@ -105,7 +113,15 @@ const gearItems = [
           <tbody>
             {brewDetailsRows.map((row) => (
               <tr>
-                <th scope="row">{row.label.toUpperCase()}</th>
+                <th scope="row">
+                  <span>{row.label.toUpperCase()}</span>
+                  {row.definition && (
+                    <details>
+                      <summary aria-label={`Definition: ${row.label}`}>ⓘ</summary>
+                      <p>{row.definition}</p>
+                    </details>
+                  )}
+                </th>
                 <td>{row.href ? <a href={row.href}>{row.value}</a> : row.value}</td>
               </tr>
             ))}
