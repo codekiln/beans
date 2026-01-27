@@ -22,6 +22,18 @@ const resolvedLinkHref = initialLinkHref ?? withBase(Astro.url.pathname);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const storedTheme = localStorage.getItem("beans-theme");
+        if (storedTheme === "light" || storedTheme === "dark") {
+          root.dataset.theme = storedTheme;
+          return;
+        }
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        root.dataset.theme = prefersDark ? "dark" : "light";
+      })();
+    </script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" />
   </head>
   <body>
