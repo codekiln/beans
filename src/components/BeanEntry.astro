@@ -84,6 +84,11 @@ const gearItems = [
             <li>{line}</li>
           ))}
         </ul>
+        {bean.image && (
+          <figure class="bean-observation-media">
+            <img src={withBase(bean.image.src)} alt={bean.image.alt} loading="lazy" />
+          </figure>
+        )}
         <TagRow tags={bean.tags} />
       </section>
       <section>

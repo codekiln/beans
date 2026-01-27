@@ -242,6 +242,20 @@ button:focus-visible {
   margin: 0.5rem 0 1rem;
 }
 
+.bean-observation-media {
+  margin: 1rem 0 0.75rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.bean-observation-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .cup-table {
   width: 100%;
   border-collapse: collapse;

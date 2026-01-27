@@ -1,5 +1,64 @@
 export const beans = [
   {
+    id: "2026-01-27-bean2",
+    beanKey: "bean2",
+    slug: "2026-01-27-bean2",
+    date: "2026-01-27",
+    time: "07:05",
+    title: "Walking tasting, unvectored palate",
+    tags: ["walking", "quiet", "snow", "cup2", "morning", "tasting"],
+    image: {
+      src: "/images/2026-01-27-bean2.png",
+      alt: "Snowy riverbank with a Patagonia mug on a stone ledge during a quiet winter walk."
+    },
+    coffee: {
+      roaster: { name: "Parable Coffee Co.", slug: "parable-coffee-co" },
+      roast: { name: "Mocha Java", slug: "mocha-java" },
+      roastLevel: "medium-dark",
+      profile: "dense · earthy berry · complete"
+    },
+    brew: {
+      brewer: { name: "Hario Switch", slug: "hario-switch" },
+      method: "Easy Immersion (closed switch)",
+      recipe: { name: "Easy Immersion", slug: "easy-immersion" },
+      notes: [
+        "Preheated the Patagonia mug and brewer to hold warmth for the walk.",
+        "Allowed late-contact drips after drawdown to finish before heading out."
+      ]
+    },
+    brewDetails: {
+      dose: "16.0 g",
+      water: "256.2 g",
+      ratio: "1 : 16",
+      grinder: { name: "Timemore C5 ESP Pro", slug: "timemore-c5-esp-pro" },
+      grind: "0.8.3",
+      temp: "~90 °C",
+      release: "2:30",
+      total: "3:32"
+    },
+    observations: [
+      "Tasting notes — cup 2 (walking tasting).",
+      "Overall impression: subtle, gentle, well-balanced; quieter than expected.",
+      "Intensity: low–medium; noticeably paler than Parable Mocha Java.",
+      "Sweetness: soft, diffuse sweetness that lives on the edges of the tongue rather than the center.",
+      "Bitterness: present but restrained; slightly elevated by late-contact drips after drawdown.",
+      "Acidity: muted; no sharp point or spark.",
+      "Body: light, a bit airy; no weighty mid-palate.",
+      "Finish: clean, slightly dry; fades rather than resolves.",
+      "Temperature effects: held warmth well due to preheated mug/brewer; flavors opened gently as it cooled.",
+      "Contextual perception: tasted while walking in deep snow just after sunrise (~6°F); crisp air sharpened awareness but did not amplify flavor.",
+      "Comparison anchor: less assertive and less directional than Parable Coffee Co. Mocha Java.",
+      "Meta-note: palate feels unvectored — no clear axis to push sweetness, acidity, or bitterness along."
+    ],
+    gear: [
+      {
+        label: "scale",
+        value: "Maestri House Mini Coffee Scale",
+        slug: "maestri-house-mini-scale"
+      }
+    ]
+  },
+  {
     id: "2026-01-27-bean1",
     beanKey: "bean1",
     slug: "2026-01-27-bean1",
