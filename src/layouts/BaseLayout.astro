@@ -19,7 +19,7 @@ const {
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="cli-float">
-      <div class="cli-command" data-cli-command aria-hidden="true">{initialCommand}</div>
+      <a class="cli-command" data-cli-command href={Astro.site?.pathname ?? "/"}>{initialCommand}</a>
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme">
         <span aria-hidden="true">🫘</span>
         <span class="theme-toggle-text sr-only">Theme</span>
