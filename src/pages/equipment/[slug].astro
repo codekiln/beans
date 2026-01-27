@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { equipment } from "../../data/equipment";
+import { beans } from "../../data/beans";
 import { withBase } from "../../utils/paths";
 
 export function getStaticPaths() {
@@ -16,6 +17,23 @@ const item =
   equipment.find((entry) => entry.aliases?.some((alias) => alias.slug === slug));
 const alias = item?.aliases?.find((entry) => entry.slug === slug);
 const related = equipment.filter((entry) => item?.related.includes(entry.slug));
+const gearSlugs = new Set([item?.slug, ...(item?.aliases?.map((entry) => entry.slug) ?? [])]);
+const relatedBeans = beans
+  .filter((bean) => {
+    const brewerSlug = bean.brew?.brewer?.slug;
+    const grinderSlug = bean.brewDetails?.grinder?.slug;
+    const extraGear = bean.gear?.map((entry) => entry.slug) ?? [];
+    return (
+      (brewerSlug && gearSlugs.has(brewerSlug)) ||
+      (grinderSlug && gearSlugs.has(grinderSlug)) ||
+      extraGear.some((entry) => entry && gearSlugs.has(entry))
+    );
+  })
+  .sort((a, b) => {
+    const left = new Date(`${a.date}T${a.time}:00`);
+    const right = new Date(`${b.date}T${b.time}:00`);
+    return right.getTime() - left.getTime();
+  });
 ---
 <BaseLayout
   title={`${item?.name ?? "Equipment"} · Beans`}
@@ -50,6 +68,22 @@ const related = equipment.filter((entry) => item?.related.includes(entry.slug));
       </ul>
     </section>
   )}
+  <section class="window">
+    <h2 class="section-title">Recent beans</h2>
+    {relatedBeans.length > 0 ? (
+      <ul>
+        {relatedBeans.map((bean) => (
+          <li>
+            <a href={withBase(`/#${bean.slug}`)}>
+              {bean.date} {bean.time} · {bean.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No beans logged with this gear yet.</p>
+    )}
+  </section>
   {item?.references?.length > 0 && (
     <section class="window">
       <h2 class="section-title">References</h2>
