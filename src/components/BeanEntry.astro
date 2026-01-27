@@ -3,7 +3,9 @@ import TagRow from "./TagRow.astro";
 import { withBase } from "../utils/paths";
 
 const { bean } = Astro.props;
-const command = `$ bean log ${bean.date} ${bean.beanKey}`;
+const logCommand = `log ${bean.date} ${bean.beanKey}`;
+const command = `$ bean ${logCommand}`;
+const detailHref = withBase(`/log/${bean.slug}/`);
 
 const coffeeRows = [
   bean.coffee.roaster && {
@@ -59,7 +61,13 @@ const gearItems = [
   ...(bean.gear ?? [])
 ].filter(Boolean);
 ---
-<article class="bean-entry" id={bean.slug} data-cli={command}>
+<article
+  class="bean-entry"
+  id={bean.slug}
+  data-cli={command}
+  data-cli-log={logCommand}
+  data-cli-href={detailHref}
+>
   <div class="ascii-block" aria-hidden="true">
     <pre>{command}</pre>
   </div>

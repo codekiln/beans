@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BeanEntry from "../../components/BeanEntry.astro";
+import { beans } from "../../data/beans";
+import { withBase } from "../../utils/paths";
+
+export function getStaticPaths() {
+  return beans.map((bean, index) => ({
+    params: { slug: bean.slug },
+    props: {
+      bean,
+      prev: index > 0 ? beans[index - 1] : null,
+      next: index < beans.length - 1 ? beans[index + 1] : null
+    }
+  }));
+}
+
+const { bean, prev, next } = Astro.props;
+const initialCommand = `$ bean log ${bean.date} ${bean.beanKey}`;
+const initialLinkHref = withBase(`/log/${bean.slug}/`);
+---
+<BaseLayout
+  title={`Bean ${bean.date} ${bean.beanKey} · Beans`}
+  description={bean.title}
+  initialCommand={initialCommand}
+  initialLinkHref={initialLinkHref}
+>
+  <section class="bean-detail">
+    <BeanEntry bean={bean} />
+    <nav class="bean-nav" aria-label="Bean log navigation">
+      {prev ? (
+        <a class="bean-nav-link" href={withBase(`/log/${prev.slug}/`)}>
+          ← Prev: {prev.date} {prev.beanKey}
+        </a>
+      ) : (
+        <span class="bean-nav-muted">← Prev</span>
+      )}
+      {next ? (
+        <a class="bean-nav-link" href={withBase(`/log/${next.slug}/`)}>
+          Next: {next.date} {next.beanKey} →
+        </a>
+      ) : (
+        <span class="bean-nav-muted">Next →</span>
+      )}
+    </nav>
+    <p class="bean-back">
+      <a href={withBase("/")}>Back to all beans</a>
+    </p>
+  </section>
+</BaseLayout>

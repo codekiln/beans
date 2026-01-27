@@ -5,8 +5,14 @@ import { beans } from "../data/beans";
 import { withBase } from "../utils/paths";
 
 const initialCommand = `$ bean log ${beans[0].date} ${beans[0].beanKey}`;
+const initialLinkHref = withBase(`/log/${beans[0].slug}/`);
 ---
-<BaseLayout title="Beans" description="A CLI-inspired coffee log." initialCommand={initialCommand}>
+<BaseLayout
+  title="Beans"
+  description="A CLI-inspired coffee log."
+  initialCommand={initialCommand}
+  initialLinkHref={initialLinkHref}
+>
   <section class="hero">
     <h1>Beans: a coffee log in CLI form.</h1>
     <p>

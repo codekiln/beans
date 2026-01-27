@@ -114,6 +114,13 @@ button:focus-visible {
   gap: 1rem;
 }
 
+.cli-command-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .cli-command {
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -160,6 +167,10 @@ button:focus-visible {
 
 .bean-entry {
   margin-bottom: 3rem;
+}
+
+.bean-detail .bean-entry {
+  margin-bottom: 2rem;
 }
 
 .bean-grid {
@@ -247,6 +258,26 @@ button:focus-visible {
   border-top: 1px dashed var(--border);
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.bean-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5rem 0 0.5rem;
+  font-size: 0.95rem;
+}
+
+.bean-nav-link {
+  text-decoration-thickness: 2px;
+}
+
+.bean-nav-muted {
+  color: var(--muted);
+}
+
+.bean-back {
+  margin: 0 0 2rem;
 }
 
 .table-list {

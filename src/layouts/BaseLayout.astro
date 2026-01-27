@@ -1,11 +1,19 @@
 ---
 import "../styles/global.css";
+import { withBase } from "../utils/paths";
 
 const {
   title = "Beans",
   description = "A coffee log.",
-  initialCommand = "$ bean log 2026-01-25 bean1"
+  initialCommand = "$ bean log 2026-01-25 bean1",
+  initialLinkHref
 } = Astro.props;
+
+const beanPrefix = "$ bean";
+const initialLog = initialCommand.startsWith(beanPrefix)
+  ? initialCommand.slice(beanPrefix.length).trim()
+  : initialCommand;
+const resolvedLinkHref = initialLinkHref ?? withBase(Astro.url.pathname);
 ---
 <!doctype html>
 <html lang="en" data-theme="auto">
@@ -19,7 +27,10 @@ const {
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="cli-float">
-      <a class="cli-command" data-cli-command href={Astro.site?.pathname ?? "/"}>{initialCommand}</a>
+      <div class="cli-command-group" aria-label="Beans command">
+        <a class="cli-command" data-cli-home href={withBase("/")}>$ bean</a>
+        <a class="cli-command" data-cli-link href={resolvedLinkHref}>{initialLog}</a>
+      </div>
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme">
         <span aria-hidden="true">🫘</span>
         <span class="theme-toggle-text sr-only">Theme</span>
@@ -59,16 +70,22 @@ const {
           updateLabel();
         });
       }
-      const commandEl = document.querySelector("[data-cli-command]");
-      const entries = document.querySelectorAll("[data-cli]");
-      if (commandEl && entries.length) {
+      const commandLink = document.querySelector("[data-cli-link]");
+      const entries = document.querySelectorAll("[data-cli-log]");
+      if (commandLink && entries.length) {
         const observer = new IntersectionObserver(
           (items) => {
             const visible = items
               .filter((item) => item.isIntersecting)
               .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
             if (visible[0]) {
-              commandEl.textContent = visible[0].target.dataset.cli || commandEl.textContent;
+              const { cliLog, cliHref } = visible[0].target.dataset;
+              if (cliLog) {
+                commandLink.textContent = cliLog;
+              }
+              if (cliHref) {
+                commandLink.href = cliHref;
+              }
             }
           },
           { rootMargin: "-30% 0px -60% 0px", threshold: [0.3, 0.6, 1] }
