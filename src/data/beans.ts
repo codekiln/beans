@@ -46,7 +46,13 @@ export const beans = [
       "Cars across the street snowed in up to the wheels.",
       "On-campus work canceled for a snow day; Debussy in the background."
     ],
-    gear: []
+    gear: [
+      {
+        label: "scale",
+        value: "Maestri House Mini Coffee Scale",
+        slug: "maestri-house-mini-scale"
+      }
+    ]
   },
   {
     id: "2026-01-26-bean1",
@@ -89,7 +95,13 @@ export const beans = [
       "Curious whether early drip-through subtly affects extraction.",
       "Intent was a controlled coarser probe after strong results yesterday."
     ],
-    gear: []
+    gear: [
+      {
+        label: "scale",
+        value: "Maestri House Mini Coffee Scale",
+        slug: "maestri-house-mini-scale"
+      }
+    ]
   },
   {
     id: "2026-01-25-bean1",
@@ -128,7 +140,13 @@ export const beans = [
       "Nothing exaggerated.",
       "Everything in proportion."
     ],
-    gear: []
+    gear: [
+      {
+        label: "scale",
+        value: "Maestri House Mini Coffee Scale",
+        slug: "maestri-house-mini-scale"
+      }
+    ]
   },
   {
     id: "2026-01-25-bean2",
@@ -172,7 +190,13 @@ export const beans = [
       "Snowstorm imminent but not yet started.",
       "The cup felt alert, not heavy."
     ],
-    gear: []
+    gear: [
+      {
+        label: "scale",
+        value: "Maestri House Mini Coffee Scale",
+        slug: "maestri-house-mini-scale"
+      }
+    ]
   },
   {
     id: "2026-01-24-bean2",
@@ -210,7 +234,13 @@ export const beans = [
       "The cold sharpened everything.",
       "The coffee felt grounding against the music — less about flavor notes, more about staying present in the body."
     ],
-    gear: []
+    gear: [
+      {
+        label: "scale",
+        value: "Maestri House Mini Coffee Scale",
+        slug: "maestri-house-mini-scale"
+      }
+    ]
   }
 ];
 

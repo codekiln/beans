@@ -4,11 +4,17 @@ import { equipment } from "../../data/equipment";
 import { withBase } from "../../utils/paths";
 
 export function getStaticPaths() {
-  return equipment.map((item) => ({ params: { slug: item.slug } }));
+  return equipment.flatMap((item) => {
+    const aliases = item.aliases?.map((alias) => ({ params: { slug: alias.slug } })) ?? [];
+    return [{ params: { slug: item.slug } }, ...aliases];
+  });
 }
 
 const { slug } = Astro.params;
-const item = equipment.find((entry) => entry.slug === slug);
+const item =
+  equipment.find((entry) => entry.slug === slug) ??
+  equipment.find((entry) => entry.aliases?.some((alias) => alias.slug === slug));
+const alias = item?.aliases?.find((entry) => entry.slug === slug);
 const related = equipment.filter((entry) => item?.related.includes(entry.slug));
 ---
 <BaseLayout
@@ -19,6 +25,7 @@ const related = equipment.filter((entry) => item?.related.includes(entry.slug));
   <section class="hero">
     <h1>{item?.name}</h1>
     <p>Namespace: {item?.type}</p>
+    {alias && <p>Alias: {alias.name}</p>}
     <p>
       <a href={withBase("/equipment/")}>[back to equipment]</a>
     </p>
@@ -31,6 +38,30 @@ const related = equipment.filter((entry) => item?.related.includes(entry.slug));
       ))}
     </ul>
   </section>
+  {item?.aliases?.length > 0 && (
+    <section class="window">
+      <h2 class="section-title">Aliases</h2>
+      <ul>
+        {item.aliases.map((entry) => (
+          <li>
+            <a href={withBase(`/equipment/${entry.slug}/`)}>{entry.name}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+  {item?.references?.length > 0 && (
+    <section class="window">
+      <h2 class="section-title">References</h2>
+      <ul>
+        {item.references.map((reference) => (
+          <li>
+            <a href={reference.url}>{reference.label}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
   {related.length > 0 && (
     <section class="window">
       <h2 class="section-title">Related</h2>
