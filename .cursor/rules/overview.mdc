@@ -1,6 +1,7 @@
-# Additional Conventions Beyond the Built-in Functions
-
-As this project's AI coding tool, you must follow the additional conventions below, in addition to the built-in functions.
+---
+description: Project overview and AI development guidelines for Beans
+globs: **/*
+---
 
 # Beans Project Overview
 

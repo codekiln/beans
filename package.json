@@ -11,5 +11,8 @@
   },
   "dependencies": {
     "astro": "^4.16.4"
+  },
+  "devDependencies": {
+    "rulesync": "^6.1.1"
   }
 }
