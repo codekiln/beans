@@ -1,5 +1,6 @@
 import rss from "@astrojs/rss";
 import { beans } from "../data/beans";
+import { withBase } from "../utils/paths";
 
 type BeanEntry = (typeof beans)[number];
 
@@ -16,7 +17,7 @@ export const GET = () => {
       title: entry.title,
       pubDate: toDate(entry),
       description: entry.observations?.[0] ?? entry.title,
-      link: `/log/${entry.slug}/`
+      link: withBase(`/log/${entry.slug}/`)
     }))
   });
 };
