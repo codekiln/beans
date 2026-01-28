@@ -1,5 +1,74 @@
 export const beans = [
   {
+    id: "2026-01-28-bean1",
+    beanKey: "bean1",
+    slug: "2026-01-28-bean1",
+    date: "2026-01-28",
+    time: "04:38",
+    title: "Pre-dawn restrained cup",
+    tags: ["pre-dawn", "dovs", "ruby", "switch", "first-cup", "immersion"],
+    image: {
+      src: "/images/2026-01-28-bean1.png",
+      alt: "Ruby Colorful Coffees Organic August Seasonal Blend bag sketched on a gray countertop."
+    },
+    coffee: {
+      roaster: { name: "Ruby Colorful Coffees", slug: "ruby-colorful-coffees" },
+      roast: {
+        name: "Organic August — Seasonal Blend",
+        slug: "organic-august-seasonal-blend"
+      },
+      profile: "honey · berries · orange zest · milk chocolate"
+    },
+    brew: {
+      brewer: { name: "Hario Switch", slug: "hario-switch" },
+      method: "Easy Immersion (Switch)",
+      recipe: { name: "Easy Immersion", slug: "easy-immersion" },
+      notes: [
+        "Preheated mug and dripper with the gooseneck before grinding/measuring.",
+        "Kept a spoon out during dosing; removed a tiny fraction of grounds to hit target weight.",
+        "Initial pour used a clockwise motion, fairly quick, aiming to finish by ~1:00–1:10.",
+        "By 1:20: 256.4 g water in.",
+        "2:30: dropped the switch.",
+        "During agitation, noticed a milky, frothy, light-colored layer on the surface—more pronounced than yesterday.",
+        "3:30: bed fully drained; bed looked chunkier and less uniform, with small clear patches along the filter wall.",
+        "Filter: conical paper."
+      ]
+    },
+    brewDetails: {
+      dose: "16 g",
+      water: "256.4 g",
+      ratio: "1 : 16",
+      grinder: { name: "Timemore C5 ESP Pro", slug: "timemore-c5-esp-pro" },
+      grind: "1.8.0",
+      release: "2:30",
+      total: "3:30"
+    },
+    observations: [
+      "Context: 4:38 a.m. pre-dawn; [listening to Psychic Geography — DOVS](https://open.spotify.com/album/5M2wfJvURaKTP1CA6CUMGt?si=mfTZdrCsRae7NnBefSgIYw).",
+      "Bag notes: honey, berries, orange zest, milk chocolate.",
+      "Roaster profile: easy-drinking, emphasis on bright sweetness; medium to light body.",
+      "Components: Organic Ethiopia Worka Chelbessa; Organic Guatemala COIPEC.",
+      "Roasted on: 11-06-2025 (MM-DD-YYYY on bag).",
+      "Aroma (wet): sweet, nutty.",
+      "First sip: more bitter than yesterday, consistent with the finer grind; still enjoyable and not overwhelming for the morning.",
+      "Second sip: cinnamony notes; with focus, a hint of dried orange zest becomes perceptible.",
+      "Acidity: on the sides of the tongue; reads as malic.",
+      "Sweetness: honey notes largely absent; sweetness is muted.",
+      "Bitterness: not bold; compared to Parable Coffee Co. Mocha Java, this lacks backbone. Bitterness presents as dry rather than structural.",
+      "Body/mouthfeel: thin, aligning with the roaster’s medium to light body.",
+      "Aftertaste: lingers toward the back/roof of the mouth.",
+      "Overall: restrained, calm, easy-drinking; a slight creaminess visible when pouring into the mug.",
+      "Reflection: the uneven bed—clear patches where grounds didn’t cling to the filter wall—made me wonder how much under-extracted coffee was effectively missing from the cup, contributing to thinness and dry bitterness rather than sweetness."
+    ],
+    gear: [
+      {
+        label: "scale",
+        value: "Maestri House Mini Coffee Scale",
+        slug: "maestri-house-mini-scale"
+      }
+    ]
+  },
+  {
     id: "2026-01-27-bean2",
     beanKey: "bean2",
     slug: "2026-01-27-bean2",

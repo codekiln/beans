@@ -13,8 +13,24 @@ const escapeHtml = (value: string) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 
+const renderInlineMarkdown = (value: string) => {
+  const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
+  let output = "";
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = linkPattern.exec(value)) !== null) {
+    output += escapeHtml(value.slice(lastIndex, match.index));
+    output += `<a href="${escapeHtml(match[2])}">${escapeHtml(match[1])}</a>`;
+    lastIndex = match.index + match[0].length;
+  }
+
+  output += escapeHtml(value.slice(lastIndex));
+  return output;
+};
+
 const renderList = (items: string[]) =>
-  `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+  `<ul>${items.map((item) => `<li>${renderInlineMarkdown(item)}</li>`).join("")}</ul>`;
 
 export const GET = () => {
   const sortedBeans = [...beans].sort((a, b) => toDate(b).getTime() - toDate(a).getTime());

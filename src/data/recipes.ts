@@ -5,7 +5,7 @@ export const recipes = [
     summary: "Switch immersion with a clean, steady release.",
     steps: [
       "Rinse brewer and warm the vessel.",
-      "Add coffee, pour water, and steep with the switch closed.",
+      "Add coffee and pour water clockwise, aiming to finish the fill by ~1:00–1:10 with the switch closed.",
       "Release at 2:30 and let drawdown finish on its own."
     ]
   },

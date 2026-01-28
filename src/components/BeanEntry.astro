@@ -6,6 +6,28 @@ const { bean } = Astro.props;
 const logCommand = `log ${bean.date} ${bean.beanKey}`;
 const command = `$ bean ${logCommand}`;
 const detailHref = withBase(`/log/${bean.slug}/`);
+const escapeHtml = (value) =>
+  value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+const renderInlineMarkdown = (value) => {
+  const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
+  let output = "";
+  let lastIndex = 0;
+  let match;
+
+  while ((match = linkPattern.exec(value)) !== null) {
+    output += escapeHtml(value.slice(lastIndex, match.index));
+    output += `<a href="${escapeHtml(match[2])}">${escapeHtml(match[1])}</a>`;
+    lastIndex = match.index + match[0].length;
+  }
+
+  output += escapeHtml(value.slice(lastIndex));
+  return output;
+};
 
 const coffeeRows = [
   bean.coffee.roaster && {
@@ -82,7 +104,7 @@ const gearItems = [
         <h3 class="section-title">Observations</h3>
         <ul>
           {bean.observations.map((line) => (
-            <li>{line}</li>
+            <li set:html={renderInlineMarkdown(line)}></li>
           ))}
         </ul>
         {bean.image && (
