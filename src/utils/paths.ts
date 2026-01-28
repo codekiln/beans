@@ -1,4 +1,7 @@
 export const withBase = (path: string) => {
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
   const base = import.meta.env.BASE_URL || "/";
   if (base === "/") {
     return path;

@@ -7,6 +7,9 @@ export const roasters = [
   {
     slug: "ruby-colorful-coffees",
     name: "Ruby Colorful Coffees",
-    notes: ["Wisconsin roaster focused on bright, seasonal blends."]
+    notes: [
+      "Wisconsin roaster focused on bright, seasonal blends.",
+      "Seasonal blend logged during a pre-dawn switch brew."
+    ]
   }
 ];

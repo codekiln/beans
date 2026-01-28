@@ -17,5 +17,12 @@ export const coffees = [
     name: "Organic August — Seasonal Blend",
     roaster: "ruby-colorful-coffees",
     profile: "honey · berries · orange zest · milk chocolate"
+  },
+  {
+    slug: "organic-artist-seasonal-blend",
+    name: "Organic Artist Seasonal Blend",
+    roaster: "ruby-colorful-coffees",
+    roastLevel: "medium",
+    profile: "muted · nutty · restrained"
   }
 ];

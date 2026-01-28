@@ -42,6 +42,16 @@ export const equipment = [
     related: []
   },
   {
+    slug: "mastery-house-scale-timer",
+    name: "Mastery House Scale & Timer",
+    type: "scale",
+    notes: [
+      "Simple scale with integrated timer.",
+      "Used for early morning Hario Switch brews."
+    ],
+    related: []
+  },
+  {
     slug: "metal-cone",
     name: "Metal cone",
     type: "brewer",
