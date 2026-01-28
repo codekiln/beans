@@ -12,5 +12,8 @@
   "dependencies": {
     "@astrojs/rss": "^4.0.15",
     "astro": "^4.16.4"
+  },
+  "devDependencies": {
+    "rulesync": "^6.1.1"
   }
 }

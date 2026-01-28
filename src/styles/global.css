@@ -209,6 +209,12 @@ button:focus-visible {
   grid-column: 1 / 2;
 }
 
+.bean-title {
+  margin: 0.35rem 0 0.65rem;
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
 .bean-side {
   grid-column: 2 / 3;
   display: grid;
