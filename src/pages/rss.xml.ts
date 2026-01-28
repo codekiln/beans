@@ -1,0 +1,44 @@
+import rss from "@astrojs/rss";
+import { beans } from "../data/beans";
+import { withBase } from "../utils/paths";
+
+type BeanEntry = (typeof beans)[number];
+
+const toDate = (entry: BeanEntry) => new Date(`${entry.date}T${entry.time ?? "00:00"}`);
+const escapeHtml = (value: string) =>
+  value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+
+const renderList = (items: string[]) =>
+  `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+
+export const GET = () => {
+  const sortedBeans = [...beans].sort((a, b) => toDate(b).getTime() - toDate(a).getTime());
+  const site = new URL(withBase("/"), import.meta.env.SITE);
+
+  return rss({
+    title: "Beans",
+    description: "A coffee log rendered as a lab notebook.",
+    site,
+    items: sortedBeans.map((entry) => ({
+      title: entry.title,
+      pubDate: toDate(entry),
+      description: [
+        entry.image
+          ? `<figure><img src="${new URL(withBase(entry.image.src), site)}" alt="${escapeHtml(
+              entry.image.alt
+            )}"></figure>`
+          : "",
+        "<h3>Observations</h3>",
+        renderList(entry.observations),
+        entry.brew.notes?.length ? "<h3>Brew notes</h3>" : "",
+        entry.brew.notes?.length ? renderList(entry.brew.notes) : ""
+      ].join(""),
+      link: withBase(`log/${entry.slug}/`)
+    }))
+  });
+};
