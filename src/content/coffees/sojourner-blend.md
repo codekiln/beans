@@ -6,9 +6,11 @@ image:
   alt: "Parable Coffee Co. Sojourner Blend bag with a red label."
 roastLevel: "medium"
 profile: "balanced · sweet dark fruits · candy · chocolate"
+blend: "Ethopian, Sumatran, Guatemalan"
 ---
 
-- Parable Coffee Co. blend featured on the Sojourner bag.
-- Label notes: balanced, sweet dark fruits, candy, chocolate.
-- Roast: medium; whole bean.
-- Legacy entry: Sourdough / Cold Winter Blend (70% Sourdough · 30% Cold Winter).
+### Label
+
+> Balanced and sweet, dark fruits, earthy, chocolate.
+
+> Start your journey with this blend of sweet creamy Ethopian, in perfect harmony with earthy Sumatran and brown sugary Guatemalan. A perfect start to your day.
