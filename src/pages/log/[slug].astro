@@ -1,10 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import BeanEntry from "../../components/BeanEntry.astro";
-import { beans } from "../../data/beans";
+import { getBeans } from "../../data/beans";
 import { withBase } from "../../utils/paths";
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
+  const beans = await getBeans();
   return beans.map((bean, index) => ({
     params: { slug: bean.slug },
     props: {

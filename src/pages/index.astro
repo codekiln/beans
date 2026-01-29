@@ -1,9 +1,10 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BeanEntry from "../components/BeanEntry.astro";
-import { beans } from "../data/beans";
+import { getBeans } from "../data/beans";
 import { withBase } from "../utils/paths";
 
+const beans = await getBeans();
 const initialCommand = `$ bean log ${beans[0].date} ${beans[0].beanKey}`;
 const initialLinkHref = withBase(`/log/${beans[0].slug}/`);
 ---

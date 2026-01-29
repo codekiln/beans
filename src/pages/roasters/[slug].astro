@@ -1,16 +1,21 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { roasters } from "../../data/roasters";
+import { getRoasters } from "../../data/roasters";
 import { coffees } from "../../data/coffees";
 import { withBase } from "../../utils/paths";
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
+  const roasters = await getRoasters();
   return roasters.map((roaster) => ({ params: { slug: roaster.slug } }));
 }
 
 const { slug } = Astro.params;
+const roasters = await getRoasters();
 const roaster = roasters.find((entry) => entry.slug === slug);
 const roasterCoffees = coffees.filter((coffee) => coffee.roaster === slug);
+const renderResult = roaster ? await roaster.render() : null;
+const NotesContent = renderResult?.Content;
+const hasNotes = Boolean(roaster?.body?.trim());
 ---
 <BaseLayout
   title={`${roaster?.name ?? "Roaster"} · Beans`}
@@ -23,14 +28,10 @@ const roasterCoffees = coffees.filter((coffee) => coffee.roaster === slug);
       <a href={withBase("/roasters/")}>[back to roasters]</a>
     </p>
   </section>
-  {roaster?.notes?.length ? (
+  {NotesContent && hasNotes ? (
     <section class="window">
       <h2 class="section-title">Notes</h2>
-      <ul>
-        {roaster.notes.map((note) => (
-          <li>{note}</li>
-        ))}
-      </ul>
+      <NotesContent />
     </section>
   ) : null}
   <section class="window">

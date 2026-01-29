@@ -1,13 +1,15 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { recipes } from "../../data/recipes";
+import { getRecipes } from "../../data/recipes";
 import { withBase } from "../../utils/paths";
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
+  const recipes = await getRecipes();
   return recipes.map((recipe) => ({ params: { slug: recipe.slug } }));
 }
 
 const { slug } = Astro.params;
+const recipes = await getRecipes();
 const recipe = recipes.find((entry) => entry.slug === slug);
 ---
 <BaseLayout

@@ -1,14 +1,16 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import BeanEntry from "../../components/BeanEntry.astro";
-import { beans, allTags } from "../../data/beans";
+import { getAllTags, getBeans } from "../../data/beans";
 import { withBase } from "../../utils/paths";
 
-export function getStaticPaths() {
-  return allTags.map((tag) => ({ params: { tag } }));
+export async function getStaticPaths() {
+  const tags = await getAllTags();
+  return tags.map((tag) => ({ params: { tag } }));
 }
 
 const { tag } = Astro.params;
+const beans = await getBeans();
 const taggedBeans = beans.filter((bean) => bean.tags.includes(tag));
 ---
 <BaseLayout title={`Tag: ${tag} · Beans`} description={`Beans tagged with ${tag}.`} initialCommand={`$ bean tag ${tag}`}>

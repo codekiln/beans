@@ -1,22 +1,36 @@
-export const recipes = [
-  {
-    slug: "easy-immersion",
-    name: "Easy Immersion",
-    summary: "Switch immersion with a clean, steady release.",
-    steps: [
-      "Rinse brewer and warm the vessel.",
-      "Add coffee and pour water clockwise, aiming to finish the fill by ~1:00–1:10 with the switch closed.",
-      "Release at 2:30 and let drawdown finish on its own."
-    ]
-  },
-  {
-    slug: "metal-cone-walk",
-    name: "Metal Cone Walk",
-    summary: "Outdoor metal cone brew tuned for cold air.",
-    steps: [
-      "Preheat the metal cone with hot water.",
-      "Pour in a steady spiral to keep the bed even.",
-      "Allow a longer drawdown to balance the cold."
-    ]
-  }
-];
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+type RecipeEntry = CollectionEntry<"recipes">;
+export type Recipe = RecipeEntry["data"] & { slug: string; steps: string[] };
+
+const parseRecipeBody = (body: string) => {
+  const steps: string[] = [];
+
+  body.split(/\r?\n/).forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const listMatch = /^[-*]\s+(.+)$/.exec(trimmed);
+    if (listMatch) {
+      steps.push(listMatch[1]);
+      return;
+    }
+
+    const orderedMatch = /^\d+\.\s+(.+)$/.exec(trimmed);
+    if (orderedMatch) {
+      steps.push(orderedMatch[1]);
+    }
+  });
+
+  return steps;
+};
+
+export const getRecipes = async () => {
+  const entries = await getCollection("recipes");
+  return entries
+    .map((entry) => ({ ...entry.data, steps: parseRecipeBody(entry.body ?? ""), slug: entry.slug }))
+    .sort((a, b) => a.order - b.order);
+};

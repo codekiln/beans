@@ -1,7 +1,9 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { recipes } from "../../data/recipes";
+import { getRecipes } from "../../data/recipes";
 import { withBase } from "../../utils/paths";
+
+const recipes = await getRecipes();
 ---
 <BaseLayout title="Recipes · Beans" description="Brew recipes used in the beans log." initialCommand="$ bean recipes">
   <section class="hero">
