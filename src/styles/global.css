@@ -239,6 +239,49 @@ button:focus-visible {
   margin: 2rem 0 0.75rem;
 }
 
+.markdown {
+  margin-top: 1rem;
+}
+
+.markdown > :first-child {
+  margin-top: 0;
+}
+
+.markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown h2,
+.markdown h3,
+.markdown h4 {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.95rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.markdown p {
+  margin: 0 0 1rem;
+}
+
+.markdown ul,
+.markdown ol {
+  margin: 0 0 1rem 1.25rem;
+  padding: 0;
+}
+
+.markdown li {
+  margin-bottom: 0.35rem;
+}
+
+.markdown blockquote {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  color: var(--muted);
+}
+
 .tag-link {
   font-size: 0.95rem;
   padding: 0 0.1rem;

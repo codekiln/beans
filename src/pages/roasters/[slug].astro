@@ -40,7 +40,9 @@ const hasNotes = Boolean(roaster?.body?.trim());
   {NotesContent && hasNotes ? (
     <section class="window">
       <h2 class="section-title">Notes</h2>
-      <NotesContent />
+      <div class="markdown">
+        <NotesContent />
+      </div>
     </section>
   ) : null}
   <section class="window">

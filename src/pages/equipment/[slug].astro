@@ -65,7 +65,9 @@ const relatedBeans = beans
   {NotesContent && hasNotes && (
     <section class="window">
       <h2 class="section-title">Notes</h2>
-      <NotesContent />
+      <div class="markdown">
+        <NotesContent />
+      </div>
     </section>
   )}
   {item?.aliases?.length > 0 && (
