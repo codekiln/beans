@@ -1,10 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { equipment } from "../../data/equipment";
-import { beans } from "../../data/beans";
+import { getEquipment } from "../../data/equipment";
+import { getBeans } from "../../data/beans";
 import { withBase } from "../../utils/paths";
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
+  const equipment = await getEquipment();
   return equipment.flatMap((item) => {
     const aliases = item.aliases?.map((alias) => ({ params: { slug: alias.slug } })) ?? [];
     return [{ params: { slug: item.slug } }, ...aliases];
@@ -12,6 +13,8 @@ export function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
+const equipment = await getEquipment();
+const beans = await getBeans();
 const item =
   equipment.find((entry) => entry.slug === slug) ??
   equipment.find((entry) => entry.aliases?.some((alias) => alias.slug === slug));

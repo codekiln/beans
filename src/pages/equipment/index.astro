@@ -1,8 +1,10 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { equipment, equipmentTypes } from "../../data/equipment";
+import { getEquipment, getEquipmentTypes } from "../../data/equipment";
 import { withBase } from "../../utils/paths";
 
+const equipment = await getEquipment();
+const equipmentTypes = await getEquipmentTypes();
 const grouped = equipmentTypes.map((type) => ({
   type,
   items: equipment.filter((item) => item.type === type)

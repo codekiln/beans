@@ -1,22 +1,12 @@
-export const recipes = [
-  {
-    slug: "easy-immersion",
-    name: "Easy Immersion",
-    summary: "Switch immersion with a clean, steady release.",
-    steps: [
-      "Rinse brewer and warm the vessel.",
-      "Add coffee and pour water clockwise, aiming to finish the fill by ~1:00–1:10 with the switch closed.",
-      "Release at 2:30 and let drawdown finish on its own."
-    ]
-  },
-  {
-    slug: "metal-cone-walk",
-    name: "Metal Cone Walk",
-    summary: "Outdoor metal cone brew tuned for cold air.",
-    steps: [
-      "Preheat the metal cone with hot water.",
-      "Pour in a steady spiral to keep the bed even.",
-      "Allow a longer drawdown to balance the cold."
-    ]
-  }
-];
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+type RecipeEntry = CollectionEntry<"recipes">;
+export type Recipe = RecipeEntry["data"] & { slug: string };
+
+export const getRecipes = async () => {
+  const entries = await getCollection("recipes");
+  return entries
+    .map((entry) => ({ ...entry.data, slug: entry.slug }))
+    .sort((a, b) => a.order - b.order);
+};

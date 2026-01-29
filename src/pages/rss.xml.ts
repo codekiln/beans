@@ -1,8 +1,8 @@
 import rss from "@astrojs/rss";
-import { beans } from "../data/beans";
+import { getBeans } from "../data/beans";
 import { withBase } from "../utils/paths";
 
-type BeanEntry = (typeof beans)[number];
+type BeanEntry = Awaited<ReturnType<typeof getBeans>>[number];
 
 const toDate = (entry: BeanEntry) => new Date(`${entry.date}T${entry.time ?? "00:00"}`);
 const escapeHtml = (value: string) =>
@@ -32,7 +32,8 @@ const renderInlineMarkdown = (value: string) => {
 const renderList = (items: string[]) =>
   `<ul>${items.map((item) => `<li>${renderInlineMarkdown(item)}</li>`).join("")}</ul>`;
 
-export const GET = () => {
+export const GET = async () => {
+  const beans = await getBeans();
   const sortedBeans = [...beans].sort((a, b) => toDate(b).getTime() - toDate(a).getTime());
   const site = new URL(withBase("/"), import.meta.env.SITE);
 
