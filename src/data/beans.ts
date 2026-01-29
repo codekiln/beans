@@ -60,7 +60,11 @@ export const getBeans = async () => {
         slug: entry.slug
       };
     })
-    .sort((a, b) => a.order - b.order);
+    .sort((a, b) => {
+      const dateCompare = b.date.localeCompare(a.date);
+      if (dateCompare !== 0) return dateCompare;
+      return b.time.localeCompare(a.time);
+    });
 };
 
 export const getAllTags = async () => {

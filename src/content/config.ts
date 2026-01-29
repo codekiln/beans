@@ -72,8 +72,7 @@ const beans = defineCollection({
           slug: z.string().optional()
         })
       )
-      .optional(),
-    order: z.number()
+      .optional()
   })
 });
 
