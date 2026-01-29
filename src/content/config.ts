@@ -82,7 +82,6 @@ const recipes = defineCollection({
   schema: z.object({
     name: z.string(),
     summary: z.string(),
-    steps: z.array(z.string()),
     order: z.number()
   })
 });
@@ -100,7 +99,6 @@ const equipment = defineCollection({
         })
       )
       .optional(),
-    notes: z.array(z.string()),
     references: z
       .array(
         z.object({
@@ -114,4 +112,12 @@ const equipment = defineCollection({
   })
 });
 
-export const collections = { beans, recipes, equipment };
+const roasters = defineCollection({
+  type: "content",
+  schema: z.object({
+    name: z.string(),
+    order: z.number()
+  })
+});
+
+export const collections = { beans, recipes, equipment, roasters };

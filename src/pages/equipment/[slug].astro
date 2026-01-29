@@ -21,6 +21,9 @@ const item =
 const alias = item?.aliases?.find((entry) => entry.slug === slug);
 const related = equipment.filter((entry) => item?.related.includes(entry.slug));
 const gearSlugs = new Set([item?.slug, ...(item?.aliases?.map((entry) => entry.slug) ?? [])]);
+const renderResult = item ? await item.render() : null;
+const NotesContent = renderResult?.Content;
+const hasNotes = Boolean(item?.body?.trim());
 const relatedBeans = beans
   .filter((bean) => {
     const brewerSlug = bean.brew?.brewer?.slug;
@@ -51,14 +54,12 @@ const relatedBeans = beans
       <a href={withBase("/equipment/")}>[back to equipment]</a>
     </p>
   </section>
-  <section class="window">
-    <h2 class="section-title">Notes</h2>
-    <ul>
-      {item?.notes.map((note) => (
-        <li>{note}</li>
-      ))}
-    </ul>
-  </section>
+  {NotesContent && hasNotes && (
+    <section class="window">
+      <h2 class="section-title">Notes</h2>
+      <NotesContent />
+    </section>
+  )}
   {item?.aliases?.length > 0 && (
     <section class="window">
       <h2 class="section-title">Aliases</h2>

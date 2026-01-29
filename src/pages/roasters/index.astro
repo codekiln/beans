@@ -1,7 +1,9 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { roasters } from "../../data/roasters";
+import { getRoasters } from "../../data/roasters";
 import { withBase } from "../../utils/paths";
+
+const roasters = await getRoasters();
 ---
 <BaseLayout title="Roasters · Beans" description="Coffee roasters referenced in the log." initialCommand="$ bean roasters">
   <section class="hero">

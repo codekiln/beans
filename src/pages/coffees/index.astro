@@ -1,9 +1,10 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { coffees } from "../../data/coffees";
-import { roasters } from "../../data/roasters";
+import { getRoasters } from "../../data/roasters";
 import { withBase } from "../../utils/paths";
 
+const roasters = await getRoasters();
 const roasterBySlug = Object.fromEntries(roasters.map((roaster) => [roaster.slug, roaster]));
 ---
 <BaseLayout title="Coffees · Beans" description="Coffee roasts referenced in the log." initialCommand="$ bean coffees">
