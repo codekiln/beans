@@ -1,9 +1,10 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { coffees } from "../../data/coffees";
+import { getCoffees } from "../../data/coffees";
 import { getRoasters } from "../../data/roasters";
 import { withBase } from "../../utils/paths";
 
+const coffees = await getCoffees();
 const roasters = await getRoasters();
 const roasterBySlug = Object.fromEntries(roasters.map((roaster) => [roaster.slug, roaster]));
 ---

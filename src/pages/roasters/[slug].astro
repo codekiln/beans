@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getRoasters } from "../../data/roasters";
-import { coffees } from "../../data/coffees";
+import { getCoffees } from "../../data/coffees";
 import { withBase } from "../../utils/paths";
 
 export async function getStaticPaths() {
@@ -12,6 +12,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const roasters = await getRoasters();
 const roaster = roasters.find((entry) => entry.slug === slug);
+const coffees = await getCoffees();
 const roasterCoffees = coffees.filter((coffee) => coffee.roaster === slug);
 const renderResult = roaster ? await roaster.render() : null;
 const NotesContent = renderResult?.Content;
@@ -28,6 +29,14 @@ const hasNotes = Boolean(roaster?.body?.trim());
       <a href={withBase("/roasters/")}>[back to roasters]</a>
     </p>
   </section>
+  {roaster?.image ? (
+    <section class="window">
+      <h2 class="section-title">Image</h2>
+      <figure class="bean-observation-media">
+        <img src={withBase(roaster.image.src)} alt={roaster.image.alt} loading="lazy" />
+      </figure>
+    </section>
+  ) : null}
   {NotesContent && hasNotes ? (
     <section class="window">
       <h2 class="section-title">Notes</h2>

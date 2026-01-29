@@ -54,6 +54,14 @@ const relatedBeans = beans
       <a href={withBase("/equipment/")}>[back to equipment]</a>
     </p>
   </section>
+  {item?.image ? (
+    <section class="window">
+      <h2 class="section-title">Image</h2>
+      <figure class="bean-observation-media">
+        <img src={withBase(item.image.src)} alt={item.image.alt} loading="lazy" />
+      </figure>
+    </section>
+  ) : null}
   {NotesContent && hasNotes && (
     <section class="window">
       <h2 class="section-title">Notes</h2>

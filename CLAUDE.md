@@ -1,6 +1,6 @@
 # Beans Project Overview
 
-Beans is a CLI-inspired coffee log built with Astro. The site content lives in `src/data` and the UI is composed of Astro components, layouts, and styles in `src/`.
+Beans is a CLI-inspired coffee log built with Astro. The site content lives in `src/content` and content helpers live in `src/data`; the UI is composed of Astro components, layouts, and styles in `src/`.
 
 ## General Guidelines
 
@@ -9,7 +9,7 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - Follow existing project conventions and patterns; mirror nearby code style when editing files.
 - Prefer small, focused changes that keep the CLI-inspired tone of the site intact.
 - Use the existing utilities (such as `withBase`) for building paths and links.
-- Keep content changes in `src/data` and presentation changes in `src/components`, `src/layouts`, or `src/styles`.
+- Keep content changes in `src/content` and presentation changes in `src/components`, `src/layouts`, or `src/styles`.
 - Keep the primary descriptive content for data models in the markdown body, not frontmatter arrays.
 - When adding new pages, use `.astro` files and include the base layout.
 

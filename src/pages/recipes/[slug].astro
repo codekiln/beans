@@ -24,6 +24,14 @@ const recipe = recipes.find((entry) => entry.slug === slug);
       <a href={withBase("/recipes/")}>[back to recipes]</a>
     </p>
   </section>
+  {recipe?.image ? (
+    <section class="window">
+      <h2 class="section-title">Image</h2>
+      <figure class="bean-observation-media">
+        <img src={withBase(recipe.image.src)} alt={recipe.image.alt} loading="lazy" />
+      </figure>
+    </section>
+  ) : null}
   <section class="window">
     <h2 class="section-title">Steps</h2>
     <ol>

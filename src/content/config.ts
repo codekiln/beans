@@ -82,6 +82,12 @@ const recipes = defineCollection({
   schema: z.object({
     name: z.string(),
     summary: z.string(),
+    image: z
+      .object({
+        src: z.string(),
+        alt: z.string()
+      })
+      .optional(),
     order: z.number()
   })
 });
@@ -107,6 +113,12 @@ const equipment = defineCollection({
         })
       )
       .optional(),
+    image: z
+      .object({
+        src: z.string(),
+        alt: z.string()
+      })
+      .optional(),
     related: z.array(z.string()),
     order: z.number()
   })
@@ -116,8 +128,31 @@ const roasters = defineCollection({
   type: "content",
   schema: z.object({
     name: z.string(),
+    image: z
+      .object({
+        src: z.string(),
+        alt: z.string()
+      })
+      .optional(),
     order: z.number()
   })
 });
 
-export const collections = { beans, recipes, equipment, roasters };
+const coffees = defineCollection({
+  type: "content",
+  schema: z.object({
+    name: z.string(),
+    roaster: z.string(),
+    image: z
+      .object({
+        src: z.string(),
+        alt: z.string()
+      })
+      .optional(),
+    roastLevel: z.string().optional(),
+    profile: z.string().optional(),
+    blend: z.string().optional()
+  })
+});
+
+export const collections = { beans, recipes, equipment, roasters, coffees };

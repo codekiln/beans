@@ -1,17 +1,25 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { coffees } from "../../data/coffees";
+import { getCoffees } from "../../data/coffees";
 import { getRoasters } from "../../data/roasters";
+import { getBeans } from "../../data/beans";
 import { withBase } from "../../utils/paths";
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
+  const coffees = await getCoffees();
   return coffees.map((coffee) => ({ params: { slug: coffee.slug } }));
 }
 
 const { slug } = Astro.params;
+const coffees = await getCoffees();
 const coffee = coffees.find((entry) => entry.slug === slug);
 const roasters = await getRoasters();
 const roaster = roasters.find((entry) => entry.slug === coffee?.roaster);
+const beans = await getBeans();
+const relatedBeans = beans.filter((bean) => bean.coffee.roast?.slug === slug).slice(0, 3);
+const renderResult = coffee ? await coffee.render() : null;
+const NotesContent = renderResult?.Content;
+const hasNotes = Boolean(coffee?.body?.trim());
 ---
 <BaseLayout
   title={`${coffee?.name ?? "Coffee"} · Beans`}
@@ -29,6 +37,20 @@ const roaster = roasters.find((entry) => entry.slug === coffee?.roaster);
       <a href={withBase("/coffees/")}>[back to coffees]</a>
     </p>
   </section>
+  {coffee?.image ? (
+    <section class="window">
+      <h2 class="section-title">Image</h2>
+      <figure class="bean-observation-media">
+        <img src={withBase(coffee.image.src)} alt={coffee.image.alt} loading="lazy" />
+      </figure>
+    </section>
+  ) : null}
+  {NotesContent && hasNotes ? (
+    <section class="window">
+      <h2 class="section-title">Notes</h2>
+      <NotesContent />
+    </section>
+  ) : null}
   <section class="window">
     <h2 class="section-title">Details</h2>
     <table class="cup-table">
@@ -47,5 +69,22 @@ const roaster = roasters.find((entry) => entry.slug === coffee?.roaster);
         </tr>
       </tbody>
     </table>
+  </section>
+  <section class="window">
+    <h2 class="section-title">Recent brew logs</h2>
+    {relatedBeans.length ? (
+      <ul class="table-list">
+        {relatedBeans.map((bean) => (
+          <li>
+            <a href={withBase(`/log/${bean.slug}/`)}>
+              [{bean.date} {bean.beanKey}]
+            </a>
+            {" "}- {bean.title}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No recent brew logs yet.</p>
+    )}
   </section>
 </BaseLayout>
