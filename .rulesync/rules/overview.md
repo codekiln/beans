@@ -30,3 +30,8 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 
 - Update the unified rules in `.rulesync/rules/`.
 - Regenerate AI tool configs with `npx rulesync generate` after changing rules.
+
+## Node Version Alignment
+
+- Use `.nvmrc` as the single source of truth for the Node version.
+- GitHub Actions and the devcontainer must both read the Node version from `.nvmrc` (do not hardcode version numbers elsewhere).
