@@ -17,12 +17,12 @@ export async function getStaticPaths() {
 }
 
 const { bean, prev, next } = Astro.props;
-const initialCommand = `$ bean log ${bean.date} ${bean.beanKey}`;
+const initialCommand = `$ bean log ${bean.data.date} ${bean.data.beanKey}`;
 const initialLinkHref = withBase(`/log/${bean.slug}/`);
 ---
 <BaseLayout
-  title={`Bean ${bean.date} ${bean.beanKey} · Beans`}
-  description={bean.title}
+  title={`Bean ${bean.data.date} ${bean.data.beanKey} · Beans`}
+  description={bean.data.title}
   initialCommand={initialCommand}
   initialLinkHref={initialLinkHref}
 >
@@ -31,14 +31,14 @@ const initialLinkHref = withBase(`/log/${bean.slug}/`);
     <nav class="bean-nav" aria-label="Bean log navigation">
       {prev ? (
         <a class="bean-nav-link" href={withBase(`/log/${prev.slug}/`)}>
-          ← Prev: {prev.date} {prev.beanKey}
+          ← Prev: {prev.data.date} {prev.data.beanKey}
         </a>
       ) : (
         <span class="bean-nav-muted">← Prev</span>
       )}
       {next ? (
         <a class="bean-nav-link" href={withBase(`/log/${next.slug}/`)}>
-          Next: {next.date} {next.beanKey} →
+          Next: {next.data.date} {next.data.beanKey} →
         </a>
       ) : (
         <span class="bean-nav-muted">Next →</span>

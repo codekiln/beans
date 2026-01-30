@@ -1,36 +1,14 @@
 import rss from "@astrojs/rss";
 import { getBeans } from "../data/beans";
 import { withBase } from "../utils/paths";
+import sanitizeHtml from "sanitize-html";
+import MarkdownIt from "markdown-it";
+
+const parser = new MarkdownIt();
 
 type BeanEntry = Awaited<ReturnType<typeof getBeans>>[number];
 
-const toDate = (entry: BeanEntry) => new Date(`${entry.date}T${entry.time ?? "00:00"}`);
-const escapeHtml = (value: string) =>
-  value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-
-const renderInlineMarkdown = (value: string) => {
-  const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
-  let output = "";
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = linkPattern.exec(value)) !== null) {
-    output += escapeHtml(value.slice(lastIndex, match.index));
-    output += `<a href="${escapeHtml(match[2])}">${escapeHtml(match[1])}</a>`;
-    lastIndex = match.index + match[0].length;
-  }
-
-  output += escapeHtml(value.slice(lastIndex));
-  return output;
-};
-
-const renderList = (items: string[]) =>
-  `<ul>${items.map((item) => `<li>${renderInlineMarkdown(item)}</li>`).join("")}</ul>`;
+const toDate = (entry: BeanEntry) => new Date(`${entry.data.date}T${entry.data.time ?? "00:00"}`);
 
 export const GET = async () => {
   const beans = await getBeans();
@@ -41,21 +19,22 @@ export const GET = async () => {
     title: "Beans",
     description: "A coffee log rendered as a lab notebook.",
     site,
-    items: sortedBeans.map((entry) => ({
-      title: entry.title,
-      pubDate: toDate(entry),
-      description: [
-        entry.image
-          ? `<figure><img src="${new URL(withBase(entry.image.src), site)}" alt="${escapeHtml(
-              entry.image.alt
-            )}"></figure>`
-          : "",
-        "<h3>Observations</h3>",
-        renderList(entry.observations),
-        entry.brew.notes?.length ? "<h3>Brew notes</h3>" : "",
-        entry.brew.notes?.length ? renderList(entry.brew.notes) : ""
-      ].join(""),
-      link: withBase(`log/${entry.slug}/`)
-    }))
+    items: sortedBeans.map((entry) => {
+      const content = parser.render(entry.body);
+      
+      return {
+        title: entry.data.title,
+        pubDate: toDate(entry),
+        description: [
+          entry.data.image
+            ? `<figure><img src="${new URL(withBase(entry.data.image.src), site)}" alt="${sanitizeHtml(
+                entry.data.image.alt
+              )}"></figure>`
+            : "",
+          content
+        ].join(""),
+        link: withBase(`log/${entry.slug}/`)
+      };
+    })
   });
 };

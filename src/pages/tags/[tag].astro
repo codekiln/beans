@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 
 const { tag } = Astro.params;
 const beans = await getBeans();
-const taggedBeans = beans.filter((bean) => bean.tags.includes(tag));
+const taggedBeans = beans.filter((bean) => bean.data.tags.includes(tag));
 ---
 <BaseLayout title={`Tag: ${tag} · Beans`} description={`Beans tagged with ${tag}.`} initialCommand={`$ bean tag ${tag}`}>
   <section class="hero">

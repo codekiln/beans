@@ -3,84 +3,63 @@ import TagRow from "./TagRow.astro";
 import { withBase } from "../utils/paths";
 
 const { bean } = Astro.props;
-const logCommand = `log ${bean.date} ${bean.beanKey}`;
+const { Content } = await bean.render();
+const logCommand = `log ${bean.data.date} ${bean.data.beanKey}`;
 const command = `$ bean ${logCommand}`;
 const detailHref = withBase(`/log/${bean.slug}/`);
-const escapeHtml = (value) =>
-  value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-const renderInlineMarkdown = (value) => {
-  const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
-  let output = "";
-  let lastIndex = 0;
-  let match;
-
-  while ((match = linkPattern.exec(value)) !== null) {
-    output += escapeHtml(value.slice(lastIndex, match.index));
-    output += `<a href="${escapeHtml(match[2])}">${escapeHtml(match[1])}</a>`;
-    lastIndex = match.index + match[0].length;
-  }
-
-  output += escapeHtml(value.slice(lastIndex));
-  return output;
-};
 
 const coffeeRows = [
-  bean.coffee.roaster && {
+  bean.data.coffee.roaster && {
     label: "roaster",
-    value: bean.coffee.roaster.name,
-    href: withBase(`/roasters/${bean.coffee.roaster.slug}/`)
+    value: bean.data.coffee.roaster.name,
+    href: withBase(`/roasters/${bean.data.coffee.roaster.slug}/`)
   },
-  bean.coffee.roast && {
+  bean.data.coffee.roast && {
     label: "coffee",
-    value: bean.coffee.roast.name,
-    href: withBase(`/coffees/${bean.coffee.roast.slug}/`)
+    value: bean.data.coffee.roast.name,
+    href: withBase(`/coffees/${bean.data.coffee.roast.slug}/`)
   },
-  bean.coffee.roastLevel && { label: "roast level", value: bean.coffee.roastLevel },
-  bean.coffee.profile && { label: "profile", value: bean.coffee.profile },
-  bean.coffee.blend && { label: "blend", value: bean.coffee.blend }
+  bean.data.coffee.roastLevel && { label: "roast level", value: bean.data.coffee.roastLevel },
+  bean.data.coffee.profile && { label: "profile", value: bean.data.coffee.profile },
+  bean.data.coffee.blend && { label: "blend", value: bean.data.coffee.blend }
 ].filter(Boolean);
 
-const grindValue = bean.brewDetails.grind ?? bean.brewDetails.setting;
+const grindValue = bean.data.brewDetails.grind ?? bean.data.brewDetails.setting;
 const brewDetailsRows = [
-  bean.brew.recipe && {
+  bean.data.brew.recipe && {
     label: "recipe",
-    value: bean.brew.recipe.name,
-    href: withBase(`/recipes/${bean.brew.recipe.slug}/`)
+    value: bean.data.brew.recipe.name,
+    href: withBase(`/recipes/${bean.data.brew.recipe.slug}/`)
   },
-  bean.brewDetails.dose && { label: "dose", value: bean.brewDetails.dose },
+  bean.data.brewDetails.dose && { label: "dose", value: bean.data.brewDetails.dose },
   grindValue && { label: "grind", value: grindValue },
-  bean.brewDetails.water && { label: "water", value: bean.brewDetails.water },
-  bean.brewDetails.ratio && { label: "ratio", value: bean.brewDetails.ratio },
-  bean.brewDetails.temp && { label: "temp", value: bean.brewDetails.temp },
-  bean.brewDetails.release && {
+  bean.data.brewDetails.water && { label: "water", value: bean.data.brewDetails.water },
+  bean.data.brewDetails.ratio && { label: "ratio", value: bean.data.brewDetails.ratio },
+  bean.data.brewDetails.temp && { label: "temp", value: bean.data.brewDetails.temp },
+  bean.data.brewDetails.release && {
     label: "release time",
-    value: bean.brewDetails.release,
+    value: bean.data.brewDetails.release,
     definition: "Time when the brew valve is opened or the release step begins."
   },
-  bean.brewDetails.total && {
+  bean.data.brewDetails.total && {
     label: "total brew time",
-    value: bean.brewDetails.total,
+    value: bean.data.brewDetails.total,
     definition: "Total time from first pour to the end of drawdown."
   }
 ].filter(Boolean);
 
 const gearItems = [
-  bean.brew.brewer && {
+  bean.data.brew.brewer && {
     label: "brewer",
-    value: bean.brew.brewer.name,
-    slug: bean.brew.brewer.slug
+    value: bean.data.brew.brewer.name,
+    slug: bean.data.brew.brewer.slug
   },
-  bean.brewDetails.grinder && {
+  bean.data.brewDetails.grinder && {
     label: "grinder",
-    value: bean.brewDetails.grinder.name,
-    slug: bean.brewDetails.grinder.slug
+    value: bean.data.brewDetails.grinder.name,
+    slug: bean.data.brewDetails.grinder.slug
   },
-  ...(bean.gear ?? [])
+  ...(bean.data.gear ?? [])
 ].filter(Boolean);
 ---
 <article
@@ -96,35 +75,18 @@ const gearItems = [
   <div class="bean-grid">
     <div class="bean-main window">
       <header>
-        <h2>{`BEAN ${bean.date} / ${bean.time}`}</h2>
-        <p class="bean-title">{bean.title}</p>
+        <h2>{`BEAN ${bean.data.date} / ${bean.data.time}`}</h2>
+        <p class="bean-title">{bean.data.title}</p>
         <p class="ascii-block" aria-hidden="true">======================</p>
       </header>
-      <section>
-        <h3 class="section-title">Observations</h3>
-        <ul>
-          {bean.observations.map((line) => (
-            <li set:html={renderInlineMarkdown(line)}></li>
-          ))}
-        </ul>
-        {bean.image && (
+      <section class="bean-content">
+        <Content />
+        {bean.data.image && (
           <figure class="bean-observation-media">
-            <img src={withBase(bean.image.src)} alt={bean.image.alt} loading="lazy" />
+            <img src={withBase(bean.data.image.src)} alt={bean.data.image.alt} loading="lazy" />
           </figure>
         )}
-        <TagRow tags={bean.tags} />
-      </section>
-      <section>
-        <h3 class="section-title">Brew notes</h3>
-        {bean.brew.notes?.length > 0 ? (
-          <ul>
-            {bean.brew.notes.map((note) => (
-              <li>{note}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No brew notes logged for this cup.</p>
-        )}
+        <TagRow tags={bean.data.tags} />
       </section>
     </div>
     <aside class="bean-side" aria-label="Bean support panes">

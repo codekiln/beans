@@ -16,7 +16,7 @@ const coffee = coffees.find((entry) => entry.slug === slug);
 const roasters = await getRoasters();
 const roaster = roasters.find((entry) => entry.slug === coffee?.roaster);
 const beans = await getBeans();
-const relatedBeans = beans.filter((bean) => bean.coffee.roast?.slug === slug).slice(0, 3);
+const relatedBeans = beans.filter((bean) => bean.data.coffee.roast?.slug === slug).slice(0, 3);
 const renderResult = coffee ? await coffee.render() : null;
 const NotesContent = renderResult?.Content;
 const hasNotes = Boolean(coffee?.body?.trim());

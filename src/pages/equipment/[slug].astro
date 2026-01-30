@@ -26,9 +26,9 @@ const NotesContent = renderResult?.Content;
 const hasNotes = Boolean(item?.body?.trim());
 const relatedBeans = beans
   .filter((bean) => {
-    const brewerSlug = bean.brew?.brewer?.slug;
-    const grinderSlug = bean.brewDetails?.grinder?.slug;
-    const extraGear = bean.gear?.map((entry) => entry.slug) ?? [];
+    const brewerSlug = bean.data.brew?.brewer?.slug;
+    const grinderSlug = bean.data.brewDetails?.grinder?.slug;
+    const extraGear = bean.data.gear?.map((entry) => entry.slug) ?? [];
     return (
       (brewerSlug && gearSlugs.has(brewerSlug)) ||
       (grinderSlug && gearSlugs.has(grinderSlug)) ||
@@ -36,8 +36,8 @@ const relatedBeans = beans
     );
   })
   .sort((a, b) => {
-    const left = new Date(`${a.date}T${a.time}:00`);
-    const right = new Date(`${b.date}T${b.time}:00`);
+    const left = new Date(`${a.data.date}T${a.data.time}:00`);
+    const right = new Date(`${b.data.date}T${b.data.time}:00`);
     return right.getTime() - left.getTime();
   });
 ---

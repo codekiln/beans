@@ -15,10 +15,17 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - When a user requests changes, load `AGENTS.md` first and provide a preview in ChatGPT Codex.
 - Follow existing project conventions and patterns; mirror nearby code style when editing files.
 - Prefer small, focused changes that keep the CLI-inspired tone of the site intact.
-- Use the existing utilities (such as `withBase`) for building paths and links.
+- Use the existing utilities (such as `withBase`) for building paths and links in components.
 - Keep content changes in `src/content` and presentation changes in `src/components`, `src/layouts`, or `src/styles`.
 - Keep the primary descriptive content for data models in the markdown body, not frontmatter arrays.
 - When adding new pages, use `.astro` files and include the base layout.
+
+## Content Guidelines
+
+- Bean entry markdown bodies are rendered directly as HTML using Astro's content rendering.
+- Images in markdown body content must use the full `/beans/images/` path (e.g., `![alt](/beans/images/file.png)`).
+- Images in frontmatter use `/images/` path without the `/beans/` prefix (handled by `withBase` utility in components).
+- Markdown bodies support all standard markdown features: headings, paragraphs, lists, links, images, code blocks, etc.
 
 ## Code Style
 
