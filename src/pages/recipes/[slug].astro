@@ -33,6 +33,21 @@ const recipe = recipes.find((entry) => entry.slug === slug);
     </section>
   ) : null}
   <section class="window">
+    <h2 class="section-title">Gear</h2>
+    {recipe?.gear?.length ? (
+      <ul>
+        {recipe.gear.map((item) => (
+          <li>
+            {item.label}:{" "}
+            {item.slug ? <a href={withBase(`/equipment/${item.slug}/`)}>{item.value}</a> : item.value}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No specific gear linked for this recipe.</p>
+    )}
+  </section>
+  <section class="window">
     <h2 class="section-title">Steps</h2>
     <ol>
       {recipe?.steps.map((step) => (

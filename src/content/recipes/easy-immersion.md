@@ -1,6 +1,10 @@
 ---
 name: "Easy Immersion"
 summary: "Switch immersion with a clean, steady release."
+gear:
+  - label: "brewer"
+    value: "Hario Switch"
+    slug: "hario-switch"
 order: 0
 ---
 

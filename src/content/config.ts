@@ -87,6 +87,15 @@ const recipes = defineCollection({
         alt: z.string()
       })
       .optional(),
+    gear: z
+      .array(
+        z.object({
+          label: z.string(),
+          value: z.string(),
+          slug: z.string().optional()
+        })
+      )
+      .optional(),
     order: z.number()
   })
 });
