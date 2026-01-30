@@ -8,7 +8,9 @@ export const getBeans = async () => {
   return entries.sort((a, b) => {
     const dateCompare = b.data.date.localeCompare(a.data.date);
     if (dateCompare !== 0) return dateCompare;
-    return b.data.time.localeCompare(a.data.time);
+    const timeA = a.data.time ?? "";
+    const timeB = b.data.time ?? "";
+    return timeB.localeCompare(timeA);
   });
 };
 
