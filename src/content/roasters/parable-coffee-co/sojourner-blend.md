@@ -1,6 +1,5 @@
 ---
 name: "Sojourner Blend"
-roaster: "parable-coffee-co"
 image:
   src: "/images/parable-coffee-co-sojourner-blend.png"
   alt: "Parable Coffee Co. Sojourner Blend bag with a red label."

@@ -1,6 +1,5 @@
 ---
 name: "Mocha Java"
-roaster: "parable-coffee-co"
 roastLevel: "medium-dark"
 profile: "dense · earthy berry · complete"
 ---

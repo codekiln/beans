@@ -1,6 +1,5 @@
 ---
 name: "Organic August — Seasonal Blend"
-roaster: "ruby-colorful-coffees"
 profile: "honey · berries · orange zest · milk chocolate"
 ---
 

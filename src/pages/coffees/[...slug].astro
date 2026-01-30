@@ -10,7 +10,9 @@ export async function getStaticPaths() {
   return coffees.map((coffee) => ({ params: { slug: coffee.slug } }));
 }
 
-const { slug } = Astro.params;
+const slug = Array.isArray(Astro.params.slug)
+  ? Astro.params.slug.join("/")
+  : (Astro.params.slug ?? "");
 const coffees = await getCoffees();
 const coffee = coffees.find((entry) => entry.slug === slug);
 const roasters = await getRoasters();
