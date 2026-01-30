@@ -88,8 +88,9 @@ const relatedBeans = beans
       <ul>
         {relatedBeans.map((bean) => (
           <li>
-            <a href={withBase(`/#${bean.slug}`)}>
-              {bean.date} {bean.time} · {bean.title}
+            <a href={withBase(`/log/${bean.slug}/`)}>
+              {bean.data.date}
+              {bean.data.time ? ` ${bean.data.time}` : ""} · {bean.data.title}
             </a>
           </li>
         ))}
