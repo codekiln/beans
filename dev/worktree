@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="/workspaces/beans-worktrees"
+
+usage() {
+  cat <<'USAGE'
+Usage: dev/worktree <command> [args]
+
+Commands:
+  add <branch> [base]   Add a worktree at /workspaces/beans-worktrees/<branch>.
+                        base defaults to origin/main unless the branch exists remotely.
+  list                  List worktrees.
+  prune                 Prune stale worktrees.
+  remove <path>         Remove a worktree by path.
+
+Examples:
+  dev/worktree add feat/foo
+  dev/worktree add feat/bar origin/main
+  dev/worktree list
+  dev/worktree prune
+  dev/worktree remove /workspaces/beans-worktrees/feat/foo
+USAGE
+}
+
+ensure_root() {
+  mkdir -p "$ROOT_DIR"
+}
+
+branch_exists_local() {
+  git show-ref --verify --quiet "refs/heads/$1"
+}
+
+branch_exists_remote() {
+  git show-ref --verify --quiet "refs/remotes/origin/$1"
+}
+
+case "${1:-}" in
+  add)
+    branch="${2:-}"
+    base="${3:-origin/main}"
+    if [[ -z "$branch" ]]; then
+      usage
+      exit 1
+    fi
+    ensure_root
+    path="$ROOT_DIR/$branch"
+    if [[ -e "$path" ]]; then
+      echo "Path already exists: $path" >&2
+      exit 1
+    fi
+    if branch_exists_local "$branch"; then
+      git worktree add "$path" "$branch"
+      exit 0
+    fi
+    if branch_exists_remote "$branch"; then
+      git worktree add -b "$branch" "$path" "origin/$branch"
+      exit 0
+    fi
+    git worktree add -b "$branch" "$path" "$base"
+    ;;
+  list)
+    git worktree list
+    ;;
+  prune)
+    git worktree prune
+    ;;
+  remove)
+    path="${2:-}"
+    if [[ -z "$path" ]]; then
+      usage
+      exit 1
+    fi
+    git worktree remove "$path"
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac
