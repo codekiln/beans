@@ -5,7 +5,7 @@ This repo uses Beads for git-native issue tracking. Issues live in the repo, tra
 ## How it is installed
 
 ### Devcontainer
-The devcontainer installs the Beads CLI (`bd`) during `postCreateCommand` if it is not already available.
+The devcontainer installs the Beads CLI (`bd`) via `.devcontainer/postCreate.sh` if it is not already available.
 
 ### Local install (optional)
 If you are not using the devcontainer, install Beads manually with the upstream installer:
