@@ -12,11 +12,6 @@ if [ -f package.json ]; then
   npm install
 fi
 
-if ! command -v bd >/dev/null 2>&1; then
-  # Install Beads CLI for repo issue tracking.
-  curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
-fi
-
 if [ ! -d "$HOME/.tmux" ]; then
   # Install Oh My Tmux config repo once.
   git clone --depth 1 https://github.com/gpakosz/.tmux "$HOME/.tmux"

@@ -3,7 +3,11 @@
   "image": "mcr.microsoft.com/devcontainers/typescript-node:24",
   "postCreateCommand": ".devcontainer/postCreate.sh",
   "features": {
-    "ghcr.io/jsburckhardt/devcontainer-features/codex:1": {}
+    "ghcr.io/jsburckhardt/devcontainer-features/codex:1": {},
+    "ghcr.io/eitsupi/devcontainer-features/beads-cli:1": {},
+    "ghcr.io/duduribeiro/devcontainer-features/tmux:1": {
+      "version": "latest"
+    }
   },
   "customizations": {
     "vscode": {
