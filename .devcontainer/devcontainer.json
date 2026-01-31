@@ -1,5 +1,15 @@
 {
   "name": "beans",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-24-bookworm",
-  "postCreateCommand": "nvm install && nvm use && if ! command -v bd >/dev/null 2>&1; then curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash; fi"
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:24",
+  "postCreateCommand": ".devcontainer/postCreate.sh",
+  "features": {
+    "ghcr.io/jsburckhardt/devcontainer-features/codex:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "openai.chatgpt"
+      ]
+    }
+  }
 }
