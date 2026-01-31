@@ -16,3 +16,11 @@ pnpm-debug.log*
 # Editor/OS files
 .vscode
 *.swp
+
+# Beads runtime files
+.beads/bd.sock
+.beads/beads.db
+.beads/beads.db-*
+.beads/daemon.*
+.beads/last-touched
+.beads/interactions.jsonl
