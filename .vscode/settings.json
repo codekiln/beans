@@ -1,3 +1,6 @@
 {
-  "terminal.integrated.fontFamily": "JetBrains Mono, Source Code Pro, FiraMono for Powerline, Menlo, Monaco, 'Courier New', monospace"
+  "editor.fontFamily": "Source Code Pro, JetBrains Mono, FiraMono for Powerline, Menlo, Monaco, 'Courier New', monospace",
+  "terminal.integrated.fontFamily": "Source Code Pro, JetBrains Mono, FiraMono for Powerline, Menlo, Monaco, 'Courier New', monospace",
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.integrated.fontSize": 15
 }
