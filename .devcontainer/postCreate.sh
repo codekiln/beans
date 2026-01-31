@@ -12,6 +12,9 @@ if [ -f package.json ]; then
   npm install
 fi
 
+# Install rulesync globally for easy CLI access.
+npm install -g rulesync
+
 if [ ! -d "$HOME/.tmux" ]; then
   # Install Oh My Tmux config repo once.
   git clone --depth 1 https://github.com/gpakosz/.tmux "$HOME/.tmux"
