@@ -12,3 +12,8 @@
   - `dev/worktree prune`
   - `dev/worktree remove /workspaces/worktrees/feat/my-branch`
 - Each worktree needs its own `npm install` before running the dev server.
+
+## Devcontainer expectations for worktrees
+- Worktrees are separate checkout roots, so each one must run `nvm install && nvm use` once (the devcontainer post-create only runs for the main workspace).
+- Keep worktrees under `/workspaces/worktrees` so they share the same Codespaces environment and can reuse forwarded ports.
+- When opening a worktree in VS Code (Remote - Codespaces), use `File > Open Folder...` and select the worktree path.
