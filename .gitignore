@@ -14,8 +14,6 @@ pnpm-debug.log*
 .env.*.local
 
 # Editor/OS files
-.vscode
-!.vscode/settings.json
 *.swp
 
 # Beads runtime files
