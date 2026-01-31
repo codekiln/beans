@@ -1,0 +1,4 @@
+# Beans devcontainer tmux overrides
+
+# Force Vi mode for copy-mode.
+set -g mode-keys vi

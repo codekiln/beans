@@ -1,5 +1,7 @@
 {
   "editor.fontFamily": "Source Code Pro, JetBrains Mono, FiraMono for Powerline, Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontSize": 15,
+  "editor.fontLigatures": true,
   "terminal.integrated.fontFamily": "Source Code Pro, JetBrains Mono, FiraMono for Powerline, Menlo, Monaco, 'Courier New', monospace",
   "terminal.integrated.fontLigatures.enabled": true,
   "terminal.integrated.fontSize": 15

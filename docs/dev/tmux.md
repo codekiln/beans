@@ -1,0 +1,10 @@
+# tmux
+
+The configuration in `.devcontainer/setup-tmux.sh` draws from 
+[gpakosz/.tmux: Oh my tmux! My self-contained, pretty & versatile tmux configuration made with 💛🩷💙🖤❤️🤍](https://github.com/gpakosz/.tmux) 
+for sensible defaults.
+
+In particular, 
+- `<prefix>` is `Ctrl+a` and `Ctrl+b` (both work)
+- `<prefix> r` reloads the config
+ 

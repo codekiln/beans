@@ -15,17 +15,5 @@ fi
 # Install rulesync globally for easy CLI access.
 npm install -g rulesync
 
-if [ ! -d "$HOME/.tmux" ]; then
-  # Install Oh My Tmux config repo once.
-  git clone --depth 1 https://github.com/gpakosz/.tmux "$HOME/.tmux"
-fi
-
-if [ ! -e "$HOME/.tmux.conf" ]; then
-  # Wire up the shared tmux config.
-  ln -s "$HOME/.tmux/.tmux.conf" "$HOME/.tmux.conf"
-fi
-
-if [ ! -e "$HOME/.tmux.conf.local" ]; then
-  # Seed local overrides.
-  cp "$HOME/.tmux/.tmux.conf.local" "$HOME/.tmux.conf.local"
-fi
+# Tmux setup: run only this step with .devcontainer/setup-tmux.sh
+.devcontainer/setup-tmux.sh
