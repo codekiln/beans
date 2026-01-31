@@ -16,7 +16,7 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 ## General Guidelines
 
 - Always generate previews using the `/beans/` base prefix (for example: `/beans/log/<slug>`).
-- When a user requests changes, load `AGENTS.md` first and provide a preview in ChatGPT Codex.
+- When a user requests changes, load `AGENTS.md` first and provide a preview in ChatGPT Codex. This is mainly for Codex Cloud tasks so you get a visual check in ChatGPT; in Codespaces you can rely on `npm run dev` for local preview.
 - Follow existing project conventions and patterns; mirror nearby code style when editing files.
 - Prefer small, focused changes that keep the CLI-inspired tone of the site intact.
 - Use the existing utilities (such as `withBase`) for building paths and links in components.
