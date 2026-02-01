@@ -38,6 +38,10 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - Update the unified rules in `.rulesync/rules/`.
 - Regenerate AI tool configs with `npx rulesync generate` after changing rules.
 
+## Git LFS
+
+- This repo does not use Git LFS. Avoid configuring or installing Git LFS hooks.
+
 ## Node Version Alignment
 
 - Use `.nvmrc` as the single source of truth for the Node version.
