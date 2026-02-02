@@ -1,0 +1,19 @@
+# Rulesync in Beans
+
+This repo uses Rulesync to keep AI tool rules and commands consistent across editors and agents. It reads the unified rules and command templates under `.rulesync/` and generates tool-specific files with `npx rulesync generate`.
+
+## Devcontainer install
+
+The devcontainer installs Rulesync globally for easy CLI access in `.devcontainer/postCreate.sh`:
+
+```bash
+npm install -g rulesync
+```
+
+## Local usage
+
+Rulesync is also listed in `devDependencies`, so you can run it with:
+
+```bash
+npx rulesync generate
+```
