@@ -1,9 +1,12 @@
 Please also reference the following rules as needed. The list below is provided in TOON format, and `@` stands for the project root directory.
 
-rules[1]:
+rules[2]:
   - path: @.codex/memories/bean-entry.md
     description: Bean entry command and content template
     applyTo[1]: src/content/beans/**
+  - path: @.codex/memories/rulesync.md
+    description: Rulesync usage and devcontainer installation
+    applyTo[1]: docs/dev/rulesync.md
 
 # Additional Conventions Beyond the Built-in Functions
 
