@@ -275,19 +275,40 @@ button:focus-visible {
 }
 
 .markdown blockquote {
+  position: relative;
   margin: 0 0 1rem;
-  padding: 0.75rem 1rem;
-  border-left: 4px solid color-mix(in srgb, var(--accent) 70%, var(--border));
-  border-radius: 0 0.5rem 0.5rem 0;
-  background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
-  color: var(--text);
+  padding: 1.1rem 1.35rem 1.1rem 1.6rem;
+  border-left: 5px solid color-mix(in srgb, var(--accent) 65%, var(--border));
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, #f4e7d7 38%, var(--bg-elevated)),
+    color-mix(in srgb, #f1e4d2 30%, var(--bg))
+  );
+  color: color-mix(in srgb, var(--text) 94%, var(--muted));
+  font-family: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
   font-style: italic;
+  font-weight: 500;
+  font-size: 1.02rem;
+  line-height: 1.7;
   font-synthesis: style;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border) 45%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--border) 30%, transparent),
+    0 10px 22px var(--shadow);
+}
+
+.markdown blockquote::before {
+  content: "“";
+  position: absolute;
+  left: 0.6rem;
+  top: 0.3rem;
+  font-size: 2rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--accent) 45%, var(--border));
 }
 
 .markdown blockquote p {
-  margin: 0 0 0.6rem;
+  margin: 0 0 0.75rem;
   font-style: italic;
   font-synthesis: style;
 }
