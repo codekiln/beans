@@ -2,6 +2,7 @@
   "name": "beans",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:24",
   "postCreateCommand": ".devcontainer/postCreate.sh",
+  "postStartCommand": "npx -y @playwright/mcp@latest --port 5173 --viewport-size 1440x900 --caps vision &",
   "features": {
     "ghcr.io/jsburckhardt/devcontainer-features/codex:1": {},
     "ghcr.io/eitsupi/devcontainer-features/beads-cli:1": {},

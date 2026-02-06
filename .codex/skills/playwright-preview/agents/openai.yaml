@@ -1,0 +1,4 @@
+interface:
+  display_name: "Playwright Preview"
+  short_description: "Capture local dev server screenshots."
+  default_prompt: "Use $playwright-preview to capture a Playwright screenshot of the running dev server."

@@ -35,7 +35,10 @@ const resolvedLinkHref = initialLinkHref ?? withBase(Astro.url.pathname);
         root.dataset.theme = prefersDark ? "dark" : "light";
       })();
     </script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400;1,600&display=swap"
+    />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>

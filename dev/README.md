@@ -4,6 +4,10 @@
 - To view in Github Codespaces, enter command palette and search for `Simple Browser: Show`
 - open up the **same** address as the external preview (for example, https://<codespace-id>-<hash>-4322.app.github.dev/beans/) in the simple browser
 
+## Codex previews (Playwright)
+- See `docs/dev/playwright-preview.md` for Playwright install + screenshot instructions.
+- The Playwright flow uses container-local `http://localhost:<port>` and supports full-page captures.
+
 ## Git worktrees in Codespaces
 - Worktrees should live under `/workspaces/worktrees` so they persist and stay inside the Codespaces workspace.
 - Use the helper script to add/list/prune/remove worktrees:
