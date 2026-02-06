@@ -24,3 +24,5 @@ pnpm-debug.log*
 .beads/daemon.*
 .beads/last-touched
 .beads/interactions.jsonl
+# bd worktree
+beans-2xl/
