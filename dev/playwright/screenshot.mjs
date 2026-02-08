@@ -54,7 +54,10 @@ if (!Number.isFinite(waitMs) || waitMs < 0) {
 const run = async () => {
   await fs.mkdir(path.dirname(output), { recursive: true });
 
-  const browser = await chromium.launch({ headless: true });
+  const armChromiumExecutable = await resolveArmChromiumExecutable();
+  const browser = await chromium.launch(
+    armChromiumExecutable ? { headless: true, executablePath: armChromiumExecutable } : { headless: true }
+  );
   const page = await browser.newPage({ viewport: { width, height } });
 
   await page.goto(url, { waitUntil: "networkidle" });
@@ -66,6 +69,42 @@ const run = async () => {
   await browser.close();
 
   console.log(`Saved screenshot to ${output}`);
+};
+
+const resolveArmChromiumExecutable = async () => {
+  if (process.arch !== "arm64") {
+    return null;
+  }
+
+  const roots = [
+    path.resolve("node_modules/playwright-core/.local-browsers"),
+    process.env.HOME ? path.join(process.env.HOME, "Library/Caches/ms-playwright") : null
+  ].filter(Boolean);
+
+  for (const root of roots) {
+    const entries = await fs.readdir(root, { withFileTypes: true }).catch(() => []);
+    const chromiumDirs = entries
+      .filter((entry) => entry.isDirectory() && entry.name.startsWith("chromium-"))
+      .map((entry) => entry.name);
+
+    for (const chromiumDir of chromiumDirs) {
+      const candidate = path.join(
+        root,
+        chromiumDir,
+        "chrome-mac-arm64",
+        "Google Chrome for Testing.app",
+        "Contents",
+        "MacOS",
+        "Google Chrome for Testing"
+      );
+      const exists = await fs.access(candidate).then(() => true).catch(() => false);
+      if (exists) {
+        return candidate;
+      }
+    }
+  }
+
+  return null;
 };
 
 run().catch((error) => {
