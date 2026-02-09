@@ -36,8 +36,8 @@ const relatedBeans = beans
     );
   })
   .sort((a, b) => {
-    const left = new Date(`${a.data.date}T${a.data.time}:00`);
-    const right = new Date(`${b.data.date}T${b.data.time}:00`);
+    const left = new Date(`${a.data.date}T${a.data.time ?? "00:00"}:00`);
+    const right = new Date(`${b.data.date}T${b.data.time ?? "00:00"}:00`);
     return right.getTime() - left.getTime();
   });
 ---

@@ -7,6 +7,9 @@ const { Content } = await bean.render();
 const logCommand = `log ${bean.data.date} ${bean.data.beanKey}`;
 const command = `$ bean ${logCommand}`;
 const detailHref = withBase(`/log/${bean.slug}/`);
+const beanHeader = bean.data.time
+  ? `BEAN ${bean.data.date} / ${bean.data.time}`
+  : `BEAN ${bean.data.date}`;
 
 const coffeeRows = [
   bean.data.coffee.roaster && {
@@ -75,7 +78,7 @@ const gearItems = [
   <div class="bean-grid">
     <div class="bean-main window">
       <header>
-        <h2>{`BEAN ${bean.data.date} / ${bean.data.time}`}</h2>
+        <h2>{beanHeader}</h2>
         <p class="bean-title">{bean.data.title}</p>
         <p class="ascii-block" aria-hidden="true">======================</p>
       </header>

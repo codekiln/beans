@@ -26,3 +26,4 @@ pnpm-debug.log*
 .beads/interactions.jsonl
 # bd worktree
 beans-2xl/
+worktrees/
