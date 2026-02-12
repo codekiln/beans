@@ -1,10 +1,12 @@
 # Bean entry command
 
-Use this CLI-style command when creating a new Bean entry:
+Use this CLI-style command as a **formatting convention** when creating a new Bean entry:
 
 ```bash
 $ bean log <YYYY-MM-DD> <beanKey>
 ```
+
+`bean` is not an installed command in this repository. Treat this as display text that mirrors the site's CLI-inspired UI and maps to file naming.
 
 Then create a matching file at `src/content/beans/<YYYY-MM-DD>-<beanKey>.md` with frontmatter fields that align with the beans collection schema, and keep the primary descriptive content in the markdown body.
 
