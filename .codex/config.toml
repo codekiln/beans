@@ -1,2 +1,5 @@
 [mcp_servers.playwright]
 url = "http://localhost:5173/mcp"
+
+[profiles.codespaces]
+approval_policy = "on-failure"

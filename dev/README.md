@@ -7,6 +7,7 @@
 ## Codex previews (Playwright)
 - See `docs/dev/playwright-preview.md` for Playwright install + screenshot instructions.
 - The Playwright flow uses container-local `http://localhost:<port>` and supports full-page captures.
+- See `docs/dev/codex.md` for Codespaces-specific Codex approval defaults.
 
 ## Git worktrees in Codespaces
 - Worktrees should live under `/workspaces/worktrees` so they persist and stay inside the Codespaces workspace.
