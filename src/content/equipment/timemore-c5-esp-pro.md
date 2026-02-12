@@ -1,6 +1,8 @@
 ---
 name: "Timemore C5 ESP Pro"
 type: "grinder"
+cost: 92
+purchaseDate: "2026-01-15"
 aliases:
   - slug: "timemore-chestnut"
     name: "Timemore Chestnut"

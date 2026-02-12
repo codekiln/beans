@@ -105,6 +105,8 @@ const equipment = defineCollection({
   schema: z.object({
     name: z.string(),
     type: z.string(),
+    cost: z.number().nullable().optional(),
+    purchaseDate: z.string().nullable().optional(),
     aliases: z
       .array(
         z.object({

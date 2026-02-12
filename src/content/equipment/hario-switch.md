@@ -1,6 +1,8 @@
 ---
 name: "Hario Switch"
 type: "brewer"
+cost: 41.44
+purchaseDate: "2026-01-22"
 references:
   - label: "Amazon product page"
     url: "https://www.amazon.com/dp/B09JL4R6SX"

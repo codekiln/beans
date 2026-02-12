@@ -5,15 +5,29 @@ import { withBase } from "../../utils/paths";
 
 const equipment = await getEquipment();
 const equipmentTypes = await getEquipmentTypes();
-const grouped = equipmentTypes.map((type) => ({
-  type,
-  items: equipment.filter((item) => item.type === type)
-}));
+const currency = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD"
+});
+const equipmentCostTotal = equipment.reduce(
+  (total, item) => (typeof item.cost === "number" ? total + item.cost : total),
+  0
+);
+const grouped = equipmentTypes
+  .slice()
+  .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }))
+  .map((type) => ({
+    type,
+    items: equipment
+      .filter((item) => item.type === type)
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
+  }));
 ---
 <BaseLayout title="Equipment · Beans" description="Coffee gear references." initialCommand="$ bean equipment">
   <section class="hero">
     <h1>Equipment namespaces</h1>
     <p>Grinders, brewers, and tools referenced by beans.</p>
+    <p>Total tracked cost: {currency.format(equipmentCostTotal)}</p>
   </section>
   {grouped.map((group) => (
     <section class="window" aria-labelledby={`equipment-${group.type}`}>
@@ -24,6 +38,7 @@ const grouped = equipmentTypes.map((type) => ({
         {group.items.map((item) => (
           <li>
             <a href={withBase(`/equipment/${item.slug}/`)}>[{item.name}]</a>
+            {typeof item.cost === "number" ? ` · ${currency.format(item.cost)}` : ""}
           </li>
         ))}
       </ul>

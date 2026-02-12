@@ -1,6 +1,11 @@
 ---
 name: "Maestri House Mini Coffee Scale"
 type: "scale"
+cost: 28.79
+purchaseDate: "2026-01-15"
+aliases:
+  - slug: "mastery-house-scale-timer"
+    name: "Mastery House Scale & Timer"
 references:
   - label: "Amazon"
     url: "https://www.amazon.com/dp/B0CQY78HV6"

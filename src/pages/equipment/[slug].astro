@@ -15,6 +15,10 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const equipment = await getEquipment();
 const beans = await getBeans();
+const currency = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD"
+});
 const item =
   equipment.find((entry) => entry.slug === slug) ??
   equipment.find((entry) => entry.aliases?.some((alias) => alias.slug === slug));
@@ -49,6 +53,8 @@ const relatedBeans = beans
   <section class="hero">
     <h1>{item?.name}</h1>
     <p>Namespace: {item?.type}</p>
+    {typeof item?.cost === "number" && <p>Cost: {currency.format(item.cost)}</p>}
+    {item?.purchaseDate && <p>Purchase date: {item.purchaseDate}</p>}
     {alias && <p>Alias: {alias.name}</p>}
     <p>
       <a href={withBase("/equipment/")}>[back to equipment]</a>

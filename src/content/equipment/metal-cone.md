@@ -1,6 +1,8 @@
 ---
 name: "Metal cone"
 type: "brewer"
+cost: null
+purchaseDate: null
 related: []
 order: 4
 ---
