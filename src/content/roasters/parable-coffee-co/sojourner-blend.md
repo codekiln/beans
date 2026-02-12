@@ -4,12 +4,14 @@ image:
   src: "/images/parable-coffee-co-sojourner-blend.png"
   alt: "Parable Coffee Co. Sojourner Blend bag with a red label."
 roastLevel: "medium"
-profile: "balanced · sweet dark fruits · candy · chocolate"
-blend: "Ethopian, Sumatran, Guatemalan"
+profile: "balanced · sweet dark fruit · earthy chocolate"
+blend: "Ethiopia · Sumatra · Guatemala"
 ---
 
 ### Label
 
-> Balanced and sweet, dark fruits, earthy, chocolate.
+> Balanced and sweet with dark fruit and earthy chocolate notes.
 
-> Start your journey with this blend of sweet creamy Ethopian, in perfect harmony with earthy Sumatran and brown sugary Guatemalan. A perfect start to your day.
+Sojourner is positioned as an approachable daily blend with a medium roast profile and a grounded, chocolate-forward cup.
+
+Parable lists this coffee as an Ethiopia, Sumatra, and Guatemala blend, and labels it as fair trade organic.
