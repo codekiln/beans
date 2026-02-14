@@ -23,5 +23,8 @@ npm install -g rulesync
 # Tmux setup: run only this step with .devcontainer/setup-tmux.sh
 .devcontainer/setup-tmux.sh
 
+# Neovim setup: terminal editor defaults + shared config.
+.devcontainer/setup-neovim.sh
+
 # Codex setup: use Codespaces profile in this repo without affecting local runs.
 .devcontainer/setup-codex.sh
