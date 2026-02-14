@@ -4,7 +4,7 @@ type: "filter"
 cost: 23.99
 purchaseDate: null
 aliases:
-  - slug: "hario-03-filters"
+  - slug: "c"
     name: "Hario 03 filters"
 references:
   - label: "Amazon product page"
@@ -16,5 +16,5 @@ order: 5
 
 - Hario 03 natural paper filters, 100-count packs in a 3-pack set.
 - Total quantity: 300 sheets.
-- Listed as a Japan import.
-- Price paid: $23.99 ($0.08/count).
+- From Japan.
+- Paid: $23.99 ($0.08/count).
