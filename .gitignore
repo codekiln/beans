@@ -27,3 +27,6 @@ pnpm-debug.log*
 # bd worktree
 beans-2xl/
 worktrees/
+
+# Playwright preview artifacts
+dev/playwright/*.png
