@@ -26,3 +26,19 @@ bd sync
 ```
 
 Use Beads IDs exactly as written (example: `beans-2xn`).
+
+## Task completion workflow (required)
+
+When finishing a Beads task that will be pushed to `main`:
+
+1. Close the Beads issue first (before push), for example:
+   - `BEADS_NO_DAEMON=1 bd close <issue-id> --reason "<short reason>"`
+2. Commit the Beads tracking changes produced by that close action (typically `.beads/issues.jsonl`, plus any related Beads metadata files that changed).
+3. Push only after both code changes and Beads state changes are committed.
+
+Quick verification before push:
+
+```bash
+BEADS_NO_DAEMON=1 bd show <issue-id>
+git status --short
+```
