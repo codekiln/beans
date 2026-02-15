@@ -26,7 +26,8 @@ pnpm-debug.log*
 .beads/interactions.jsonl
 # bd worktree
 beans-2xl/
-worktrees/
+worktrees/*
+!worktrees/README.md
 
 # Playwright preview artifacts
 dev/playwright/*.png

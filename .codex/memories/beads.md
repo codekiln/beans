@@ -11,8 +11,16 @@ This repository uses **Beads** as the issue tracker. Beads data is local to the 
 - Treat Beads as the default task system for this repo.
 - When a user asks about "tasks", "issues", or ticket IDs like `beans-2xn`, use `bd` first.
 - Prefer `bd list`/`bd show` over manually reading JSONL unless debugging storage-level issues.
+- This project is used in three execution environments:
+  - GitHub Codespaces
+  - Local devcontainer
+  - Local execution
 - In git worktrees, avoid daemon mode to prevent branch mix-ups:
   - `export BEADS_NO_DAEMON=1`
+- Preferred worktree layout for local execution:
+  - `${PROJECT_ROOT}/worktrees/${BRANCH_NAME}`
+  - Keep all worktrees in subdirectories under `${PROJECT_ROOT}/worktrees/` (no worktree checkout directly at `${PROJECT_ROOT}/worktrees`).
+  - Ensure `${PROJECT_ROOT}/worktrees/README.md` exists and states that all worktrees should live in subfolders of that directory.
 
 ## Common commands
 
