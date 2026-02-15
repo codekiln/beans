@@ -42,6 +42,28 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - Run `bd sync --check` before `bd sync`/push when task state changed.
 - Avoid `bd edit` in agent sessions because it opens an interactive editor.
 
+### Session Start
+
+```bash
+bd prime
+bd where
+bd worktree info
+bd sync --status
+bd ready
+```
+
+### Session End
+
+```bash
+bd show <issue-id>
+bd sync --check
+git status --short
+bd sync
+git push
+```
+
+- Keep Beads hooks healthy: run `bd hooks list` and `bd doctor --check-health` periodically.
+
 ## Content Guidelines
 
 - Bean entry markdown bodies are rendered directly as HTML using Astro's content rendering.

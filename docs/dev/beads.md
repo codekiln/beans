@@ -125,3 +125,62 @@ bd hooks install
 - If JSONL conflicts occur, use `bd resolve-conflicts` (or normal git merge flow with the Beads merge driver).
 - Keep sync branch consistent across clones/worktrees. This repo standard is `beads-sync`.
 - Keep deploy workflows branch-filtered (for example, Pages deploy only from `main`) so metadata sync branch updates do not trigger site deploys.
+
+
+## Session checklists
+
+Session start:
+
+```bash
+bd prime
+bd where
+bd worktree info
+bd sync --status
+bd ready
+```
+
+Session end:
+
+```bash
+bd show <issue-id>
+bd sync --check
+git status --short
+bd sync
+git push
+```
+
+## Hook health checks
+
+```bash
+bd hooks list
+bd doctor --check-health
+```
+
+## Solo-dev sync branch policy
+
+- This repo uses `beads-sync` as a persistent metadata branch.
+- Keep deploy workflows filtered to `main` only.
+- Avoid merge-and-delete behavior for `beads-sync`; if deleted remotely, recreate it before next sync.
+
+## Worktree lock troubleshooting
+
+If branch checkout fails with a message like `fatal: '<branch>' is already checked out at '.git/beads-worktrees/<name>'`:
+
+```bash
+# Remove stale beads-managed worktrees
+rm -rf .git/beads-worktrees
+
+# Prune stale git worktree metadata
+git worktree prune
+
+# Retry normal branch/worktree commands
+git worktree list
+```
+
+Then verify Beads state:
+
+```bash
+bd worktree list
+bd sync --status
+bd doctor --check-health
+```
