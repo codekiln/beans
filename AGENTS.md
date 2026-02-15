@@ -30,6 +30,18 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - Keep the primary descriptive content for data models in the markdown body, not frontmatter arrays.
 - When adding new pages, use `.astro` files and include the base layout.
 
+## Beads Workflow
+
+- Run `bd prime` at session start (or after context compaction) to refresh the current Beads workflow contract.
+- Use Beads (`bd`) as the task source of truth; do not track tasks in ad hoc markdown lists.
+- Do not use TodoWrite/TaskCreate as the task system in this repo; use Beads issues instead.
+- Create or claim the bead before coding, keep status current during work, and close/sync when done.
+- For multi-agent work, prefer `bd ready` and atomically claim with `bd update <issue-id> --claim`.
+- Use Beads-managed worktrees going forward: `bd worktree create worktrees/<branch-name> --branch <branch-name>`.
+- Keep worktrees under `worktrees/` subfolders only.
+- Run `bd sync --check` before `bd sync`/push when task state changed.
+- Avoid `bd edit` in agent sessions because it opens an interactive editor.
+
 ## Content Guidelines
 
 - Bean entry markdown bodies are rendered directly as HTML using Astro's content rendering.

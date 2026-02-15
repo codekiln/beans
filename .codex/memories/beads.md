@@ -2,8 +2,9 @@
 
 This repository uses **Beads** as the issue tracker. Beads data is local to the repo under `.beads/`.
 
-- Source of truth: `.beads/issues.jsonl`
-- Database/cache/runtime files: `.beads/beads.db*` and daemon state files
+- Runtime store: `.beads/beads.db` (SQLite)
+- Git exchange artifact: `.beads/issues.jsonl` (committed and merged with code)
+- Database/cache/runtime files: `.beads/beads.db*` plus daemon/runtime state files
 - CLI command: `bd`
 
 ## Expected agent behavior
@@ -11,42 +12,65 @@ This repository uses **Beads** as the issue tracker. Beads data is local to the 
 - Treat Beads as the default task system for this repo.
 - When a user asks about "tasks", "issues", or ticket IDs like `beans-2xn`, use `bd` first.
 - Prefer `bd list`/`bd show` over manually reading JSONL unless debugging storage-level issues.
+- Prefer `bd ready` to find actually claimable work (dependency-aware), not only `bd list --ready`.
+- Use atomic claim for multi-agent safety:
+  - `bd update <issue-id> --claim`
 - This project is used in three execution environments:
   - GitHub Codespaces
   - Local devcontainer
   - Local execution
-- In git worktrees, avoid daemon mode to prevent branch mix-ups:
-  - `export BEADS_NO_DAEMON=1`
 - Preferred worktree layout for local execution:
   - `${PROJECT_ROOT}/worktrees/${BRANCH_NAME}`
   - Keep all worktrees in subdirectories under `${PROJECT_ROOT}/worktrees/` (no worktree checkout directly at `${PROJECT_ROOT}/worktrees`).
   - Ensure `${PROJECT_ROOT}/worktrees/README.md` exists and states that all worktrees should live in subfolders of that directory.
+- Create worktrees with Beads-aware wiring:
+  - `bd worktree create worktrees/<branch-name> --branch <branch-name>`
+  - `bd worktree list`
+  - `bd worktree info`
+- Do not rely on legacy `BEADS_NO_DAEMON` guidance; current `bd` defaults to direct mode and `--no-daemon` is deprecated.
 
 ## Common commands
 
 ```bash
+bd worktree create worktrees/<branch-name> --branch <branch-name>
+bd ready
 bd list --status open --type task
 bd show <issue-id>
 bd create "<title>"
-bd update <issue-id> --status in_progress
+bd update <issue-id> --claim
 bd close <issue-id>
+bd sync --check
 bd sync
 ```
 
 Use Beads IDs exactly as written (example: `beans-2xn`).
+
+## Multi-agent coordination
+
+- Use dependencies and blockers, then let `bd ready` route agents to unblocked work.
+- Use `bd gate` for async waits (human, timer, CI, PR, bead).
+- Use `bd merge-slot` to serialize merge-conflict resolution when many agents converge on shared branches.
+
+## Git integration
+
+- Install Beads hooks in active clones/worktrees:
+  - `bd hooks install`
+- Ensure merge driver remains configured so `.beads/issues.jsonl` merges are handled by `bd`.
+- If sync branch is required, keep one shared value across clones/worktrees (this repo uses `beads-sync`).
 
 ## Task completion workflow (required)
 
 When finishing a Beads task that will be pushed to `main`:
 
 1. Close the Beads issue first (before push), for example:
-   - `BEADS_NO_DAEMON=1 bd close <issue-id> --reason "<short reason>"`
+   - `bd close <issue-id> --reason "<short reason>"`
 2. Commit the Beads tracking changes produced by that close action (typically `.beads/issues.jsonl`, plus any related Beads metadata files that changed).
 3. Push only after both code changes and Beads state changes are committed.
 
 Quick verification before push:
 
 ```bash
-BEADS_NO_DAEMON=1 bd show <issue-id>
+bd show <issue-id>
+bd sync --check
 git status --short
 ```

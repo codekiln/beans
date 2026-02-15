@@ -16,9 +16,26 @@ curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/insta
 
 ## Where data lives
 
-- `.beads/issues.jsonl` is the git-tracked source of truth for issues.
+- `.beads/beads.db` is the runtime issue database used by `bd`.
+- `.beads/issues.jsonl` is the git-tracked sync artifact exchanged between clones/branches.
 - `.beads/config.yaml` stores repo-level Beads config.
 - Local SQLite/daemon files live under `.beads/` and are gitignored.
+
+## Worktrees (required pattern)
+
+Use Beads-managed worktree creation so all worktrees share the same `.beads` store through redirect wiring.
+
+```bash
+# Preferred pattern in this repo
+bd worktree create worktrees/<branch-name> --branch <branch-name>
+
+# Inspect configuration
+bd worktree list
+bd worktree info
+bd where
+```
+
+Do not create ad hoc worktrees outside `worktrees/` for regular agent workflows.
 
 ## Quick start (this repo)
 
@@ -29,8 +46,8 @@ bd ready
 # Create an issue
 bd create "Add CI content integrity checks"
 
-# Start work
-bd update <issue-id> --status in_progress
+# Start work atomically (safe with many concurrent agents)
+bd update <issue-id> --claim
 
 # Add notes or acceptance criteria
 bd update <issue-id> --notes "Validate all bean entry links"
@@ -75,6 +92,19 @@ bd dep tree <issue-id>
 bd blocked
 ```
 
+For larger async workflows, prefer:
+
+```bash
+# Manage async waits
+bd gate list
+bd gate check
+
+# Serialize merge conflict resolution in multi-agent queues
+bd merge-slot check
+bd merge-slot acquire
+bd merge-slot release
+```
+
 ## Issue lifecycle and IDs
 
 - Statuses are usually `open`, `in_progress`, and `closed` (also `blocked` or `deferred` when needed).
@@ -83,6 +113,15 @@ bd blocked
 
 ## Sync + git workflow
 
+- Install hooks in each active clone/worktree:
+
+```bash
+bd hooks install
+```
+
+- Use `bd sync --check` before syncing/pushing.
 - Use `bd sync` before pushing so `.beads/issues.jsonl` stays current.
 - JSONL merges are handled via a custom git merge driver defined in `.gitattributes`.
-- If `bd sync` prompts for a sync branch, set it once with `bd config set sync.branch <branch>` and keep it consistent across clones.
+- If JSONL conflicts occur, use `bd resolve-conflicts` (or normal git merge flow with the Beads merge driver).
+- Keep sync branch consistent across clones/worktrees. This repo standard is `beads-sync`.
+- Keep deploy workflows branch-filtered (for example, Pages deploy only from `main`) so metadata sync branch updates do not trigger site deploys.
