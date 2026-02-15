@@ -16,6 +16,8 @@
   - `dev/worktree list`
   - `dev/worktree prune`
   - `dev/worktree remove /workspaces/worktrees/feat/my-branch`
+- For Beads issue kickoff, use:
+  - `dev/beads-start <issue-id>`
 - Each worktree needs its own `npm install` before running the dev server.
 
 ## Devcontainer expectations for worktrees

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: dev/beads-start <issue-id> [branch]
+
+Starts Beads work quickly:
+  1) Claim issue
+  2) Ensure worktree at worktrees/<issue-id>
+  3) Ensure branch (default: codex/<issue-id>)
+USAGE
+}
+
+issue_id="${1:-}"
+branch="${2:-}"
+
+if [[ -z "$issue_id" ]]; then
+  usage
+  exit 1
+fi
+
+if [[ -z "$branch" ]]; then
+  branch="codex/$issue_id"
+fi
+
+worktree_path="worktrees/$issue_id"
+
+bd prime >/dev/null || true
+bd show "$issue_id" >/dev/null
+
+if ! bd update "$issue_id" --claim >/dev/null 2>&1; then
+  bd update "$issue_id" --status in_progress >/dev/null
+fi
+
+if [[ -d "$worktree_path" ]]; then
+  echo "Worktree exists: $worktree_path"
+else
+  bd worktree create "$worktree_path" --branch "$branch"
+fi
+
+echo "Issue: $issue_id"
+echo "Branch: $branch"
+echo "Worktree: $worktree_path"
+echo "Next: cd $worktree_path"

@@ -37,6 +37,14 @@ bd where
 
 Do not create ad hoc worktrees outside `worktrees/` for regular agent workflows.
 
+Fast-start helper:
+
+```bash
+dev/beads-start <issue-id>
+```
+
+This helper runs Beads startup steps in one command: claim issue, ensure worktree, and select branch.
+
 ## Quick start (this repo)
 
 ```bash

@@ -18,6 +18,11 @@ Rules:
   - `bd worktree create worktrees/<branch-name> --branch <branch-name>`
 - Do not use TodoWrite/TaskCreate/markdown task lists as the task system.
 - Avoid `bd edit` in agent sessions.
+- If user asks to "get started" on a bead, execute immediately:
+  - claim bead
+  - create/ensure worktree
+  - begin implementation
+  - do not stop for extra confirmation
 
 ## During work
 

@@ -28,6 +28,12 @@ This repository uses **Beads** as the issue tracker. Beads data is local to the 
   - `bd worktree list`
   - `bd worktree info`
 - Do not rely on legacy `BEADS_NO_DAEMON` guidance; current `bd` defaults to direct mode and `--no-daemon` is deprecated.
+- Auto-start intent:
+  - If the user asks to "get started" on `<issue-id>` with Beads/worktree workflow, execute immediately:
+    1. `bd prime`
+    2. `bd update <issue-id> --claim`
+    3. `bd worktree create worktrees/<issue-id> --branch codex/<issue-id>`
+    4. continue into implementation work without waiting for extra confirmation.
 
 ## Common commands
 

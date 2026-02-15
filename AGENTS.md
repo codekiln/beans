@@ -42,6 +42,16 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - Run `bd sync --check` before `bd sync`/push when task state changed.
 - Avoid `bd edit` in agent sessions because it opens an interactive editor.
 
+### Auto-Start Intent
+
+- Treat requests like `use beads worktree workflow to get started with <issue-id>` as execution requests, not planning requests.
+- Do this immediately without asking for an extra "start" confirmation:
+  1. `bd prime`
+  2. `bd update <issue-id> --claim` (or set `--status in_progress` if already assigned)
+  3. create/ensure Beads worktree: `bd worktree create worktrees/<issue-id> --branch codex/<issue-id>`
+  4. proceed directly with implementation in that worktree
+- After setup, continue coding work automatically in the same response flow; do not stop at setup-only unless the user explicitly asked for setup-only.
+
 ### Session Start
 
 ```bash
