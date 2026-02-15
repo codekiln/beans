@@ -66,12 +66,16 @@ Use Beads IDs exactly as written (example: `beans-2xn`).
 
 ## Task completion workflow (required)
 
-When finishing a Beads task that will be pushed to `main`:
+When finishing a Beads task in local Codex Desktop execution:
 
 1. Close the Beads issue first (before push), for example:
    - `bd close <issue-id> --reason "<short reason>"`
 2. Commit the Beads tracking changes produced by that close action (typically `.beads/issues.jsonl`, plus any related Beads metadata files that changed).
-3. Push only after both code changes and Beads state changes are committed.
+3. Rebase the worktree branch on top of `origin/main`.
+4. Commit the task code/content changes on the worktree branch.
+5. Merge the worktree branch into local `main`.
+6. Push `main` to `origin` (do not push only the worktree branch).
+7. Push only after both code changes and Beads state changes are committed.
 
 Quick verification before push:
 
