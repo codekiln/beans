@@ -12,10 +12,10 @@ Then create a matching file at `src/content/beans/<YYYY-MM-DD>-<beanKey>.md` wit
 
 ## Voice and Tone
 
-- Keep bean entry body text aligned with recent post tone by avoiding first-person pronouns (`I`, `me`, `my`, `mine`) unless explicitly requested otherwise.
-- Favor concise, concrete sensory language over explanation.
-- Use short sections (`Context`, `Listening`, `Brew Notes`, `Observations`, `Reflections`) and keep each section focused on new information.
-- Prefer grounded specifics (air, aroma, texture, timing anomalies, soundtrack) and avoid filler or generic summary lines.
+- Mirror the author's voice from recent entries: reflective, sensory, and occasionally lyrical.
+- First-person voice is acceptable when it appears in source notes; do not force depersonalized phrasing.
+- Preserve the user's supplied section structure when provided (including custom labels like `i. grind`, `ii. brew`, `iii. transition`, `iv. listen`, `v. observe`) instead of remapping to default headings.
+- Keep details concrete and lived-in (environment, process friction, listening context, timing anomalies) while avoiding generic filler.
 
 ## DRY Rules (Frontmatter vs Body)
 
