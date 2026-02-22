@@ -16,6 +16,7 @@ Then create a matching file at `src/content/beans/<YYYY-MM-DD>-<beanKey>.md` wit
 - First-person voice is acceptable when it appears in source notes; do not force depersonalized phrasing.
 - Preserve the user's supplied section structure when provided (including custom labels like `i. grind`, `ii. brew`, `iii. transition`, `iv. listen`, `v. observe`) instead of remapping to default headings.
 - Keep details concrete and lived-in (environment, process friction, listening context, timing anomalies) while avoiding generic filler.
+- Normalize unicorn references to the emoji `🦄` (do not leave the plain word `unicorn`).
 
 ## DRY Rules (Frontmatter vs Body)
 

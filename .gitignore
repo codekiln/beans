@@ -31,3 +31,5 @@ worktrees/*
 
 # Playwright preview artifacts
 dev/playwright/*.png
+# bd worktree
+worktrees/beans-j59/
