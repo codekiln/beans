@@ -6,10 +6,15 @@ const { bean } = Astro.props;
 const { Content } = await bean.render();
 const logCommand = `log ${bean.data.date} ${bean.data.beanKey}`;
 const command = `$ bean ${logCommand}`;
+const commandLabel = `bean ${logCommand}`;
 const detailHref = withBase(`/log/${bean.slug}/`);
-const beanHeader = bean.data.time
-  ? `BEAN ${bean.data.date} / ${bean.data.time}`
-  : `BEAN ${bean.data.date}`;
+const promptTime = bean.data.time
+  ? bean.data.time
+      .split(":")
+      .slice(0, 2)
+      .map((part) => part.padStart(2, "0"))
+      .join(":")
+  : null;
 
 const coffeeRows = [
   bean.data.coffee.roaster && {
@@ -72,15 +77,20 @@ const gearItems = [
   data-cli-log={logCommand}
   data-cli-href={detailHref}
 >
-  <div class="ascii-block" aria-hidden="true">
-    <pre>{command}</pre>
-  </div>
   <div class="bean-grid">
     <div class="bean-main window">
       <header>
-        <h2>{beanHeader}</h2>
+        <h2 class="bean-prompt">
+          <a class="bean-prompt-link" href={detailHref}>
+            <span class="bean-prompt-time">
+              {promptTime && <span>{promptTime}</span>}
+              <span class="bean-prompt-emoji" aria-hidden="true">🫘</span>
+              <span aria-hidden="true">&gt;</span>
+            </span>
+            <span class="bean-prompt-command">{commandLabel}</span>
+          </a>
+        </h2>
         <p class="bean-title">{bean.data.title}</p>
-        <p class="ascii-block" aria-hidden="true">======================</p>
       </header>
       <section class="bean-content markdown">
         <Content />

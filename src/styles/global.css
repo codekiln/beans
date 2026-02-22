@@ -9,6 +9,12 @@
   --accent-hover: #5b2d00;
   --focus: #c05600;
   --shadow: rgba(30, 26, 21, 0.1);
+  --prompt-bg-top: #7a4b2b;
+  --prompt-bg-bottom: #5d3b22;
+  --prompt-border: #4a2b16;
+  --prompt-text: #fef8ef;
+  --prompt-emoji-bg: #f6f2ec;
+  --prompt-emoji-ring: #c18e56;
 }
 
 :root[data-theme="dark"] {
@@ -21,6 +27,12 @@
   --accent-hover: #f6d6a8;
   --focus: #f5b66a;
   --shadow: rgba(0, 0, 0, 0.4);
+  --prompt-bg-top: #5f3b22;
+  --prompt-bg-bottom: #3d2515;
+  --prompt-border: #d8b68e;
+  --prompt-text: #fff4e3;
+  --prompt-emoji-bg: #2f2218;
+  --prompt-emoji-ring: #d8b68e;
 }
 
 :root[data-theme="auto"] {
@@ -33,6 +45,12 @@
   --accent-hover: #5b2d00;
   --focus: #c05600;
   --shadow: rgba(30, 26, 21, 0.1);
+  --prompt-bg-top: #7a4b2b;
+  --prompt-bg-bottom: #5d3b22;
+  --prompt-border: #4a2b16;
+  --prompt-text: #fef8ef;
+  --prompt-emoji-bg: #f6f2ec;
+  --prompt-emoji-ring: #c18e56;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,6 +64,12 @@
     --accent-hover: #f6d6a8;
     --focus: #f5b66a;
     --shadow: rgba(0, 0, 0, 0.4);
+    --prompt-bg-top: #5f3b22;
+    --prompt-bg-bottom: #3d2515;
+    --prompt-border: #d8b68e;
+    --prompt-text: #fff4e3;
+    --prompt-emoji-bg: #2f2218;
+    --prompt-emoji-ring: #d8b68e;
   }
 }
 
@@ -207,6 +231,60 @@ button:focus-visible {
 
 .bean-main {
   grid-column: 1 / 2;
+}
+
+.bean-prompt {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.bean-prompt-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  padding: 0.2rem 0.68rem 0.24rem;
+  border: 1px solid var(--prompt-border);
+  border-radius: 0.7rem;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--prompt-bg-top) 88%, var(--accent)),
+    color-mix(in srgb, var(--prompt-bg-bottom) 88%, #000)
+  );
+  color: var(--prompt-text);
+  text-decoration: none;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #f2ddc7 20%, transparent),
+    0 1px 2px color-mix(in srgb, #000 18%, transparent);
+}
+
+.bean-prompt-link:hover,
+.bean-prompt-link:focus-visible {
+  color: color-mix(in srgb, var(--prompt-text) 84%, #fff);
+}
+
+.bean-prompt-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  letter-spacing: 0.02em;
+}
+
+.bean-prompt-emoji {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35em;
+  height: 1.35em;
+  border-radius: 999px;
+  background: var(--prompt-emoji-bg);
+  box-shadow: inset 0 0 0 1px var(--prompt-emoji-ring);
+}
+
+.bean-prompt-command {
+  font-weight: 500;
 }
 
 .bean-title {
