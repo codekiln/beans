@@ -93,12 +93,12 @@ const gearItems = [
         <p class="bean-title">{bean.data.title}</p>
       </header>
       <section class="bean-content markdown">
-        <Content />
         {bean.data.image && (
           <figure class="bean-observation-media">
             <img src={withBase(bean.data.image.src)} alt={bean.data.image.alt} loading="lazy" />
           </figure>
         )}
+        <Content />
         <TagRow tags={bean.data.tags} />
       </section>
     </div>
