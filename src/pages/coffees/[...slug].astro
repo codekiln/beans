@@ -18,7 +18,21 @@ const coffee = coffees.find((entry) => entry.slug === slug);
 const roasters = await getRoasters();
 const roaster = roasters.find((entry) => entry.slug === coffee?.roaster);
 const beans = await getBeans();
-const relatedBeans = beans.filter((bean) => bean.data.coffee.roast?.slug === slug).slice(0, 3);
+const compareBeansByRecent = (a, b) => {
+  const dateCompare = b.data.date.localeCompare(a.data.date);
+  if (dateCompare !== 0) return dateCompare;
+  const timeA = a.data.time ?? "";
+  const timeB = b.data.time ?? "";
+  return timeB.localeCompare(timeA);
+};
+const formatBeanLogLabel = (bean) => {
+  const suffix = bean.data.beanKey ?? bean.data.time ?? "";
+  return suffix ? `bean log ${bean.data.date} ${suffix}` : `bean log ${bean.data.date}`;
+};
+const relatedBeans = beans
+  .filter((bean) => bean.data.coffee.roast?.slug === slug)
+  .sort(compareBeansByRecent)
+  .slice(0, 3);
 const renderResult = coffee ? await coffee.render() : null;
 const NotesContent = renderResult?.Content;
 const hasNotes = Boolean(coffee?.body?.trim());
@@ -80,10 +94,7 @@ const hasNotes = Boolean(coffee?.body?.trim());
       <ul class="table-list">
         {relatedBeans.map((bean) => (
           <li>
-            <a href={withBase(`/log/${bean.slug}/`)}>
-              [{bean.date} {bean.beanKey}]
-            </a>
-            {" "}- {bean.title}
+            <a href={withBase(`/log/${bean.slug}/`)}>[{formatBeanLogLabel(bean)}]</a>
           </li>
         ))}
       </ul>
