@@ -24,12 +24,9 @@ pnpm-debug.log*
 .beads/daemon.*
 .beads/last-touched
 .beads/interactions.jsonl
-# bd worktree
-beans-2xl/
-worktrees/*
+# bd worktrees
+worktrees/beans-*/
 !worktrees/README.md
 
 # Playwright preview artifacts
 dev/playwright/*.png
-# bd worktree
-worktrees/beans-j59/
