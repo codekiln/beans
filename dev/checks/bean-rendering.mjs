@@ -27,8 +27,9 @@ if (html.includes("BEAN 2026-02-06 / undefined") || html.includes("/ undefined")
   throw new Error("Bean detail page contains an undefined time placeholder.");
 }
 
-if (!html.includes("BEAN 2026-02-06")) {
-  throw new Error("Bean detail page is missing the expected date-only header.");
+const expectedPromptCommand = "bean log 2026-02-06 bean1";
+if (!html.includes(expectedPromptCommand)) {
+  throw new Error("Bean detail page is missing the expected bean command prompt.");
 }
 
 console.log("bean-rendering check passed for 2026-02-06-bean1");
