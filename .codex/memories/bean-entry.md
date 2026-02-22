@@ -21,6 +21,7 @@ Then create a matching file at `src/content/beans/<YYYY-MM-DD>-<beanKey>.md` wit
 ## DRY Rules (Frontmatter vs Body)
 
 - Do not restate structured metadata in the markdown body when it is already visible in the UI from frontmatter.
+- Do not add an inline command preamble like `` `$ bean log YYYY-MM-DD beanX` `` in the markdown body; the entry header already renders this command prompt.
 - In `Brew Notes`, focus on process deltas, mistakes, experiments, and anomalies rather than repeating recipe, dose, water, grinder, grind, coffee, brewer, or time values already in frontmatter.
 - In `Context`, avoid repeating cup index, date, or time that the title/header already conveys unless the repetition adds new nuance.
 - Run a final redundancy pass before finishing: remove any sentence that only duplicates frontmatter data without adding interpretation.
