@@ -1,5 +1,6 @@
 ---
-paths: src/content/beans/**
+paths:
+  - src/content/beans/**
 ---
 # Bean entry command
 
