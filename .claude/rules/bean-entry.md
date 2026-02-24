@@ -1,6 +1,5 @@
 ---
-paths:
-  - src/content/beans/**
+paths: src/content/beans/**
 ---
 # Bean entry command
 
@@ -13,6 +12,11 @@ $ bean log <YYYY-MM-DD> <beanKey>
 Then create a matching file at `src/content/beans/<YYYY-MM-DD>-<beanKey>.md` with frontmatter fields that align with the beans collection schema, and keep the primary descriptive content in the markdown body.
 
 `bean` is not an installed command in this repository. Treat this as display text for UI/agent responses and file naming only.
+
+## Worktree convention for bean-entry tasks
+
+- Use Beads-managed worktrees under `worktrees/beans-<issue-id>`.
+- Do not add individual worktree paths to `.gitignore`; this repo already ignores them via `worktrees/beans-*/`.
 
 ## Markdown Body Content
 

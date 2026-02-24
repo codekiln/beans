@@ -1,6 +1,5 @@
 ---
-paths:
-  - docs/dev/rulesync.md
+paths: docs/dev/rulesync.md
 ---
 # Rulesync in Beans
 
@@ -21,3 +20,8 @@ Rulesync is also listed in `devDependencies`, so you can run it with:
 ```bash
 npx rulesync generate
 ```
+
+## Source of truth
+
+- Keep durable rule and memory changes in `.rulesync/rules/*.md`.
+- Generated files like `AGENTS.md`, `.codex/memories/*`, and `.cursor/commands/*` should be treated as derived output from Rulesync.
