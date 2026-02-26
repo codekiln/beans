@@ -1,21 +1,27 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import BeanEntry from "../components/BeanEntry.astro";
 import { getBeans } from "../data/beans";
 import { withBase } from "../utils/paths";
 
 const beans = await getBeans();
-const initialCommand = `$ bean log ${beans[0].data.date} ${beans[0].data.beanKey}`;
-const initialLinkHref = withBase(`/log/${beans[0].slug}/`);
+const initialCommand = "$ bean log list";
 ---
 <BaseLayout
   title="Beans"
   description="A coffee log."
   initialCommand={initialCommand}
-  initialLinkHref={initialLinkHref}
 >
-  <section class="hero home-hero">
-    <h1>Beans: a coffee log.</h1>
+  <section class="hero">
+    <h1 class="bean-prompt">
+      <span class="bean-prompt-link">
+        <span class="bean-prompt-time">
+          <span class="bean-prompt-emoji" aria-hidden="true">🫘</span>
+          <span aria-hidden="true">&gt;</span>
+        </span>
+        <span class="bean-prompt-command">bean log list</span>
+      </span>
+    </h1>
+    <p>coffee log entries</p>
     <nav class="home-nav" aria-label="Site sections">
       <a href={withBase("/about/")}>[about]</a>
       <span aria-hidden="true">·</span>
@@ -30,9 +36,15 @@ const initialLinkHref = withBase(`/log/${beans[0].slug}/`);
       <a href={withBase("/terms/")}>[terms]</a>
     </nav>
   </section>
-  <section class="bean-stream" aria-label="Coffee log entries">
-    {beans.map((bean) => (
-      <BeanEntry bean={bean} />
-    ))}
+  <section class="window" aria-label="Coffee log entries">
+    <h2 class="section-title">Entries</h2>
+    <ul class="table-list">
+      {beans.map((bean) => (
+        <li>
+          <a href={withBase(`/log/${bean.slug}/`)}>[{bean.data.date} {bean.data.beanKey}]</a>
+          {" "}· {bean.data.title}
+        </li>
+      ))}
+    </ul>
   </section>
 </BaseLayout>
