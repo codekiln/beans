@@ -1,0 +1,31 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getTerms } from "../../data/terms";
+import { withBase } from "../../utils/paths";
+
+const terms = await getTerms();
+---
+<BaseLayout title="Terms · Beans" description="Command glossary for the Beans CLI simulation." initialCommand="$ bean term list">
+  <section class="hero">
+    <h1 class="bean-prompt">
+      <span class="bean-prompt-link">
+        <span class="bean-prompt-time">
+          <span class="bean-prompt-emoji" aria-hidden="true">🫘</span>
+          <span aria-hidden="true">&gt;</span>
+        </span>
+        <span class="bean-prompt-command">bean term list</span>
+      </span>
+    </h1>
+    <p>coffee vocabulary</p>
+  </section>
+  <section class="window">
+    <h2 class="section-title">Terms</h2>
+    <ul class="table-list">
+      {terms.map((term) => (
+        <li>
+          <a href={withBase(`/terms/${term.slug}/`)}>[{term.name}]</a> · {term.summary}
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

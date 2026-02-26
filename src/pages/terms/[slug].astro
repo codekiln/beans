@@ -1,0 +1,64 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getTerms } from "../../data/terms";
+import { withBase } from "../../utils/paths";
+
+export async function getStaticPaths() {
+  const terms = await getTerms();
+  return terms.map((term) => ({ params: { slug: term.slug } }));
+}
+
+const { slug } = Astro.params;
+const terms = await getTerms();
+const term = terms.find((entry) => entry.slug === slug);
+const renderResult = term ? await term.render() : null;
+const DefinitionContent = renderResult?.Content;
+const hasDefinition = Boolean(term?.body?.trim());
+---
+<BaseLayout
+  title={`${term?.name ?? "Term"} · Beans`}
+  description={term?.summary ?? "Beans terminology reference."}
+  initialCommand={`$ bean term ${term?.name ?? term?.slug ?? ""}`.trim()}
+>
+  <section class="hero">
+    <h1 class="bean-prompt">
+      <span class="bean-prompt-link">
+        <span class="bean-prompt-time">
+          <span class="bean-prompt-emoji" aria-hidden="true">🫘</span>
+          <span aria-hidden="true">&gt;</span>
+        </span>
+        <span class="bean-prompt-command">{`bean term ${term?.name ?? term?.slug ?? ""}`}</span>
+      </span>
+    </h1>
+    <p>
+      <a href={withBase("/terms/")}>[back to terms]</a>
+    </p>
+  </section>
+  {DefinitionContent && hasDefinition ? (
+    <section class="window">
+      <h2 class="section-title">Definition</h2>
+      <div class="markdown">
+        <DefinitionContent />
+      </div>
+    </section>
+  ) : null}
+  {term?.aliases?.length ? (
+    <section class="window">
+      <h2 class="section-title">Aliases</h2>
+      <ul class="table-list">
+        {term.aliases.map((alias) => (
+          <li>{alias}</li>
+        ))}
+      </ul>
+    </section>
+  ) : null}
+  {(term?.dateCreated || term?.dateUpdated) ? (
+    <section class="window">
+      <h2 class="section-title">Dates</h2>
+      <ul class="table-list">
+        {term?.dateCreated ? <li>date-created: {term.dateCreated}</li> : null}
+        {term?.dateUpdated ? <li>date-updated: {term.dateUpdated}</li> : null}
+      </ul>
+    </section>
+  ) : null}
+</BaseLayout>

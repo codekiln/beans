@@ -134,6 +134,16 @@ const equipment = defineCollection({
   })
 });
 
+
+const terms = defineCollection({
+  type: "content",
+  schema: z.object({
+    name: z.string(),
+    aliases: z.array(z.string()).optional(),
+    summary: z.string()
+  })
+});
+
 const roasters = defineCollection({
   type: "content",
   schema: z.union([
@@ -162,4 +172,4 @@ const roasters = defineCollection({
   ])
 });
 
-export const collections = { beans, recipes, equipment, roasters };
+export const collections = { beans, recipes, equipment, roasters, terms };
