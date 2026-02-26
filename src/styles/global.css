@@ -208,6 +208,30 @@ button:focus-visible {
   color: var(--muted);
 }
 
+.home-hero {
+  margin-bottom: 2rem;
+}
+
+.home-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem 0.85rem;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.9vw, 1.22rem);
+  max-width: 100%;
+}
+
+.home-nav span {
+  color: color-mix(in srgb, var(--muted) 85%, var(--border));
+}
+
+.bean-stream {
+  margin-top: 1.8rem;
+  padding-top: 1.8rem;
+  border-top: 1px dashed var(--border);
+}
+
 .window {
   border: 1px solid var(--border);
   background: var(--bg-elevated);

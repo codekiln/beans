@@ -14,15 +14,25 @@ const initialLinkHref = withBase(`/log/${beans[0].slug}/`);
   initialCommand={initialCommand}
   initialLinkHref={initialLinkHref}
 >
-  <section class="hero">
+  <section class="hero home-hero">
     <h1>Beans: a coffee log.</h1>
-    <p>
-      <a href={withBase("/about/")}>[about]</a> · <a href={withBase("/equipment/")}>[equipment]</a> ·{" "}
-      <a href={withBase("/recipes/")}>[recipes]</a> · <a href={withBase("/roasters/")}>[roasters]</a>{" "}
-      · <a href={withBase("/coffees/")}>[coffees]</a>
-    </p>
+    <nav class="home-nav" aria-label="Site sections">
+      <a href={withBase("/about/")}>[about]</a>
+      <span aria-hidden="true">·</span>
+      <a href={withBase("/equipment/")}>[equipment]</a>
+      <span aria-hidden="true">·</span>
+      <a href={withBase("/recipes/")}>[recipes]</a>
+      <span aria-hidden="true">·</span>
+      <a href={withBase("/roasters/")}>[roasters]</a>
+      <span aria-hidden="true">·</span>
+      <a href={withBase("/coffees/")}>[coffees]</a>
+      <span aria-hidden="true">·</span>
+      <a href={withBase("/terms/")}>[terms]</a>
+    </nav>
   </section>
-  {beans.map((bean) => (
-    <BeanEntry bean={bean} />
-  ))}
+  <section class="bean-stream" aria-label="Coffee log entries">
+    {beans.map((bean) => (
+      <BeanEntry bean={bean} />
+    ))}
+  </section>
 </BaseLayout>
