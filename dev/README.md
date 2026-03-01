@@ -19,6 +19,7 @@
 - For Beads issue kickoff, use:
   - `dev/beads-start <issue-id>`
   - `dev/beads-finish <issue-id> "optional notes"`
+- In this repo, prefer direct Beads mode. The helpers force `bd --no-daemon`, and durability should be checked against `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` rather than the current checkout's `.beads/issues.jsonl`.
 - Each worktree needs its own `npm install` before running the dev server.
 
 ## Devcontainer expectations for worktrees

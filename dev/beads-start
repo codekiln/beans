@@ -28,6 +28,10 @@ fi
 worktree_path="worktrees/$issue_id"
 gitignore_path=".gitignore"
 
+bd_cmd() {
+  bd --no-daemon "$@"
+}
+
 cleanup_gitignore_entry() {
   local entry="$1"
   local tmp_file
@@ -56,13 +60,13 @@ ensure_branch_exists() {
 }
 
 ensure_issue_is_claimed() {
-  if ! bd update "$issue_id" --claim >/dev/null 2>&1; then
-    bd update "$issue_id" --status in_progress >/dev/null
+  if ! bd_cmd update "$issue_id" --claim >/dev/null 2>&1; then
+    bd_cmd update "$issue_id" --status in_progress >/dev/null
   fi
 }
 
-bd prime >/dev/null || true
-bd show "$issue_id" >/dev/null
+bd_cmd prime >/dev/null || true
+bd_cmd show "$issue_id" >/dev/null
 
 warn_if_checkout_dirty
 ensure_issue_is_claimed
@@ -71,7 +75,7 @@ ensure_branch_exists
 if [[ -d "$worktree_path" ]]; then
   echo "Worktree exists: $worktree_path"
 else
-  bd worktree create "$worktree_path" --branch "$branch"
+  bd_cmd worktree create "$worktree_path" --branch "$branch"
   cleanup_gitignore_entry "$worktree_path/"
 fi
 

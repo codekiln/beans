@@ -73,6 +73,21 @@ if ! grep -Fq "branch codex/beans-test HEAD" "$tmp_dir/git.log"; then
   exit 1
 fi
 
+if ! grep -Fq -- "--no-daemon prime" "$tmp_dir/bd.log"; then
+  echo "beads-start did not use --no-daemon for bd prime" >&2
+  exit 1
+fi
+
+if ! grep -Fq -- "--no-daemon show beans-test" "$tmp_dir/bd.log"; then
+  echo "beads-start did not use --no-daemon for bd show" >&2
+  exit 1
+fi
+
+if ! grep -Fq -- "--no-daemon update beans-test --claim" "$tmp_dir/bd.log"; then
+  echo "beads-start did not use --no-daemon when claiming the issue" >&2
+  exit 1
+fi
+
 if ! grep -Fq "worktree create worktrees/beans-test --branch codex/beans-test" "$tmp_dir/bd.log"; then
   echo "beads-start did not create the expected Beads worktree path" >&2
   exit 1

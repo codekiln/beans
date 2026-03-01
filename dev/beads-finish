@@ -19,22 +19,43 @@ USAGE
 issue_id="${1:-}"
 notes="${2:-}"
 beads_sync_path=".git/beads-worktrees/beads-sync"
+beads_sync_jsonl="$beads_sync_path/.beads/issues.jsonl"
 
 if [[ -z "$issue_id" ]]; then
   usage
   exit 1
 fi
 
-bd show "$issue_id"
+bd_cmd() {
+  bd --no-daemon "$@"
+}
+
+bd_cmd show "$issue_id"
 
 if [[ -n "$notes" ]]; then
-  bd update "$issue_id" --append-notes "$notes" >/dev/null
+  bd_cmd update "$issue_id" --append-notes "$notes" >/dev/null
 fi
 
-bd update "$issue_id" --status closed >/dev/null
-bd sync --check
+bd_cmd update "$issue_id" --status closed >/dev/null
+bd_cmd sync --check
 git status --short
-bd sync
+bd_cmd sync --force
+
+if [[ -f "$beads_sync_jsonl" ]]; then
+  if ! grep -Fq "\"id\":\"$issue_id\"" "$beads_sync_jsonl"; then
+    bd_cmd export -o "$beads_sync_jsonl"
+  fi
+
+  if grep -Fq "\"id\":\"$issue_id\"" "$beads_sync_jsonl"; then
+    echo "Metadata durable: $issue_id is present in $beads_sync_jsonl"
+  else
+    echo "Metadata mismatch: $issue_id exists in the DB but is missing from $beads_sync_jsonl" >&2
+    exit 1
+  fi
+else
+  echo "beads-sync JSONL not found at $beads_sync_jsonl" >&2
+  exit 1
+fi
 
 echo "Issue: $issue_id"
 echo "Current branch: $(git rev-parse --abbrev-ref HEAD)"
