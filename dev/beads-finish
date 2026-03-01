@@ -18,7 +18,8 @@ USAGE
 
 issue_id="${1:-}"
 notes="${2:-}"
-beads_sync_path=".git/beads-worktrees/beads-sync"
+git_common_dir="$(git rev-parse --git-common-dir)"
+beads_sync_path="$git_common_dir/beads-worktrees/beads-sync"
 beads_sync_jsonl="$beads_sync_path/.beads/issues.jsonl"
 
 if [[ -z "$issue_id" ]]; then

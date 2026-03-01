@@ -20,7 +20,11 @@ case "\$1" in
     exit 0
     ;;
   rev-parse)
-    printf "codex/beans-test\n"
+    if [[ "\$2" == "--git-common-dir" ]]; then
+      printf ".git\n"
+    else
+      printf "codex/beans-test\n"
+    fi
     exit 0
     ;;
   -C)
