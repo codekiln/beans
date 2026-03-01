@@ -49,6 +49,15 @@ dev/beads-start <issue-id>
 
 This helper runs Beads startup steps in one command: claim issue, ensure worktree, and select branch.
 It also removes the redundant per-worktree `.gitignore` entry that some `bd worktree create` versions append even though the repo already has a wildcard ignore rule.
+It warns if the source checkout is already dirty and creates `codex/<issue-id>` first when the installed `bd` expects `--branch` to reference an existing branch.
+
+Finish helper:
+
+```bash
+dev/beads-finish <issue-id> ["notes"]
+```
+
+This helper standardizes the close/sync path: show issue, optionally append notes, close it, run `bd sync --check`, show `git status --short`, run `bd sync`, and report whether `beads-sync` now has metadata changes to commit.
 
 ## Quick start (this repo)
 
@@ -150,15 +159,13 @@ bd where
 bd worktree info
 bd sync --status
 bd ready
+dev/beads-start <issue-id>
 ```
 
 Session end:
 
 ```bash
-bd show <issue-id>
-bd sync --check
-git status --short
-bd sync
+dev/beads-finish <issue-id> "optional notes"
 git push
 ```
 

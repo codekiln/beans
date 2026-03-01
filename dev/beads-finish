@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: dev/beads-finish <issue-id> [notes]
+
+Wraps the common Beads finish sequence:
+  1) Show issue details
+  2) Optionally append notes
+  3) Close the issue
+  4) Run sync integrity check
+  5) Show git status
+  6) Run bd sync
+  7) Report whether beads-sync now has uncommitted metadata changes
+USAGE
+}
+
+issue_id="${1:-}"
+notes="${2:-}"
+beads_sync_path=".git/beads-worktrees/beads-sync"
+
+if [[ -z "$issue_id" ]]; then
+  usage
+  exit 1
+fi
+
+bd show "$issue_id"
+
+if [[ -n "$notes" ]]; then
+  bd update "$issue_id" --append-notes "$notes" >/dev/null
+fi
+
+bd update "$issue_id" --status closed >/dev/null
+bd sync --check
+git status --short
+bd sync
+
+echo "Issue: $issue_id"
+echo "Current branch: $(git rev-parse --abbrev-ref HEAD)"
+
+if [[ -d "$beads_sync_path" ]]; then
+  echo "beads-sync status:"
+  git -C "$beads_sync_path" status --short --branch
+else
+  echo "beads-sync worktree not found at $beads_sync_path"
+fi

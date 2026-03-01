@@ -27,6 +27,7 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - Keep the primary descriptive content for data models in the markdown body, not frontmatter arrays.
 - When adding new pages, use `.astro` files and include the base layout.
 - For Beads-managed work, prefer `dev/beads-start <issue-id>` so startup uses the repo's Beads worktree flow and cleanup.
+- Prefer `dev/beads-finish <issue-id>` for the close/sync path so metadata handling is consistent.
 - Task worktrees live at `worktrees/beans-<issue-id>` on branches like `codex/beans-<issue-id>`.
 - Do not add per-worktree paths to `.gitignore`; rely on the existing wildcard rule `worktrees/beans-*/`.
 

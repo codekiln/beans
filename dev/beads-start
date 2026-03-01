@@ -7,6 +7,7 @@ Usage: dev/beads-start <issue-id> [branch]
 
 Starts Beads work quickly:
   1) Claim issue
+  2) Warn if the source checkout is dirty
   2) Ensure worktree at worktrees/<issue-id>
   3) Ensure branch (default: codex/<issue-id>)
 USAGE
@@ -39,12 +40,33 @@ cleanup_gitignore_entry() {
   mv "$tmp_file" "$gitignore_path"
 }
 
+warn_if_checkout_dirty() {
+  if [[ -n "$(git status --short)" ]]; then
+    echo "Warning: source checkout has local changes before worktree startup." >&2
+    git status --short
+  fi
+}
+
+ensure_branch_exists() {
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    return 0
+  fi
+
+  git branch "$branch" HEAD >/dev/null
+}
+
+ensure_issue_is_claimed() {
+  if ! bd update "$issue_id" --claim >/dev/null 2>&1; then
+    bd update "$issue_id" --status in_progress >/dev/null
+  fi
+}
+
 bd prime >/dev/null || true
 bd show "$issue_id" >/dev/null
 
-if ! bd update "$issue_id" --claim >/dev/null 2>&1; then
-  bd update "$issue_id" --status in_progress >/dev/null
-fi
+warn_if_checkout_dirty
+ensure_issue_is_claimed
+ensure_branch_exists
 
 if [[ -d "$worktree_path" ]]; then
   echo "Worktree exists: $worktree_path"
