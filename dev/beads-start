@@ -25,6 +25,19 @@ if [[ -z "$branch" ]]; then
 fi
 
 worktree_path="worktrees/$issue_id"
+gitignore_path=".gitignore"
+
+cleanup_gitignore_entry() {
+  local entry="$1"
+  local tmp_file
+
+  [[ -f "$gitignore_path" ]] || return 0
+  grep -Fqx "$entry" "$gitignore_path" || return 0
+
+  tmp_file="$(mktemp)"
+  grep -Fvx "$entry" "$gitignore_path" >"$tmp_file" || true
+  mv "$tmp_file" "$gitignore_path"
+}
 
 bd prime >/dev/null || true
 bd show "$issue_id" >/dev/null
@@ -37,6 +50,7 @@ if [[ -d "$worktree_path" ]]; then
   echo "Worktree exists: $worktree_path"
 else
   bd worktree create "$worktree_path" --branch "$branch"
+  cleanup_gitignore_entry "$worktree_path/"
 fi
 
 echo "Issue: $issue_id"

@@ -12,6 +12,7 @@ Then create a matching file at `src/content/beans/<YYYY-MM-DD>-<beanKey>.md` wit
 
 ## Worktree convention for bean-entry tasks
 
+- Prefer `dev/beads-start <issue-id>` when starting a bean-entry task worktree.
 - Use Beads-managed worktrees under `worktrees/beans-<issue-id>`.
 - Do not add individual worktree paths to `.gitignore`; this repo already ignores them via `worktrees/beans-*/`.
 

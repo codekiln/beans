@@ -26,8 +26,11 @@ curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/insta
 Use Beads-managed worktree creation so all worktrees share the same `.beads` store through redirect wiring.
 
 ```bash
-# Preferred pattern in this repo
-bd worktree create worktrees/<branch-name> --branch <branch-name>
+# Preferred startup path in this repo
+dev/beads-start <issue-id>
+
+# Low-level Beads command used by the helper
+bd worktree create worktrees/<issue-id> --branch codex/<issue-id>
 
 # Inspect configuration
 bd worktree list
@@ -36,6 +39,7 @@ bd where
 ```
 
 Do not create ad hoc worktrees outside `worktrees/` for regular agent workflows.
+This repo already ignores `worktrees/beans-*/`, so startup flows must not leave per-worktree ignore entries behind in `.gitignore`.
 
 Fast-start helper:
 
@@ -44,6 +48,7 @@ dev/beads-start <issue-id>
 ```
 
 This helper runs Beads startup steps in one command: claim issue, ensure worktree, and select branch.
+It also removes the redundant per-worktree `.gitignore` entry that some `bd worktree create` versions append even though the repo already has a wildcard ignore rule.
 
 ## Quick start (this repo)
 
