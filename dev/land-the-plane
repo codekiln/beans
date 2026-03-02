@@ -154,13 +154,22 @@ push_current_branch() {
   branch="$(git rev-parse --abbrev-ref HEAD)"
 
   print_section "Rebasing and pushing:"
-  git pull --rebase
+
   bd_cmd sync --check
   bd_cmd sync --force
 
   if git rev-parse --abbrev-ref --symbolic-full-name "@{upstream}" >/dev/null 2>&1; then
+    git pull --rebase
     git push
   else
+    git fetch origin
+
+    if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+      git rebase "origin/$branch"
+    else
+      echo "No remote branch yet for $branch; skipping rebase before first push."
+    fi
+
     git push --set-upstream origin "$branch"
   fi
 }

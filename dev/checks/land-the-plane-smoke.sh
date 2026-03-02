@@ -42,6 +42,9 @@ case "\$1" in
   push)
     exit 0
     ;;
+  fetch)
+    exit 0
+    ;;
   rev-parse)
     if [[ "\${2:-}" == "--abbrev-ref" && "\${3:-}" == "HEAD" ]]; then
       printf "codex/beans-test\n"
@@ -53,6 +56,9 @@ case "\$1" in
       exit 0
     fi
 
+    exit 1
+    ;;
+  show-ref)
     exit 0
     ;;
   *)
