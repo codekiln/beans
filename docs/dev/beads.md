@@ -61,6 +61,14 @@ dev/beads-finish <issue-id> ["notes"]
 
 This helper standardizes the close/sync path: show issue, optionally append notes, close it, run `bd --no-daemon sync --check`, show `git status --short`, run `bd --no-daemon sync --force`, fall back to `bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl` if needed, and fail if the issue is still missing from `beads-sync/.beads/issues.jsonl`.
 
+Land-the-plane helper:
+
+```bash
+dev/land-the-plane <issue-id> ["notes"] [--check "<command>"]... [--follow-up "<title>"]...
+```
+
+This is the repo's named session closeout ritual. It requires explicit quality-gate and follow-up accounting, runs `dev/beads-finish`, rebases, pushes, verifies the branch is synced with origin, then surfaces cleanup state and a next-session prompt. See [Land the plane](/Users/pnore/Documents/GitHub/codekiln/beans/worktrees/beans-2wm/docs/dev/land-the-plane.md).
+
 ## Quick start (this repo)
 
 ```bash
@@ -182,9 +190,11 @@ dev/beads-start <issue-id>
 Session end:
 
 ```bash
-dev/beads-finish <issue-id> "optional notes"
+dev/land-the-plane <issue-id> "optional notes"
 git push
 ```
+
+If you only need the lower-level close/sync step, `dev/beads-finish` remains available.
 
 ## Hook health checks
 
