@@ -12,41 +12,56 @@ Use it from the active worktree after the implementation work is done.
 
 ## What the helper does
 
-The helper is intentionally strict. Work is not considered landed until the branch is rebased, pushed, and the remaining work is accounted for explicitly.
+The helper is intentionally automation-friendly. Work is not considered landed until the branch is rebased, pushed, and synced, but the default path should still be easy for an agent to execute without waiting for a human to answer bookkeeping questions.
 
-1. Requires either one or more `--check "<command>"` entries or an explicit `--no-checks`.
-2. Requires either one or more `--follow-up "<title>"` entries or an explicit `--no-follow-up`.
-3. Creates any requested follow-up Beads issues before closeout.
-4. Runs `dev/beads-finish <issue-id> ["notes"]`.
-5. Runs `git pull --rebase`, then `bd --no-daemon sync --check` and `bd --no-daemon sync --force`.
-6. Pushes the current branch to `origin`, setting upstream if needed.
-7. Verifies `git status --short --branch` no longer reports the branch as ahead or behind.
-8. Lists untracked files and stashes for cleanup review.
-9. Shows `bd --no-daemon ready`.
-10. Emits a next-session prompt built from the first ready issue, if one exists.
+1. Runs explicit `--check` commands when provided.
+2. Otherwise runs a repo default validation command when one is configured. In Beans, that default is `npm run build`.
+3. If `--no-checks` is passed, skips validation for that one landing.
+4. Creates any requested follow-up Beads issues before closeout.
+5. If no follow-up override is provided, defaults to creating no follow-up issues.
+6. Runs `dev/beads-finish <issue-id> ["notes"]`.
+7. Rebases from the remote branch when possible, then runs `bd --no-daemon sync --check` and `bd --no-daemon sync --force`.
+8. Pushes the current branch to `origin`, setting upstream if needed.
+9. Verifies `git status --short --branch` no longer reports the branch as ahead or behind.
+10. Lists untracked files and stashes for cleanup review.
+11. Shows `bd --no-daemon ready`.
+12. Emits a next-session prompt built from the first ready issue, if one exists.
 
-## Required acknowledgements
+## Defaults and overrides
 
-The command will fail if you do not account for these two questions:
+The default path is meant for unattended closeout:
 
-- What validation command proves this work is acceptable?
-- What remaining work needs its own Beads issue?
+- Run the repo's default validation command when available.
+- Assume no follow-up issue is needed unless one is explicitly requested.
 
-For doc-only or no-code changes, use `--no-checks`. If the task is truly finished with no follow-up, use `--no-follow-up`.
+Humans can override that on a one-off basis:
+
+- `--check "<command>"`: replace the default check with one or more explicit commands.
+- `--no-checks`: skip checks for that landing.
+- `--follow-up "<title>"`: create a follow-up issue before landing.
+- `--require-checks`: force explicit `--check` entries for that run.
+- `--require-follow-up`: force explicit `--follow-up` entries for that run.
 
 Examples:
 
 ```bash
 dev/land-the-plane beans-2wm "Documented the new workflow" \
   --check "npm run check:land-the-plane" \
-  --check "npm run check:beads-finish" \
-  --no-follow-up
+  --check "npm run check:beads-finish"
 ```
 
 ```bash
 dev/land-the-plane beans-abc "Closed with a follow-up" \
   --no-checks \
   --follow-up "Add branch cleanup suggestions to land-the-plane output"
+```
+
+```bash
+dev/land-the-plane beans-abc "Require explicit one-off review this time" \
+  --require-checks \
+  --check "npm run build" \
+  --require-follow-up \
+  --follow-up "Investigate remaining merge conflict edge cases"
 ```
 
 ## Cleanup expectations

@@ -6,17 +6,19 @@ usage() {
 Usage: dev/land-the-plane <issue-id> [notes] [options]
 
 Runs the Beans session closeout ritual:
-  1) Run required quality checks or record that no checks are needed
-  2) File any follow-up Beads issues or record that none are needed
+  1) Run default quality checks unless overridden
+  2) File requested follow-up Beads issues, otherwise assume none
   3) Finish and sync the issue through dev/beads-finish
   4) Rebase on remote, sync metadata, and push the branch
   5) Show final cleanup state and emit a next-session prompt
 
 Options:
-  --check "<command>"   Run a required validation command before closeout
-  --no-checks           Explicitly record that no validation command is needed
+  --check "<command>"   Run this validation command before closeout
+  --no-checks           Skip default validation commands for this landing
   --follow-up "<title>" Create a follow-up Beads issue before closing out
-  --no-follow-up        Explicitly record that no follow-up issue is needed
+  --no-follow-up        Keep compatibility with old explicit-no-follow-up usage
+  --require-checks      Fail unless explicit check commands are provided
+  --require-follow-up   Fail unless explicit follow-up titles are provided
 USAGE
 }
 
@@ -27,6 +29,8 @@ checks=()
 follow_ups=()
 no_checks=false
 no_follow_up=false
+require_checks=false
+require_follow_up=false
 
 if [[ -z "$issue_id" ]]; then
   usage
@@ -56,6 +60,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --no-follow-up)
       no_follow_up=true
+      shift
+      ;;
+    --require-checks)
+      require_checks=true
+      shift
+      ;;
+    --require-follow-up)
+      require_follow_up=true
       shift
       ;;
     *)
@@ -96,6 +108,7 @@ require_value() {
 
 run_checks() {
   local check_cmd
+  local default_checks=()
 
   if [[ "${#checks[@]}" -gt 0 && "$no_checks" == true ]]; then
     echo "Use either --check or --no-checks, not both" >&2
@@ -103,17 +116,30 @@ run_checks() {
   fi
 
   if [[ "${#checks[@]}" -eq 0 && "$no_checks" == false ]]; then
-    echo "Provide at least one --check command or pass --no-checks" >&2
-    exit 1
+    if [[ -f package.json ]] && grep -q '"build"' package.json; then
+      default_checks=("npm run build")
+    fi
   fi
 
-  if [[ "${#checks[@]}" -eq 0 ]]; then
-    print_section "Quality gates:"
-    echo "No validation commands required for this landing."
-    return
+  if [[ "${#checks[@]}" -eq 0 && "${#default_checks[@]}" -gt 0 ]]; then
+    checks=("${default_checks[@]}")
   fi
 
   print_section "Quality gates:"
+
+  if [[ "${#checks[@]}" -eq 0 ]]; then
+    if [[ "$require_checks" == true ]]; then
+      echo "Explicit check commands are required for this landing." >&2
+      exit 1
+    fi
+
+    if [[ "$no_checks" == true ]]; then
+      echo "Skipping validation commands for this landing."
+    else
+      echo "No default validation commands configured for this repo."
+    fi
+    return
+  fi
 
   for check_cmd in "${checks[@]}"; do
     require_value "--check" "$check_cmd"
@@ -125,20 +151,20 @@ run_checks() {
 create_follow_ups() {
   local title
 
-  if [[ "${#follow_ups[@]}" -gt 0 && "$no_follow_up" == true ]]; then
-    echo "Use either --follow-up or --no-follow-up, not both" >&2
-    exit 1
-  fi
-
-  if [[ "${#follow_ups[@]}" -eq 0 && "$no_follow_up" == false ]]; then
-    echo "Provide at least one --follow-up title or pass --no-follow-up" >&2
-    exit 1
-  fi
-
   print_section "Follow-up issues:"
 
   if [[ "${#follow_ups[@]}" -eq 0 ]]; then
-    echo "No follow-up issues needed."
+    if [[ "$require_follow_up" == true ]]; then
+      echo "At least one explicit follow-up title is required for this landing." >&2
+      exit 1
+    fi
+
+    if [[ "$no_follow_up" == true ]]; then
+      echo "No follow-up issues created."
+      return
+    fi
+
+    echo "No follow-up issues created."
     return
   fi
 

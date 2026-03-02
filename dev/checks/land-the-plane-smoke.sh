@@ -8,6 +8,14 @@ trap 'rm -rf "$tmp_dir"' EXIT
 mkdir -p "$tmp_dir/bin" "$tmp_dir/dev"
 cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
 
+cat >"$tmp_dir/package.json" <<'EOF'
+{
+  "scripts": {
+    "build": "echo build"
+  }
+}
+EOF
+
 cat >"$tmp_dir/dev/beads-finish" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
@@ -67,6 +75,20 @@ case "\$1" in
 esac
 EOF
 
+cat >"$tmp_dir/bin/npm" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "\$*" >>"$tmp_dir/npm.log"
+
+if [[ "\$1" == "run" && "\$2" == "build" ]]; then
+  echo "build ok"
+  exit 0
+fi
+
+exit 0
+EOF
+
 cat >"$tmp_dir/bin/bd" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
@@ -102,11 +124,11 @@ READY
 esac
 EOF
 
-chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd"
+chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd" "$tmp_dir/bin/npm"
 
 output="$(
   cd "$tmp_dir"
-  PATH="$tmp_dir/bin:$PATH" ./dev/land-the-plane beans-test "note" --check "printf 'ok\\n' >/dev/null" --no-follow-up
+  PATH="$tmp_dir/bin:$PATH" ./dev/land-the-plane beans-test "note"
 )"
 
 if ! grep -Fq "beans-test note" "$tmp_dir/beads-finish.log"; then
@@ -119,8 +141,13 @@ if [[ "$output" != *"Quality gates:"* ]]; then
   exit 1
 fi
 
-if [[ "$output" != *"No follow-up issues needed."* ]]; then
-  echo "land-the-plane did not require follow-up acknowledgement" >&2
+if [[ "$output" != *"No follow-up issues created."* ]]; then
+  echo "land-the-plane did not default follow-up handling sensibly" >&2
+  exit 1
+fi
+
+if ! grep -Fq "run build" "$tmp_dir/npm.log"; then
+  echo "land-the-plane did not run the default build check" >&2
   exit 1
 fi
 

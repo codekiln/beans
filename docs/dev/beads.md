@@ -67,7 +67,7 @@ Land-the-plane helper:
 dev/land-the-plane <issue-id> ["notes"] [--check "<command>"]... [--follow-up "<title>"]...
 ```
 
-This is the repo's named session closeout ritual. It requires explicit quality-gate and follow-up accounting, runs `dev/beads-finish`, rebases, pushes, verifies the branch is synced with origin, then surfaces cleanup state and a next-session prompt. See [Land the plane](/Users/pnore/Documents/GitHub/codekiln/beans/worktrees/beans-2wm/docs/dev/land-the-plane.md).
+This is the repo's named session closeout ritual. By default it runs the repo's standard validation command when available, assumes no follow-up issue is needed, runs `dev/beads-finish`, rebases and pushes, verifies the branch is synced with origin, then surfaces cleanup state and a next-session prompt. Humans can override the defaults with explicit flags. See [Land the plane](/Users/pnore/Documents/GitHub/codekiln/beans/worktrees/beans-1g2/docs/dev/land-the-plane.md).
 
 ## Quick start (this repo)
 
@@ -191,7 +191,6 @@ Session end:
 
 ```bash
 dev/land-the-plane <issue-id> "optional notes"
-git push
 ```
 
 If you only need the lower-level close/sync step, `dev/beads-finish` remains available.
