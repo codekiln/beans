@@ -1,0 +1,242 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: dev/land-the-plane <issue-id> [notes] [options]
+
+Runs the Beans session closeout ritual:
+  1) Run default quality checks unless overridden
+  2) File requested follow-up Beads issues, otherwise assume none
+  3) Finish and sync the issue through dev/beads-finish
+  4) Rebase on remote, sync metadata, and push the branch
+  5) Show final cleanup state and emit a next-session prompt
+
+Options:
+  --check "<command>"   Run this validation command before closeout
+  --no-checks           Skip default validation commands for this landing
+  --follow-up "<title>" Create a follow-up Beads issue before closing out
+  --no-follow-up        Keep compatibility with old explicit-no-follow-up usage
+  --require-checks      Fail unless explicit check commands are provided
+  --require-follow-up   Fail unless explicit follow-up titles are provided
+USAGE
+}
+
+issue_id="${1:-}"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+notes=""
+checks=()
+follow_ups=()
+no_checks=false
+no_follow_up=false
+require_checks=false
+require_follow_up=false
+
+if [[ -z "$issue_id" ]]; then
+  usage
+  exit 1
+fi
+
+shift
+
+if [[ "${1:-}" != "" && "${1:-}" != --* ]]; then
+  notes="$1"
+  shift
+fi
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --check)
+      checks+=("${2:-}")
+      shift 2
+      ;;
+    --no-checks)
+      no_checks=true
+      shift
+      ;;
+    --follow-up)
+      follow_ups+=("${2:-}")
+      shift 2
+      ;;
+    --no-follow-up)
+      no_follow_up=true
+      shift
+      ;;
+    --require-checks)
+      require_checks=true
+      shift
+      ;;
+    --require-follow-up)
+      require_follow_up=true
+      shift
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+bd_cmd() {
+  bd --no-daemon "$@"
+}
+
+print_section() {
+  printf "\n%s\n" "$1"
+}
+
+print_or_none() {
+  local output="$1"
+
+  if [[ -n "$output" ]]; then
+    printf "%s\n" "$output"
+  else
+    echo "(none)"
+  fi
+}
+
+require_value() {
+  local flag_name="$1"
+  local flag_value="$2"
+
+  if [[ -z "$flag_value" ]]; then
+    echo "$flag_name requires a value" >&2
+    exit 1
+  fi
+}
+
+run_checks() {
+  local check_cmd
+  local default_checks=()
+
+  if [[ "${#checks[@]}" -gt 0 && "$no_checks" == true ]]; then
+    echo "Use either --check or --no-checks, not both" >&2
+    exit 1
+  fi
+
+  if [[ "${#checks[@]}" -eq 0 && "$no_checks" == false ]]; then
+    if [[ -f package.json ]] && grep -q '"build"' package.json; then
+      default_checks=("npm run build")
+    fi
+  fi
+
+  if [[ "${#checks[@]}" -eq 0 && "${#default_checks[@]}" -gt 0 ]]; then
+    checks=("${default_checks[@]}")
+  fi
+
+  print_section "Quality gates:"
+
+  if [[ "${#checks[@]}" -eq 0 ]]; then
+    if [[ "$require_checks" == true ]]; then
+      echo "Explicit check commands are required for this landing." >&2
+      exit 1
+    fi
+
+    if [[ "$no_checks" == true ]]; then
+      echo "Skipping validation commands for this landing."
+    else
+      echo "No default validation commands configured for this repo."
+    fi
+    return
+  fi
+
+  for check_cmd in "${checks[@]}"; do
+    require_value "--check" "$check_cmd"
+    echo "+ $check_cmd"
+    eval "$check_cmd"
+  done
+}
+
+create_follow_ups() {
+  local title
+
+  print_section "Follow-up issues:"
+
+  if [[ "${#follow_ups[@]}" -eq 0 ]]; then
+    if [[ "$require_follow_up" == true ]]; then
+      echo "At least one explicit follow-up title is required for this landing." >&2
+      exit 1
+    fi
+
+    if [[ "$no_follow_up" == true ]]; then
+      echo "No follow-up issues created."
+      return
+    fi
+
+    echo "No follow-up issues created."
+    return
+  fi
+
+  for title in "${follow_ups[@]}"; do
+    require_value "--follow-up" "$title"
+    bd_cmd create "$title"
+  done
+}
+
+push_current_branch() {
+  local branch
+
+  branch="$(git rev-parse --abbrev-ref HEAD)"
+
+  print_section "Rebasing and pushing:"
+
+  bd_cmd sync --check
+  bd_cmd sync --force
+
+  if git rev-parse --abbrev-ref --symbolic-full-name "@{upstream}" >/dev/null 2>&1; then
+    git pull --rebase
+    git push
+  else
+    git fetch origin
+
+    if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+      git rebase "origin/$branch"
+    else
+      echo "No remote branch yet for $branch; skipping rebase before first push."
+    fi
+
+    git push --set-upstream origin "$branch"
+  fi
+}
+
+verify_branch_is_synced() {
+  local status_branch
+
+  status_branch="$(git status --short --branch | head -n 1)"
+
+  if [[ "$status_branch" == *"ahead "* || "$status_branch" == *"behind "* || "$status_branch" == *"[gone]"* ]]; then
+    echo "Branch is not fully synced with origin: $status_branch" >&2
+    exit 1
+  fi
+}
+
+run_checks
+create_follow_ups
+"$script_dir/beads-finish" "$issue_id" "$notes"
+push_current_branch
+verify_branch_is_synced
+
+print_section "Final working tree review:"
+git status --short --branch
+
+print_section "Untracked files to review before leaving:"
+untracked_files="$(git ls-files --others --exclude-standard || true)"
+print_or_none "$untracked_files"
+
+print_section "Git stashes to review before leaving:"
+stash_list="$(git stash list || true)"
+print_or_none "$stash_list"
+
+print_section "Ready Beads work:"
+ready_output="$(bd_cmd ready || true)"
+print_or_none "$ready_output"
+
+next_issue="$(printf "%s\n" "$ready_output" | grep -oE 'beans-[a-z0-9]+' | head -n 1 || true)"
+
+if [[ -n "$next_issue" ]]; then
+  print_section "Suggested next-session prompt:"
+  cat <<EOF
+Start with dev/beads-start $next_issue, read the issue with bd --no-daemon show $next_issue, confirm the worktree is clean, implement the task, then run dev/land-the-plane $next_issue before handing off.
+EOF
+fi
