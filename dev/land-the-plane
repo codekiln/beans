@@ -9,7 +9,7 @@ Runs the Beans session closeout ritual:
   1) Run default quality checks unless overridden
   2) File requested follow-up Beads issues, otherwise assume none
   3) Finish and sync the issue through dev/beads-finish
-  4) Rebase on remote, sync metadata, and push the branch
+  4) Update local main from origin/main, merge the task branch into main, and push main
   5) Show final cleanup state and emit a next-session prompt
 
 Options:
@@ -174,39 +174,72 @@ create_follow_ups() {
   done
 }
 
-push_current_branch() {
+find_main_worktree() {
+  git worktree list --porcelain | awk '
+    /^worktree / { path = substr($0, 10) }
+    /^branch refs\/heads\/main$/ { print path; exit }
+  '
+}
+
+ensure_worktree_clean() {
+  local path="$1"
+  local label="$2"
+  local status_branch
+
+  status_branch="$(git -C "$path" status --short)"
+
+  if [[ -n "$status_branch" ]]; then
+    echo "$label worktree is not clean: $path" >&2
+    printf "%s\n" "$status_branch" >&2
+    exit 1
+  fi
+}
+
+land_on_main() {
   local branch
+  local main_worktree
 
   branch="$(git rev-parse --abbrev-ref HEAD)"
+  main_worktree="$(find_main_worktree)"
 
-  print_section "Rebasing and pushing:"
+  if [[ -z "$main_worktree" ]]; then
+    echo "Could not locate the main worktree. Make sure branch 'main' is checked out in one worktree." >&2
+    exit 1
+  fi
+
+  if [[ "$branch" == "main" ]]; then
+    echo "dev/land-the-plane should be run from the task worktree, not from main." >&2
+    exit 1
+  fi
+
+  print_section "Landing on main:"
 
   bd_cmd sync --check
   bd_cmd sync --force
 
-  if git rev-parse --abbrev-ref --symbolic-full-name "@{upstream}" >/dev/null 2>&1; then
-    git pull --rebase
-    git push
-  else
-    git fetch origin
+  ensure_worktree_clean "$main_worktree" "Main"
 
-    if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
-      git rebase "origin/$branch"
-    else
-      echo "No remote branch yet for $branch; skipping rebase before first push."
-    fi
-
-    git push --set-upstream origin "$branch"
-  fi
+  git -C "$main_worktree" fetch origin
+  git -C "$main_worktree" pull --ff-only origin main
+  git -C "$main_worktree" merge --no-edit "$branch"
+  git -C "$main_worktree" push origin main
 }
 
-verify_branch_is_synced() {
+verify_main_is_synced() {
+  local main_worktree
   local status_branch
 
-  status_branch="$(git status --short --branch | head -n 1)"
+  main_worktree="$(find_main_worktree)"
+
+  if [[ -z "$main_worktree" ]]; then
+    echo "Could not locate the main worktree to verify sync status." >&2
+    exit 1
+  fi
+
+  status_branch="$(git -C "$main_worktree" status --short --branch | head -n 1)"
 
   if [[ "$status_branch" == *"ahead "* || "$status_branch" == *"behind "* || "$status_branch" == *"[gone]"* ]]; then
-    echo "Branch is not fully synced with origin: $status_branch" >&2
+    echo "Main is not fully synced with origin: $status_branch" >&2
     exit 1
   fi
 }
@@ -214,11 +247,17 @@ verify_branch_is_synced() {
 run_checks
 create_follow_ups
 "$script_dir/beads-finish" "$issue_id" "$notes"
-push_current_branch
-verify_branch_is_synced
+land_on_main
+verify_main_is_synced
 
 print_section "Final working tree review:"
 git status --short --branch
+
+main_worktree="$(find_main_worktree)"
+if [[ -n "$main_worktree" ]]; then
+  print_section "Main worktree review:"
+  git -C "$main_worktree" status --short --branch
+fi
 
 print_section "Untracked files to review before leaving:"
 untracked_files="$(git ls-files --others --exclude-standard || true)"

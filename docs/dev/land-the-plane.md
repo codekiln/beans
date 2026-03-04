@@ -8,11 +8,11 @@
 dev/land-the-plane <issue-id> ["notes"] [--check "<command>"]... [--follow-up "<title>"]...
 ```
 
-Use it from the active worktree after the implementation work is done.
+Use it from the active task worktree after the implementation work is done. The helper is expected to merge that task branch into the separate local `main` worktree and then push `main` directly.
 
 ## What the helper does
 
-The helper is intentionally automation-friendly. Work is not considered landed until the branch is rebased, pushed, and synced, but the default path should still be easy for an agent to execute without waiting for a human to answer bookkeeping questions.
+The helper is intentionally automation-friendly. Work is not considered landed until the issue is synced, local `main` is updated from `origin/main`, the task branch is merged into `main`, and `main` is pushed. The default path should still be easy for an agent to execute without waiting for a human to answer bookkeeping questions.
 
 1. Runs explicit `--check` commands when provided.
 2. Otherwise runs a repo default validation command when one is configured. In Beans, that default is `npm run build`.
@@ -20,12 +20,14 @@ The helper is intentionally automation-friendly. Work is not considered landed u
 4. Creates any requested follow-up Beads issues before closeout.
 5. If no follow-up override is provided, defaults to creating no follow-up issues.
 6. Runs `dev/beads-finish <issue-id> ["notes"]`.
-7. Rebases from the remote branch when possible, then runs `bd --no-daemon sync --check` and `bd --no-daemon sync --force`.
-8. Pushes the current branch to `origin`, setting upstream if needed.
-9. Verifies `git status --short --branch` no longer reports the branch as ahead or behind.
-10. Lists untracked files and stashes for cleanup review.
-11. Shows `bd --no-daemon ready`.
-12. Emits a next-session prompt built from the first ready issue, if one exists.
+7. Verifies the separate local `main` worktree is clean before changing it.
+8. Updates local `main` from `origin/main` with `git pull --ff-only origin main`.
+9. Merges the current task branch into local `main`.
+10. Pushes `main` to `origin`.
+11. Verifies `main` is no longer ahead or behind `origin/main`.
+12. Lists untracked files and stashes for cleanup review.
+13. Shows `bd --no-daemon ready`.
+14. Emits a next-session prompt built from the first ready issue, if one exists.
 
 ## Defaults and overrides
 
@@ -33,6 +35,7 @@ The default path is meant for unattended closeout:
 
 - Run the repo's default validation command when available.
 - Assume no follow-up issue is needed unless one is explicitly requested.
+- Land via local `main` and push `main` directly rather than pushing the task branch or opening a PR.
 
 Humans can override that on a one-off basis:
 
@@ -50,19 +53,7 @@ dev/land-the-plane beans-2wm "Documented the new workflow" \
   --check "npm run check:beads-finish"
 ```
 
-```bash
-dev/land-the-plane beans-abc "Closed with a follow-up" \
-  --no-checks \
-  --follow-up "Add branch cleanup suggestions to land-the-plane output"
-```
-
-```bash
-dev/land-the-plane beans-abc "Require explicit one-off review this time" \
-  --require-checks \
-  --check "npm run build" \
-  --require-follow-up \
-  --follow-up "Investigate remaining merge conflict edge cases"
-```
+The helper will fail if the separate `main` worktree is dirty. That is intentional: in this repo, landing should not silently merge into a `main` checkout that already has unrelated local work.
 
 ## Cleanup expectations
 
@@ -76,7 +67,7 @@ The helper still does not delete files, branches, or stashes automatically. In t
 ## Suggested ritual
 
 1. Finish the implementation and run any checks that matter for the task.
-2. Run `dev/land-the-plane <issue-id> "optional notes" ...`.
+2. Run `dev/land-the-plane <issue-id> "optional notes" ...` from the task worktree.
 3. Review the reported untracked files and stashes.
 4. If another issue is ready, copy the suggested prompt into the next session.
 
