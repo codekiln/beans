@@ -9,6 +9,7 @@
     "check:bean-rendering": "node dev/checks/bean-rendering.mjs",
     "check:beads-start": "bash dev/checks/beads-start-smoke.sh",
     "check:beads-finish": "bash dev/checks/beads-finish-smoke.sh",
+    "check:beads-prune-closed-worktrees": "bash dev/checks/beads-prune-closed-worktrees-smoke.sh",
     "check:land-the-plane": "bash dev/checks/land-the-plane-smoke.sh",
     "build": "astro build",
     "preview": "astro preview"

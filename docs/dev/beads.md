@@ -61,6 +61,14 @@ dev/beads-finish <issue-id> ["notes"]
 
 This helper standardizes the close/sync path: show issue, optionally append notes, close it, run `bd --no-daemon sync --check`, show `git status --short`, run `bd --no-daemon sync --force`, fall back to `bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl` if needed, and fail if the issue is still missing from `beads-sync/.beads/issues.jsonl`.
 
+Closed-worktree cleanup helper:
+
+```bash
+dev/beads-prune-closed-worktrees
+```
+
+This helper removes Beads task worktrees under `worktrees/beans-*` when their corresponding Beads issue is already closed. Use `--dry-run` to inspect targets first and `--force` only when a closed-task worktree is intentionally disposable despite local dirt.
+
 Land-the-plane helper:
 
 ```bash

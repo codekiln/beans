@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: dev/beads-prune-closed-worktrees [--dry-run] [--force]
+
+Removes Beads task worktrees under worktrees/beans-* when the corresponding
+issue is closed in the Beads database.
+
+Options:
+  --dry-run  Print the worktrees that would be removed without removing them
+  --force    Pass --force to git worktree remove
+USAGE
+}
+
+dry_run=false
+force=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run)
+      dry_run=true
+      shift
+      ;;
+    --force)
+      force=true
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+repo_root="$(git rev-parse --show-toplevel)"
+worktree_root="$repo_root/worktrees"
+closed_ids_file="$(mktemp)"
+trap 'rm -f "$closed_ids_file"' EXIT
+
+bd --no-daemon list --status closed | grep -oE 'beans-[a-z0-9]+' | sort -u >"$closed_ids_file" || true
+
+if [[ ! -s "$closed_ids_file" ]]; then
+  echo "No closed Beads issues found."
+  exit 0
+fi
+
+candidates=()
+while IFS= read -r path; do
+  case "$path" in
+    "$worktree_root"/beans-*)
+      issue_id="$(basename "$path")"
+      if grep -Fxq "$issue_id" "$closed_ids_file"; then
+        candidates+=("$path")
+      fi
+      ;;
+  esac
+done < <(
+  git worktree list --porcelain | awk '
+    /^worktree / { print substr($0, 10) }
+  '
+)
+
+if [[ "${#candidates[@]}" -eq 0 ]]; then
+  echo "No closed-task Beads worktrees to remove."
+  exit 0
+fi
+
+echo "Closed-task worktrees:"
+printf '%s\n' "${candidates[@]}"
+
+if [[ "$dry_run" == true ]]; then
+  echo "Dry run only; no worktrees removed."
+  exit 0
+fi
+
+remove_args=(worktree remove)
+if [[ "$force" == true ]]; then
+  remove_args+=(--force)
+fi
+
+for path in "${candidates[@]}"; do
+  git "${remove_args[@]}" "$path"
+done
+
+git worktree prune
+
+echo "Removed ${#candidates[@]} closed-task worktree(s)."
