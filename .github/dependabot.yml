@@ -1,0 +1,45 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "automation"
+      - "dependencies"
+    commit-message:
+      prefix: "deps"
+    groups:
+      astro:
+        patterns:
+          - "astro"
+          - "@astrojs/*"
+      production-dependencies:
+        dependency-type: "production"
+        patterns:
+          - "*"
+      development-tooling:
+        dependency-type: "development"
+        patterns:
+          - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:30"
+    open-pull-requests-limit: 3
+    labels:
+      - "automation"
+      - "ci"
+      - "dependencies"
+    commit-message:
+      prefix: "ci"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
