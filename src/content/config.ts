@@ -39,7 +39,6 @@ const beans = defineCollection({
           slug: z.string()
         })
         .optional(),
-      method: z.string().optional(),
       recipe: z
         .object({
           name: z.string(),
