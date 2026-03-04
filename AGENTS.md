@@ -8,10 +8,6 @@ rules[2]:
     description: Rulesync usage and devcontainer installation
     applyTo[1]: docs/dev/rulesync.md
 
-# Additional Conventions Beyond the Built-in Functions
-
-As this project's AI coding tool, you must follow the additional conventions below, in addition to the built-in functions.
-
 # Beans Project Overview
 
 Beans is a CLI-inspired coffee log built with Astro. The site content lives in `src/content` and content helpers live in `src/data`; the UI is composed of Astro components, layouts, and styles in `src/`.
