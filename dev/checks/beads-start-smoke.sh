@@ -54,7 +54,9 @@ EOF
 chmod +x "$tmp_dir/bin/git" "$tmp_dir/bin/bd" "$tmp_dir/beads-start"
 
 cat >"$tmp_dir/.gitignore" <<'EOF'
+# bd worktrees
 worktrees/beans-*/
+# bd worktree
 worktrees/beans-test/
 EOF
 
@@ -65,6 +67,16 @@ EOF
 
 if grep -Fqx "worktrees/beans-test/" "$tmp_dir/.gitignore"; then
   echo "beads-start left a per-worktree .gitignore entry behind" >&2
+  exit 1
+fi
+
+if grep -Fqx "# bd worktree" "$tmp_dir/.gitignore"; then
+  echo "beads-start left a stray Beads .gitignore comment behind" >&2
+  exit 1
+fi
+
+if ! grep -Fqx "# bd worktrees" "$tmp_dir/.gitignore"; then
+  echo "beads-start removed the repo's canonical worktree .gitignore comment" >&2
   exit 1
 fi
 

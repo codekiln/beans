@@ -15,7 +15,7 @@ Use it from the active task worktree after the implementation work is done. The 
 The helper is intentionally automation-friendly. Work is not considered landed until the issue is synced, local `main` is updated from `origin/main`, the task branch is merged into `main`, and `main` is pushed. The default path should still be easy for an agent to execute without waiting for a human to answer bookkeeping questions.
 
 1. Runs explicit `--check` commands when provided.
-2. Otherwise runs a repo default validation command when one is configured. In Beans, that default is `npm run build`.
+2. Otherwise runs the repo default validation commands when configured. In Beans, the defaults are `npm run check:beads-start` and `npm run build`.
 3. If `--no-checks` is passed, skips validation for that one landing.
 4. Creates any requested follow-up Beads issues before closeout.
 5. If no follow-up override is provided, defaults to creating no follow-up issues.

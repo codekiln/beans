@@ -37,10 +37,19 @@ cleanup_gitignore_entry() {
   local tmp_file
 
   [[ -f "$gitignore_path" ]] || return 0
-  grep -Fqx "$entry" "$gitignore_path" || return 0
+  if ! grep -Fqx "$entry" "$gitignore_path" &&
+    ! grep -Fqx "# bd worktree" "$gitignore_path"; then
+    return 0
+  fi
 
   tmp_file="$(mktemp)"
-  grep -Fvx "$entry" "$gitignore_path" >"$tmp_file" || true
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" == "$entry" || "$line" == "# bd worktree" ]]; then
+      continue
+    fi
+
+    printf '%s\n' "$line" >>"$tmp_file"
+  done <"$gitignore_path"
   mv "$tmp_file" "$gitignore_path"
 }
 

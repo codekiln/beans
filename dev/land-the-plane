@@ -116,8 +116,12 @@ run_checks() {
   fi
 
   if [[ "${#checks[@]}" -eq 0 && "$no_checks" == false ]]; then
+    if [[ -f package.json ]] && grep -q '"check:beads-start"' package.json; then
+      default_checks+=("npm run check:beads-start")
+    fi
+
     if [[ -f package.json ]] && grep -q '"build"' package.json; then
-      default_checks=("npm run build")
+      default_checks+=("npm run build")
     fi
   fi
 

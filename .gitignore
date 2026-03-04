@@ -30,4 +30,3 @@ worktrees/beans-*/
 
 # Playwright preview artifacts
 dev/playwright/*.png
-# bd worktree

@@ -12,6 +12,7 @@ cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
 cat >"$tmp_dir/package.json" <<'EOF'
 {
   "scripts": {
+    "check:beads-start": "echo beads-start",
     "build": "echo build"
   }
 }
@@ -93,6 +94,11 @@ set -euo pipefail
 
 echo "\$*" >>"$tmp_dir/npm.log"
 
+if [[ "\$1" == "run" && "\$2" == "check:beads-start" ]]; then
+  echo "beads-start ok"
+  exit 0
+fi
+
 if [[ "\$1" == "run" && "\$2" == "build" ]]; then
   echo "build ok"
   exit 0
@@ -155,6 +161,11 @@ fi
 
 if [[ "$output" != *"No follow-up issues created."* ]]; then
   echo "land-the-plane did not default follow-up handling sensibly" >&2
+  exit 1
+fi
+
+if ! grep -Fq "run check:beads-start" "$tmp_dir/npm.log"; then
+  echo "land-the-plane did not run the default Beads startup smoke check" >&2
   exit 1
 fi
 
