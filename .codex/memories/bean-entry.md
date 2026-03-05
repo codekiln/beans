@@ -26,6 +26,22 @@ The markdown body is rendered directly using Astro's content rendering. You can 
 **Important**: Images in the markdown body must use the full `/beans/images/` path prefix, not `/images/`. This is different from frontmatter images which use `/images/` and are handled by the `withBase` utility in the component.
 **Important**: Do not add an inline body preamble like `` `$ bean log YYYY-MM-DD beanX` `` in the markdown body. The UI renders the bean log command prompt in the entry header.
 
+## Virtual Persona Comment Frontmatter
+
+Bean entries may include optional virtual persona comment metadata in frontmatter:
+
+```yaml
+personaComment:
+  name: "Rin Vale"
+  title: "Campfire Cupping Companion"
+  body: "<single comment body>"
+```
+
+- Keep the persona identity as `Rin Vale` with title `Campfire Cupping Companion` unless explicitly asked to edit these values.
+- When a `personaComment` is present, include the tag `comment/rin-vale` in the bean entry `tags` list.
+- Regeneration replaces `personaComment.body` instead of appending additional comments.
+- Persona comments should read like a knowledgeable coffee friend and include practical, actionable brew advice linked to the logged details.
+
 ## Examples
 
 ### Frontmatter Image

@@ -1,6 +1,3 @@
----
-description: Close out a Beans work session
----
 # Land the plane
 
 Use this command when implementation work is done and the session needs a clean, resumable closeout.

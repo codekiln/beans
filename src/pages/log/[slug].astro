@@ -27,7 +27,7 @@ const initialLinkHref = withBase(`/log/${bean.slug}/`);
   initialLinkHref={initialLinkHref}
 >
   <section class="bean-detail">
-    <BeanEntry bean={bean} />
+    <BeanEntry bean={bean} showPersonaComment={true} />
     <nav class="bean-nav" aria-label="Bean log navigation">
       {prev ? (
         <a class="bean-nav-link" href={withBase(`/log/${prev.slug}/`)}>
