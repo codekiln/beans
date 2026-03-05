@@ -13,6 +13,16 @@ const escapeHtml = (value: string) =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+const renderPersonaComment = (entry: BeanEntry) => {
+  if (!entry.data.personaComment) {
+    return "";
+  }
+
+  const { name, title, body } = entry.data.personaComment;
+  return `<section aria-label="Virtual persona comment"><h3>Virtual Persona Comment</h3><p><strong>${escapeHtml(
+    `${name} (${title})`
+  )}</strong></p><p>${escapeHtml(body)}</p></section>`;
+};
 
 export const GET = async () => {
   const markdown = await createMarkdownProcessor();
@@ -36,7 +46,8 @@ export const GET = async () => {
                 entry.data.image.alt
               )}"></figure>`
             : "",
-          content
+          content,
+          renderPersonaComment(entry)
         ].join(""),
         link: withBase(`log/${entry.slug}/`)
       };

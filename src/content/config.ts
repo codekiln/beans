@@ -71,6 +71,13 @@ const beans = defineCollection({
           slug: z.string().optional()
         })
       )
+      .optional(),
+    personaComment: z
+      .object({
+        name: z.string(),
+        title: z.string(),
+        body: z.string()
+      })
       .optional()
   })
 });
