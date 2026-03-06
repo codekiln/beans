@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.15",
-    "astro": "^4.16.4"
+    "astro": "^5.18.0"
   },
   "devDependencies": {
     "playwright": "^1.58.1",
