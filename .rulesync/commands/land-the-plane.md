@@ -19,7 +19,12 @@ Leave the branch, Beads metadata, and working tree in a state that another sessi
 4. Create any explicit follow-up Beads issues that are still needed.
 5. Run `dev/beads-finish <issue-id> ["notes"]` when the work is Beads-managed.
 6. Rebase from the remote branch when needed, then push.
-7. End with a clean or intentionally-dirty working tree that is explained in the handoff.
+7. Prune closed-task worktrees with `dev/beads-prune-closed-worktrees`.
+8. End with a clean or intentionally-dirty working tree that is explained in the handoff.
+
+Final invariant:
+
+- After landing, no closed-task Beads worktree should remain under `worktrees/`.
 
 ## `.gitignore` cleanup rule
 
@@ -39,6 +44,7 @@ npm run build
 dev/beads-finish <issue-id> "optional notes"
 git pull --rebase
 git push
+dev/beads-prune-closed-worktrees
 git status --short --branch
 ```
 
