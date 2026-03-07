@@ -34,6 +34,12 @@ curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/insta
 
 Use Beads-managed worktree creation so all worktrees share the same `.beads` store through redirect wiring.
 
+Worktree roles in this repo are explicit:
+
+- The repo root checkout stays on `main` and is integration-only. Use it for fetch/merge/push cleanup, not for active edits.
+- Personal non-task WIP belongs in `worktrees/my/main`.
+- Beads task work belongs in `worktrees/beans-<issue-id>` on branches like `codex/<issue-id>`.
+
 ```bash
 # Preferred startup path in this repo
 dev/beads-start <issue-id>
@@ -49,6 +55,7 @@ bd --no-daemon where
 
 Do not create ad hoc worktrees outside `worktrees/` for regular agent workflows.
 This repo already ignores `worktrees/beans-*/`, so startup flows must not leave per-worktree ignore entries behind in `.gitignore`.
+If you want a personal `main` worktree, create or refresh it separately from the root checkout, for example with `git worktree add worktrees/my/main main`.
 
 Fast-start helper:
 
@@ -84,6 +91,15 @@ dev/land-the-plane <issue-id> ["notes"] [--check "<command>"]... [--follow-up "<
 ```
 
 This is the repo's named session closeout ritual. By default it runs the repo's standard validation command when available, assumes no follow-up issue is needed, runs `dev/beads-finish`, rebases and pushes, verifies the branch is synced with origin, then surfaces cleanup state and a next-session prompt. Humans can override the defaults with explicit flags. See [Land the plane](/Users/pnore/Documents/GitHub/codekiln/beans/worktrees/beans-1g2/docs/dev/land-the-plane.md).
+
+Successful closeout for a Beads-managed task means all of the following are true:
+
+- the task worktree is clean, and any tracked edits were committed before landing
+- `main` is clean and synced with `origin/main`
+- `beads-sync` is clean and synced with `origin/beads-sync`
+- no closed-task Beads worktree remains under `worktrees/`
+
+`dev/land-the-plane` treats the root checkout as the integration target. It fails if the root `main` checkout is dirty, ignores unrelated dirt in worktrees such as `worktrees/my/main`, auto-commits tracked task-worktree changes when safe, and fails if the task worktree is ambiguous (for example because of untracked files or merge conflicts).
 
 ## Quick start (this repo)
 

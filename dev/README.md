@@ -10,6 +10,9 @@
 - See `docs/dev/codex.md` for Codespaces-specific Codex approval defaults.
 
 ## Git worktrees in Codespaces
+- Keep the repo root checkout on `main` as an integration-only worktree.
+- Keep personal non-task WIP on `main` in `worktrees/my/main`.
+- Keep Beads task work in `worktrees/beans-<issue-id>`.
 - Worktrees should live under `/workspaces/worktrees` so they persist and stay inside the Codespaces workspace.
 - Use the helper script to add/list/prune/remove worktrees:
   - `dev/worktree add feat/my-branch`

@@ -10,6 +10,8 @@ dev/land-the-plane <issue-id> ["notes"] [--check "<command>"]... [--follow-up "<
 
 Use it from the active task worktree after the implementation work is done. The helper is expected to merge that task branch into the separate local `main` worktree and then push `main` directly.
 
+In Beans, the repo root checkout is the integration-only `main` worktree. Keep active edits out of the root checkout. If you want personal WIP on `main`, keep that in `worktrees/my/main`; Beads task work still belongs in `worktrees/beans-*`.
+
 ## What the helper does
 
 The helper is intentionally automation-friendly. Work is not considered landed until the issue is synced, local `main` is updated from `origin/main`, the task branch is merged into `main`, and `main` is pushed. The default path should still be easy for an agent to execute without waiting for a human to answer bookkeeping questions.
@@ -18,16 +20,19 @@ The helper is intentionally automation-friendly. Work is not considered landed u
 2. Otherwise runs the repo default validation commands when configured. In Beans, the defaults are `npm run check:beads-start` and `npm run build`.
 3. If `--no-checks` is passed, skips validation for that one landing.
 4. Creates any requested follow-up Beads issues before closeout.
-5. If no follow-up override is provided, defaults to creating no follow-up issues.
-6. Runs `dev/beads-finish <issue-id> ["notes"]`.
-7. Verifies the separate local `main` worktree is clean before changing it.
-8. Updates local `main` from `origin/main` with `git pull --ff-only origin main`.
-9. Merges the current task branch into local `main`.
-10. Pushes `main` to `origin`.
-11. Verifies `main` is no longer ahead or behind `origin/main`.
-12. Lists untracked files and stashes for cleanup review.
-13. Shows `bd --no-daemon ready`.
-14. Emits a next-session prompt built from the first ready issue, if one exists.
+5. If the task worktree has tracked edits, auto-commits them with a checkpoint commit before closeout.
+6. If the task worktree is ambiguous (for example because of untracked files or unresolved merges), fails before closeout.
+7. Runs `dev/beads-finish <issue-id> ["notes"]`.
+8. Verifies the root `main` checkout is clean before changing it. Dirty `worktrees/my/main` does not block landing.
+9. Updates root `main` from `origin/main` with `git pull --ff-only origin main`.
+10. Merges the current task branch into root `main`.
+11. Pushes `main` to `origin`.
+12. Verifies the landed task commit is now reachable from root `main`.
+13. Verifies the task worktree, root `main`, and `beads-sync` worktree all end clean, and that root `main` plus `beads-sync` are synced with origin.
+14. Reports the landed SHAs for the task branch, root `main`, and `beads-sync`.
+15. Lists untracked files and stashes for cleanup review.
+16. Shows `bd --no-daemon ready`.
+17. Emits a next-session prompt built from the best ready issue, preferring ready task/bug work, then lower priority number, then current ready order.
 
 ## Defaults and overrides
 
@@ -35,7 +40,8 @@ The default path is meant for unattended closeout:
 
 - Run the repo's default validation command when available.
 - Assume no follow-up issue is needed unless one is explicitly requested.
-- Land via local `main` and push `main` directly rather than pushing the task branch or opening a PR.
+- Land via the root `main` checkout and push `main` directly rather than pushing the task branch or opening a PR.
+- Ignore unrelated dirt in `worktrees/my/main`.
 
 Humans can override that on a one-off basis:
 
@@ -53,7 +59,7 @@ dev/land-the-plane beans-2wm "Documented the new workflow" \
   --check "npm run check:beads-finish"
 ```
 
-The helper will fail if the separate `main` worktree is dirty. That is intentional: in this repo, landing should not silently merge into a `main` checkout that already has unrelated local work.
+The helper will fail if the root `main` checkout is dirty. That is intentional: in this repo, landing should not silently merge into the integration checkout when the root already has unrelated local work.
 
 ## Cleanup expectations
 

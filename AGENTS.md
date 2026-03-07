@@ -31,10 +31,12 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - When adding new pages, use `.astro` files and include the base layout.
 - For Beads-managed work, prefer `dev/beads-start <issue-id>` so startup uses the repo's Beads worktree flow and cleanup.
 - Prefer `dev/beads-finish <issue-id>` for the close/sync path so metadata handling is consistent.
+- Keep the repo root checkout on `main` as an integration-only worktree; do not use it for active feature edits.
+- Personal non-task WIP belongs in `worktrees/my/main`.
 - Task worktrees live at `worktrees/beans-<issue-id>` on branches like `codex/beans-<issue-id>`.
 - Do not add per-worktree paths to `.gitignore`; rely on the existing wildcard rule `worktrees/beans-*/`.
 - Creating or updating Beads issue metadata is not complete until the exported metadata change is committed in git. Default to committing it on `main`; committing it on an active Beads task branch is acceptable when that branch will land in `main` through the normal merge flow.
-- Unless the user explicitly asks for a branch or PR workflow, land completed work by updating local `main` from `origin/main`, merging the task branch into `main` locally, and pushing `main` directly.
+- Unless the user explicitly asks for a branch or PR workflow, land completed work by updating the root `main` checkout from `origin/main`, merging the task branch into root `main` locally, and pushing `main` directly.
 - In this repo, the default handoff should sidestep PR creation entirely; do not treat pushing the task worktree branch as the normal landing path unless the user requests it.
 - Do not describe Beads sync changes as "just metadata" when deciding whether cleanup is complete. In this repo, the `beads-sync` worktree is part of the durable landing path.
 - A Beads-managed task is not fully landed until both `main` and `beads-sync` are clean and synced with their matching `origin/*` branches.
