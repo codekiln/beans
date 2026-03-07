@@ -9,18 +9,30 @@ blend: "single-origin"
 
 ### facts
 
-- Producer/Farm: ACODIHUE Assoc., various smallholders
+#### about the producer  
+
+Asociación de Cooperación al Desarrollo Integral de Huehuetenango (ACODIHUE) 
+
+established in 1996, this is a co-op with over 40,000 farmers. 
+
+| region        | number of municipalities |
+|---------------|--------------------------|
+| Huehuetenango | 16                       |
+| San Marcos    | 2                        |
+| Totonicapán   | 2                        |
+
+Parable's product notes for this coffee highlight ACODIHUE's 
+work across multiple municipalities in focus on 
+poverty reduction, food security, and
+environmental stewardship.
+
+#### other
+
+
 - Variety: Bourbon, Catimor, Caturra, Maragogype, Pache
 - Altitude: 1400-2200 masl
 - Region: Huehuetenango, Guatemala
 - Process: Washed
 - Certifications: Organic and Fair Trade
 
-### ACODIHUE context
 
-Parable describes this coffee as sourced through ACODIHUE, a fair-trade and
-organic-certified cooperative established in 1996.
-
-The product notes highlight ACODIHUE's work across multiple municipalities in
-western Guatemala and its focus on poverty reduction, food security, and
-environmental stewardship.
