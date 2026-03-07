@@ -27,12 +27,13 @@ The helper is intentionally automation-friendly. Work is not considered landed u
 9. Updates root `main` from `origin/main` with `git pull --ff-only origin main`.
 10. Merges the current task branch into root `main`.
 11. Pushes `main` to `origin`.
-12. Verifies the landed task commit is now reachable from root `main`.
-13. Verifies the task worktree, root `main`, and `beads-sync` worktree all end clean, and that root `main` plus `beads-sync` are synced with origin.
-14. Reports the landed SHAs for the task branch, root `main`, and `beads-sync`.
-15. Lists untracked files and stashes for cleanup review.
-16. Shows `bd --no-daemon ready`.
-17. Emits a next-session prompt built from the best ready issue, preferring ready task/bug work, then lower priority number, then current ready order.
+12. Commits and pushes `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch when closeout dirties that worktree.
+13. Verifies the landed task commit is now reachable from root `main`.
+14. Verifies the task worktree, root `main`, and `beads-sync` worktree all end clean, and that root `main` plus `beads-sync` are synced with origin.
+15. Reports the landed SHAs for the task branch, root `main`, and `beads-sync`.
+16. Lists untracked files and stashes for cleanup review.
+17. Shows `bd --no-daemon ready`.
+18. Emits a next-session prompt built from the best ready issue, preferring ready task/bug work, then lower priority number, then current ready order.
 
 ## Defaults and overrides
 

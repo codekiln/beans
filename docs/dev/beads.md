@@ -99,7 +99,7 @@ Successful closeout for a Beads-managed task means all of the following are true
 - `beads-sync` is clean and synced with `origin/beads-sync`
 - no closed-task Beads worktree remains under `worktrees/`
 
-`dev/land-the-plane` treats the root checkout as the integration target. It fails if the root `main` checkout is dirty, ignores unrelated dirt in worktrees such as `worktrees/my/main`, auto-commits tracked task-worktree changes when safe, and fails if the task worktree is ambiguous (for example because of untracked files or merge conflicts).
+`dev/land-the-plane` treats the root checkout as the integration target. It fails if the root `main` checkout is dirty, ignores unrelated dirt in worktrees such as `worktrees/my/main`, auto-commits tracked task-worktree changes when safe, commits and pushes `beads-sync` metadata when closeout dirties that worktree, and fails if the task worktree is ambiguous (for example because of untracked files or merge conflicts).
 
 ## Quick start (this repo)
 

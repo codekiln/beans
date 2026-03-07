@@ -265,6 +265,27 @@ land_on_root_main() {
   git -C "$repo_root" push origin main
 }
 
+sync_beads_metadata_branch() {
+  local sync_status
+
+  if [[ ! -d "$beads_sync_worktree" ]]; then
+    echo "Could not locate the beads-sync worktree at $beads_sync_worktree" >&2
+    exit 1
+  fi
+
+  sync_status="$(git -C "$beads_sync_worktree" status --short)"
+
+  if [[ -z "$sync_status" ]]; then
+    return
+  fi
+
+  print_section "Syncing beads-sync:"
+  printf "%s\n" "$sync_status"
+  git -C "$beads_sync_worktree" add .beads/issues.jsonl
+  git -C "$beads_sync_worktree" commit -m "chore(beads): sync $issue_id metadata"
+  git -C "$beads_sync_worktree" push origin beads-sync
+}
+
 assert_task_commit_landed() {
   local task_head="$1"
 
@@ -363,6 +384,7 @@ auto_commit_task_worktree_if_safe
 task_head="$(git rev-parse HEAD)"
 "$script_dir/beads-finish" "$issue_id" "$notes"
 land_on_root_main
+sync_beads_metadata_branch
 print_final_state "$task_head"
 
 print_section "Task worktree review:"

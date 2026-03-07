@@ -44,6 +44,7 @@ task_worktree="$task_worktree"
 my_main_worktree="$my_main_worktree"
 beads_sync_worktree="$tmp_dir/.git/beads-worktrees/beads-sync"
 task_dirty_flag="$tmp_dir/task-dirty"
+beads_sync_dirty_flag="$tmp_dir/beads-sync-dirty"
 
 case "\$1" in
   rev-parse)
@@ -85,9 +86,16 @@ case "\$1" in
     exit 0
     ;;
   add)
+    if [[ "\$PWD" == "\$beads_sync_worktree" || "\${GIT_DIR:-}" == "\$beads_sync_worktree/.git" ]]; then
+      exit 0
+    fi
     exit 0
     ;;
   commit)
+    if [[ "\$PWD" == "\$beads_sync_worktree" || "\${GIT_DIR:-}" == "\$beads_sync_worktree/.git" ]]; then
+      rm -f "\$beads_sync_dirty_flag"
+      exit 0
+    fi
     rm -f "\$task_dirty_flag"
     exit 0
     ;;
@@ -131,6 +139,10 @@ case "\$1" in
         fi
 
         if [[ "\$worktree_path" == "\$beads_sync_worktree" ]]; then
+          if [[ "\${2:-}" == "--short" && -f "\$beads_sync_dirty_flag" ]]; then
+            printf " M .beads/issues.jsonl\n"
+            exit 0
+          fi
           if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
             printf "## beads-sync...origin/beads-sync\n"
           fi
@@ -144,7 +156,19 @@ case "\$1" in
 
         exit 0
         ;;
+      add)
+        exit 0
+        ;;
+      commit)
+        if [[ "\$worktree_path" == "\$beads_sync_worktree" ]]; then
+          rm -f "\$beads_sync_dirty_flag"
+        fi
+        exit 0
+        ;;
       fetch|pull|merge|push)
+        if [[ "\$worktree_path" == "\$beads_sync_worktree" && "\${1:-}" == "push" ]]; then
+          rm -f "\$beads_sync_dirty_flag"
+        fi
         exit 0
         ;;
       merge-base)
@@ -234,6 +258,7 @@ EOF
 
   chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd" "$tmp_dir/bin/npm"
   : >"$tmp_dir/task-dirty"
+  : >"$tmp_dir/beads-sync-dirty"
 
   output="$(
     cd "$task_worktree"
@@ -282,6 +307,16 @@ EOF
 
   if ! grep -Fq -- "-C $tmp_dir/.git/beads-worktrees/beads-sync status --short --branch" "$tmp_dir/git.log"; then
     echo "land-the-plane did not verify beads-sync final state" >&2
+    exit 1
+  fi
+
+  if ! grep -Fq -- "-C $tmp_dir/.git/beads-worktrees/beads-sync commit -m chore(beads): sync beans-test metadata" "$tmp_dir/git.log"; then
+    echo "land-the-plane did not commit beads-sync metadata during closeout" >&2
+    exit 1
+  fi
+
+  if ! grep -Fq -- "-C $tmp_dir/.git/beads-worktrees/beads-sync push origin beads-sync" "$tmp_dir/git.log"; then
+    echo "land-the-plane did not push beads-sync during closeout" >&2
     exit 1
   fi
 
