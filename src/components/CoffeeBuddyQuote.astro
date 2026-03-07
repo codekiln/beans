@@ -13,6 +13,7 @@ interface Props {
 
 const { comment } = Astro.props as Props;
 const titleId = `buddy-comment-${Math.random().toString(36).slice(2, 10)}`;
+const companionHref = withBase("/companion/rin-vale/");
 ---
 {comment && (
   <aside class="buddy-quote" aria-labelledby={titleId}>
@@ -29,12 +30,14 @@ const titleId = `buddy-comment-${Math.random().toString(36).slice(2, 10)}`;
       </div>
       <div class="buddy-copy">
         <p class="buddy-kicker">Coffee Buddy Comment</p>
-        <div class="buddy-nameplate">
-          <p class="buddy-name" id={titleId}>{comment.name}</p>
-          <p class="buddy-title">{comment.title}</p>
-        </div>
-        <blockquote class="buddy-dialogue">
+        <p class="buddy-source" id={titleId}>{comment.name}</p>
+        <blockquote class="buddy-dialogue" aria-label={`${comment.name} says`}>
           <p>{comment.body}</p>
+          <footer class="buddy-attribution">
+            <span aria-hidden="true">--</span>
+            <a href={companionHref}>{comment.name}</a>
+            <span class="sr-only">, {comment.title}</span>
+          </footer>
         </blockquote>
       </div>
     </div>
@@ -121,46 +124,48 @@ const titleId = `buddy-comment-${Math.random().toString(36).slice(2, 10)}`;
     color: #7a5533;
   }
 
-  .buddy-nameplate {
-    margin-bottom: 0.7rem;
-    padding: 0.4rem 0.65rem;
-    border: 2px solid #4d2e18;
-    background: linear-gradient(180deg, #5d3a21 0%, #3d2413 100%);
-    color: #f9e6c5;
-  }
-
-  .buddy-name,
-  .buddy-title {
-    margin: 0;
-  }
-
-  .buddy-name {
-    font-size: 1rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  .buddy-title {
-    margin-top: 0.15rem;
+  .buddy-source {
+    margin: 0 0 0.45rem;
     font-size: 0.78rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #f1c991;
+    color: #7a5533;
   }
 
   .buddy-dialogue {
     margin: 0;
-    padding: 0.8rem 0.9rem;
+    padding: 1.1rem 0.9rem 0.8rem;
     border: 2px solid #342018;
     background: #fffdf7;
     color: #2a1d13;
     line-height: 1.56;
+    position: relative;
   }
 
   .buddy-dialogue p {
     margin: 0;
     white-space: pre-line;
     font-family: "Trebuchet MS", "Verdana", sans-serif;
+  }
+
+  .buddy-dialogue::before {
+    content: "“";
+    position: absolute;
+    top: 0.2rem;
+    left: 0.65rem;
+    font-size: 2rem;
+    line-height: 1;
+    color: #866149;
+  }
+
+  .buddy-attribution {
+    margin-top: 0.65rem;
+    font-size: 0.88rem;
+    color: #6b4b36;
+  }
+
+  .buddy-attribution a {
+    color: inherit;
   }
 
   :global(:root[data-theme="dark"]) .buddy-quote {
@@ -192,20 +197,22 @@ const titleId = `buddy-comment-${Math.random().toString(36).slice(2, 10)}`;
     color: #be935f;
   }
 
-  :global(:root[data-theme="dark"]) .buddy-nameplate {
-    border-color: #c18b53;
-    background: linear-gradient(180deg, #53331d 0%, #362013 100%);
-    color: #f8d8aa;
-  }
-
-  :global(:root[data-theme="dark"]) .buddy-title {
-    color: #f2ba7a;
+  :global(:root[data-theme="dark"]) .buddy-source {
+    color: #d5aa76;
   }
 
   :global(:root[data-theme="dark"]) .buddy-dialogue {
     border-color: #9f7746;
     background: #120f0e;
     color: #f4e6cf;
+  }
+
+  :global(:root[data-theme="dark"]) .buddy-dialogue::before {
+    color: #d0a26c;
+  }
+
+  :global(:root[data-theme="dark"]) .buddy-attribution {
+    color: #d7b48a;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -238,20 +245,22 @@ const titleId = `buddy-comment-${Math.random().toString(36).slice(2, 10)}`;
       color: #be935f;
     }
 
-    :global(:root[data-theme="auto"]) .buddy-nameplate {
-      border-color: #c18b53;
-      background: linear-gradient(180deg, #53331d 0%, #362013 100%);
-      color: #f8d8aa;
-    }
-
-    :global(:root[data-theme="auto"]) .buddy-title {
-      color: #f2ba7a;
+    :global(:root[data-theme="auto"]) .buddy-source {
+      color: #d5aa76;
     }
 
     :global(:root[data-theme="auto"]) .buddy-dialogue {
       border-color: #9f7746;
       background: #120f0e;
       color: #f4e6cf;
+    }
+
+    :global(:root[data-theme="auto"]) .buddy-dialogue::before {
+      color: #d0a26c;
+    }
+
+    :global(:root[data-theme="auto"]) .buddy-attribution {
+      color: #d7b48a;
     }
   }
 
