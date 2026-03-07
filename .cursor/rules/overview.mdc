@@ -42,7 +42,9 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 
 ## RuleSync Workflow
 
+- Rulesync is the AI config system of record for this repo.
 - Update the unified rules in `.rulesync/rules/`.
+- If a generated AI config file and a Rulesync source file disagree, fix the Rulesync source and regenerate instead of editing the generated file directly.
 - Regenerate AI tool configs with `npx rulesync generate` after changing rules.
 - Treat generated agent files (for example `AGENTS.md`, `.codex/memories/*`, `.cursor/commands/*`) as outputs; do not make durable edits there.
 
