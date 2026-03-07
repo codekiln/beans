@@ -16,7 +16,12 @@ const TERMS_DIR = fileURLToPath(new URL("../content/terms", import.meta.url));
 const toDateString = (value: Date) => value.toISOString().slice(0, 10);
 
 const getTermFileDates = async (id: string) => {
-  const candidates = [path.join(TERMS_DIR, `${id}.md`), path.join(TERMS_DIR, `${id}.mdx`)];
+  const normalizedId = id.replace(/\.(md|mdx)$/i, "");
+  const candidates = [
+    path.join(TERMS_DIR, id),
+    path.join(TERMS_DIR, `${normalizedId}.md`),
+    path.join(TERMS_DIR, `${normalizedId}.mdx`)
+  ];
 
   for (const candidate of candidates) {
     try {
