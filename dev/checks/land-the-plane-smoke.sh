@@ -2,14 +2,22 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-tmp_dir="$(mktemp -d)"
-main_worktree="$tmp_dir/main-worktree"
-trap 'rm -rf "$tmp_dir"' EXIT
 
-mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$main_worktree"
-cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
+run_success_scenario() {
+  local tmp_dir
+  local task_worktree
+  local my_main_worktree
+  local output
 
-cat >"$tmp_dir/package.json" <<'EOF'
+  tmp_dir="$(mktemp -d)"
+  task_worktree="$tmp_dir/worktrees/beans-test"
+  my_main_worktree="$tmp_dir/worktrees/my/main"
+  trap 'rm -rf "$tmp_dir"' RETURN
+
+  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$task_worktree" "$my_main_worktree" "$tmp_dir/.git/beads-worktrees/beads-sync"
+  cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
+
+  cat >"$task_worktree/package.json" <<'EOF'
 {
   "scripts": {
     "check:beads-start": "echo beads-start",
@@ -18,34 +26,69 @@ cat >"$tmp_dir/package.json" <<'EOF'
 }
 EOF
 
-cat >"$tmp_dir/dev/beads-finish" <<EOF
+  cat >"$tmp_dir/dev/beads-finish" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 
 echo "\$*" >>"$tmp_dir/beads-finish.log"
 EOF
 
-cat >"$tmp_dir/bin/git" <<EOF
+  cat >"$tmp_dir/bin/git" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 
 echo "\$*" >>"$tmp_dir/git.log"
 
-case "\$1" in
-  worktree)
-    cat <<'WORKTREES'
-worktree $main_worktree
-branch refs/heads/main
+repo_root="$tmp_dir"
+task_worktree="$task_worktree"
+my_main_worktree="$my_main_worktree"
+beads_sync_worktree="$tmp_dir/.git/beads-worktrees/beads-sync"
+task_dirty_flag="$tmp_dir/task-dirty"
 
-worktree $tmp_dir
-branch refs/heads/codex/beans-test
-WORKTREES
-    exit 0
+case "\$1" in
+  rev-parse)
+    if [[ "\${2:-}" == "--show-toplevel" ]]; then
+      printf "%s\n" "\$task_worktree"
+      exit 0
+    fi
+
+    if [[ "\${2:-}" == "--abbrev-ref" && "\${3:-}" == "HEAD" ]]; then
+      printf "codex/beans-test\n"
+      exit 0
+    fi
+
+    if [[ "\${2:-}" == "--path-format=absolute" && "\${3:-}" == "--git-common-dir" ]]; then
+      printf "%s\n" "\$repo_root/.git"
+      exit 0
+    fi
+
+    if [[ "\${2:-}" == "HEAD" ]]; then
+      printf "task-head-sha\n"
+      exit 0
+    fi
+
+    exit 1
     ;;
   status)
+    if [[ "\${2:-}" == "--porcelain" ]]; then
+      if [[ -f "\$task_dirty_flag" ]]; then
+        printf " M dev/land-the-plane\n"
+      fi
+      exit 0
+    fi
+
     if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
       printf "## codex/beans-test...origin/codex/beans-test\n"
+      exit 0
     fi
+
+    exit 0
+    ;;
+  add)
+    exit 0
+    ;;
+  commit)
+    rm -f "\$task_dirty_flag"
     exit 0
     ;;
   ls-files)
@@ -61,26 +104,59 @@ WORKTREES
     shift 2
 
     case "\${1:-}" in
-      status)
-        if [[ "\$worktree_path" == "$main_worktree" && "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
-          printf "## main...origin/main\n"
+      rev-parse)
+        if [[ "\$worktree_path" == "\$repo_root" && "\${2:-}" == "--abbrev-ref" && "\${3:-}" == "HEAD" ]]; then
+          printf "main\n"
+          exit 0
         fi
+
+        if [[ "\${2:-}" == "HEAD" ]]; then
+          case "\$worktree_path" in
+            "\$repo_root")
+              printf "main-head-sha\n"
+              ;;
+            "\$beads_sync_worktree")
+              printf "beads-sync-sha\n"
+              ;;
+          esac
+          exit 0
+        fi
+        ;;
+      status)
+        if [[ "\$worktree_path" == "\$repo_root" ]]; then
+          if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
+            printf "## main...origin/main\n"
+          fi
+          exit 0
+        fi
+
+        if [[ "\$worktree_path" == "\$beads_sync_worktree" ]]; then
+          if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
+            printf "## beads-sync...origin/beads-sync\n"
+          fi
+          exit 0
+        fi
+
+        if [[ "\$worktree_path" == "\$my_main_worktree" ]]; then
+          printf " M notes.txt\n"
+          exit 0
+        fi
+
         exit 0
         ;;
       fetch|pull|merge|push)
         exit 0
         ;;
+      merge-base)
+        if [[ "\${2:-}" == "--is-ancestor" && "\${3:-}" == "task-head-sha" && "\${4:-}" == "HEAD" ]]; then
+          exit 0
+        fi
+        exit 1
+        ;;
       *)
         exit 0
         ;;
     esac
-    ;;
-  rev-parse)
-    if [[ "\${2:-}" == "--abbrev-ref" && "\${3:-}" == "HEAD" ]]; then
-      printf "codex/beans-test\n"
-      exit 0
-    fi
-    exit 1
     ;;
   *)
     exit 0
@@ -88,7 +164,7 @@ WORKTREES
 esac
 EOF
 
-cat >"$tmp_dir/bin/npm" <<EOF
+  cat >"$tmp_dir/bin/npm" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -107,7 +183,7 @@ fi
 exit 0
 EOF
 
-cat >"$tmp_dir/bin/bd" <<EOF
+  cat >"$tmp_dir/bin/bd" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -123,17 +199,31 @@ while [[ "\${1:-}" == --* ]]; do
 done
 
 case "\${1:-}" in
-  create)
-    printf "✓ Created issue: beans-follow\n"
-    exit 0
-    ;;
   ready)
     cat <<'READY'
 
-📋 Ready work (1 issue with no blockers):
+📋 Ready work (2 issues with no blockers):
 
-1. [● P2] [task] beans-next: Add next-session guidance
+1. [● P1] [epic] beans-nep: Bigger theme
+2. [● P2] [task] beans-ntk: Smaller next step
 READY
+    exit 0
+    ;;
+  show)
+    case "\${2:-}" in
+      beans-nep)
+        cat <<'SHOW'
+○ beans-nep · Bigger theme   [● P1 · OPEN]
+Owner: CHANGE_ME · Type: epic
+SHOW
+        ;;
+      beans-ntk)
+        cat <<'SHOW'
+○ beans-ntk · Smaller next step   [● P2 · OPEN]
+Owner: CHANGE_ME · Type: task
+SHOW
+        ;;
+    esac
     exit 0
     ;;
   *)
@@ -142,71 +232,276 @@ READY
 esac
 EOF
 
-chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd" "$tmp_dir/bin/npm"
+  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd" "$tmp_dir/bin/npm"
+  : >"$tmp_dir/task-dirty"
 
-output="$(
-  cd "$tmp_dir"
-  PATH="$tmp_dir/bin:$PATH" ./dev/land-the-plane beans-test "note"
-)"
+  output="$(
+    cd "$task_worktree"
+    PATH="$tmp_dir/bin:$PATH" ../..//dev/land-the-plane beans-test "note"
+  )"
 
-if ! grep -Fq "beans-test note" "$tmp_dir/beads-finish.log"; then
-  echo "land-the-plane did not delegate to beads-finish with issue and notes" >&2
-  exit 1
-fi
+  if ! grep -Fq "beans-test note" "$tmp_dir/beads-finish.log"; then
+    echo "land-the-plane did not delegate to beads-finish with issue and notes" >&2
+    exit 1
+  fi
 
-if [[ "$output" != *"Quality gates:"* ]]; then
-  echo "land-the-plane did not report quality gates" >&2
-  exit 1
-fi
+  if ! grep -Fq "commit -m chore(land-the-plane): checkpoint beans-test" "$tmp_dir/git.log"; then
+    echo "land-the-plane did not auto-commit tracked task worktree changes" >&2
+    exit 1
+  fi
 
-if [[ "$output" != *"No follow-up issues created."* ]]; then
-  echo "land-the-plane did not default follow-up handling sensibly" >&2
-  exit 1
-fi
+  if [[ "$output" != *"Task worktree checkpoint:"* ]]; then
+    echo "land-the-plane did not report the auto-commit checkpoint" >&2
+    exit 1
+  fi
 
-if ! grep -Fq "run check:beads-start" "$tmp_dir/npm.log"; then
-  echo "land-the-plane did not run the default Beads startup smoke check" >&2
-  exit 1
-fi
+  if ! grep -Fq "run check:beads-start" "$tmp_dir/npm.log"; then
+    echo "land-the-plane did not run the default Beads startup smoke check" >&2
+    exit 1
+  fi
 
-if ! grep -Fq "run build" "$tmp_dir/npm.log"; then
-  echo "land-the-plane did not run the default build check" >&2
-  exit 1
-fi
+  if ! grep -Fq "run build" "$tmp_dir/npm.log"; then
+    echo "land-the-plane did not run the default build check" >&2
+    exit 1
+  fi
 
-if ! grep -Fq "ls-files --others --exclude-standard" "$tmp_dir/git.log"; then
-  echo "land-the-plane did not inspect untracked files" >&2
-  exit 1
-fi
+  if ! grep -Fq -- "-C $tmp_dir pull --ff-only origin main" "$tmp_dir/git.log"; then
+    echo "land-the-plane did not update root main from origin/main" >&2
+    exit 1
+  fi
 
-if ! grep -Fq "stash list" "$tmp_dir/git.log"; then
-  echo "land-the-plane did not inspect git stashes" >&2
-  exit 1
-fi
+  if ! grep -Fq -- "-C $tmp_dir merge --no-edit codex/beans-test" "$tmp_dir/git.log"; then
+    echo "land-the-plane did not merge the task branch into root main" >&2
+    exit 1
+  fi
 
-if ! grep -Fq -- "-C $main_worktree pull --ff-only origin main" "$tmp_dir/git.log"; then
-  echo "land-the-plane did not update main from origin/main" >&2
-  exit 1
-fi
+  if ! grep -Fq -- "-C $tmp_dir push origin main" "$tmp_dir/git.log"; then
+    echo "land-the-plane did not push root main" >&2
+    exit 1
+  fi
 
-if ! grep -Fq -- "-C $main_worktree merge --no-edit codex/beans-test" "$tmp_dir/git.log"; then
-  echo "land-the-plane did not merge the task branch into main" >&2
-  exit 1
-fi
+  if ! grep -Fq -- "-C $tmp_dir/.git/beads-worktrees/beads-sync status --short --branch" "$tmp_dir/git.log"; then
+    echo "land-the-plane did not verify beads-sync final state" >&2
+    exit 1
+  fi
 
-if ! grep -Fq -- "-C $main_worktree push origin main" "$tmp_dir/git.log"; then
-  echo "land-the-plane did not push main" >&2
-  exit 1
-fi
+  if ! grep -Fq -- "-C $tmp_dir merge-base --is-ancestor task-head-sha HEAD" "$tmp_dir/git.log"; then
+    echo "land-the-plane did not assert that task HEAD landed on main" >&2
+    exit 1
+  fi
 
-if ! grep -Fq -- "--no-daemon ready" "$tmp_dir/bd.log"; then
-  echo "land-the-plane did not inspect ready Beads work" >&2
-  exit 1
-fi
+  if grep -Fq -- "-C $my_main_worktree status --short" "$tmp_dir/git.log"; then
+    echo "land-the-plane should ignore unrelated worktrees/my/main dirt" >&2
+    exit 1
+  fi
 
-if [[ "$output" != *"dev/beads-start beans-next"* ]]; then
-  echo "land-the-plane did not emit the next-session prompt" >&2
-  exit 1
-fi
+  if [[ "$output" != *"Heuristic: prefer ready task/bug work, then lower P-number, then existing ready order."* ]]; then
+    echo "land-the-plane did not document the next-task heuristic" >&2
+    exit 1
+  fi
+
+  if [[ "$output" != *"dev/beads-start beans-ntk"* ]]; then
+    echo "land-the-plane did not prefer the best next ready task" >&2
+    exit 1
+  fi
+}
+
+run_dirty_root_failure() {
+  local tmp_dir
+  local task_worktree
+  local output
+
+  tmp_dir="$(mktemp -d)"
+  task_worktree="$tmp_dir/worktrees/beans-test"
+  trap 'rm -rf "$tmp_dir"' RETURN
+
+  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$task_worktree" "$tmp_dir/.git/beads-worktrees/beads-sync"
+  cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
+
+  cat >"$tmp_dir/dev/beads-finish" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+
+  cat >"$tmp_dir/bin/git" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$tmp_dir"
+
+case "\$1" in
+  rev-parse)
+    case "\${2:-}" in
+      --show-toplevel)
+        printf "%s\n" "$task_worktree"
+        exit 0
+        ;;
+      --abbrev-ref)
+        printf "codex/beans-test\n"
+        exit 0
+        ;;
+      --path-format=absolute)
+        printf "%s\n" "\$repo_root/.git"
+        exit 0
+        ;;
+      HEAD)
+        printf "task-head-sha\n"
+        exit 0
+        ;;
+    esac
+    ;;
+  status)
+    if [[ "\${2:-}" == "--porcelain" || "\${2:-}" == "--short" ]]; then
+      exit 0
+    fi
+    ;;
+  -C)
+    worktree_path="\$2"
+    shift 2
+    if [[ "\$worktree_path" == "\$repo_root" && "\${1:-}" == "rev-parse" ]]; then
+      printf "main\n"
+      exit 0
+    fi
+    if [[ "\$worktree_path" == "\$repo_root" && "\${1:-}" == "status" ]]; then
+      printf " M README.md\n"
+      exit 0
+    fi
+    exit 0
+    ;;
+  *)
+    exit 0
+    ;;
+esac
+EOF
+
+  cat >"$tmp_dir/bin/bd" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+
+  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd"
+
+  set +e
+  output="$(
+    cd "$task_worktree"
+    PATH="$tmp_dir/bin:$PATH" ../..//dev/land-the-plane beans-test 2>&1
+  )"
+  status=$?
+  set -e
+
+  if [[ $status -eq 0 ]]; then
+    echo "land-the-plane should fail when root main is dirty" >&2
+    exit 1
+  fi
+
+  if [[ "$output" != *"Root main worktree is not clean"* ]]; then
+    echo "land-the-plane did not explain the dirty root main failure" >&2
+    exit 1
+  fi
+}
+
+run_untracked_failure() {
+  local tmp_dir
+  local task_worktree
+  local output
+
+  tmp_dir="$(mktemp -d)"
+  task_worktree="$tmp_dir/worktrees/beans-test"
+  trap 'rm -rf "$tmp_dir"' RETURN
+
+  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$task_worktree" "$tmp_dir/.git/beads-worktrees/beads-sync"
+  cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
+
+  cat >"$tmp_dir/dev/beads-finish" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+
+  cat >"$tmp_dir/bin/git" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$tmp_dir"
+
+case "\$1" in
+  rev-parse)
+    case "\${2:-}" in
+      --show-toplevel)
+        printf "%s\n" "$task_worktree"
+        exit 0
+        ;;
+      --abbrev-ref)
+        printf "codex/beans-test\n"
+        exit 0
+        ;;
+      --path-format=absolute)
+        printf "%s\n" "\$repo_root/.git"
+        exit 0
+        ;;
+      HEAD)
+        printf "task-head-sha\n"
+        exit 0
+        ;;
+    esac
+    ;;
+  status)
+    if [[ "\${2:-}" == "--porcelain" ]]; then
+      printf "?? scratch.txt\n"
+      exit 0
+    fi
+    if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
+      printf "## codex/beans-test...origin/codex/beans-test\n"
+      exit 0
+    fi
+    exit 0
+    ;;
+  -C)
+    worktree_path="\$2"
+    shift 2
+    if [[ "\$worktree_path" == "\$repo_root" && "\${1:-}" == "rev-parse" ]]; then
+      printf "main\n"
+      exit 0
+    fi
+    exit 0
+    ;;
+  *)
+    exit 0
+    ;;
+esac
+EOF
+
+  cat >"$tmp_dir/bin/bd" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+
+  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd"
+
+  set +e
+  output="$(
+    cd "$task_worktree"
+    PATH="$tmp_dir/bin:$PATH" ../..//dev/land-the-plane beans-test 2>&1
+  )"
+  status=$?
+  set -e
+
+  if [[ $status -eq 0 ]]; then
+    echo "land-the-plane should fail when the task worktree has untracked files" >&2
+    exit 1
+  fi
+
+  if [[ "$output" != *"Task worktree has untracked files."* ]]; then
+    echo "land-the-plane did not explain the ambiguous task worktree failure" >&2
+    exit 1
+  fi
+}
+
+run_success_scenario
+run_dirty_root_failure
+run_untracked_failure
 
 echo "land-the-plane smoke check passed"

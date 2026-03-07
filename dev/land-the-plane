@@ -8,9 +8,10 @@ Usage: dev/land-the-plane <issue-id> [notes] [options]
 Runs the Beans session closeout ritual:
   1) Run default quality checks unless overridden
   2) File requested follow-up Beads issues, otherwise assume none
-  3) Finish and sync the issue through dev/beads-finish
-  4) Update local main from origin/main, merge the task branch into main, and push main
-  5) Show final cleanup state and emit a next-session prompt
+  3) Auto-commit tracked task-worktree edits when safe, or fail on ambiguity
+  4) Finish and sync the issue through dev/beads-finish
+  5) Update root main from origin/main, merge the task branch into main, and push main
+  6) Assert final cleanup state and emit a next-session prompt
 
 Options:
   --check "<command>"   Run this validation command before closeout
@@ -31,6 +32,11 @@ no_checks=false
 no_follow_up=false
 require_checks=false
 require_follow_up=false
+current_worktree="$(git rev-parse --show-toplevel)"
+current_branch="$(git rev-parse --abbrev-ref HEAD)"
+git_common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
+repo_root="$(cd "$git_common_dir/.." && pwd)"
+beads_sync_worktree="$git_common_dir/beads-worktrees/beads-sync"
 
 if [[ -z "$issue_id" ]]; then
   usage
@@ -106,6 +112,51 @@ require_value() {
   fi
 }
 
+ensure_not_running_from_main() {
+  if [[ "$current_branch" == "main" ]]; then
+    echo "dev/land-the-plane should be run from a task worktree, not from main." >&2
+    exit 1
+  fi
+}
+
+ensure_root_main_policy() {
+  local root_branch
+
+  root_branch="$(git -C "$repo_root" rev-parse --abbrev-ref HEAD)"
+
+  if [[ "$root_branch" != "main" ]]; then
+    echo "Repo root checkout must stay on main for integration-only landings. Current root branch: $root_branch" >&2
+    exit 1
+  fi
+}
+
+ensure_worktree_clean() {
+  local path="$1"
+  local label="$2"
+  local status_output
+
+  status_output="$(git -C "$path" status --short)"
+
+  if [[ -n "$status_output" ]]; then
+    echo "$label worktree is not clean: $path" >&2
+    printf "%s\n" "$status_output" >&2
+    exit 1
+  fi
+}
+
+ensure_branch_is_synced() {
+  local path="$1"
+  local label="$2"
+  local status_branch
+
+  status_branch="$(git -C "$path" status --short --branch | head -n 1)"
+
+  if [[ "$status_branch" == *"ahead "* || "$status_branch" == *"behind "* || "$status_branch" == *"[gone]"* ]]; then
+    echo "$label is not fully synced with origin: $status_branch" >&2
+    exit 1
+  fi
+}
+
 run_checks() {
   local check_cmd
   local default_checks=()
@@ -163,11 +214,6 @@ create_follow_ups() {
       exit 1
     fi
 
-    if [[ "$no_follow_up" == true ]]; then
-      echo "No follow-up issues created."
-      return
-    fi
-
     echo "No follow-up issues created."
     return
   fi
@@ -178,90 +224,152 @@ create_follow_ups() {
   done
 }
 
-find_main_worktree() {
-  git worktree list --porcelain | awk '
-    /^worktree / { path = substr($0, 10) }
-    /^branch refs\/heads\/main$/ { print path; exit }
-  '
+auto_commit_task_worktree_if_safe() {
+  local status_output
+
+  status_output="$(git status --porcelain)"
+
+  if [[ -z "$status_output" ]]; then
+    return
+  fi
+
+  if printf "%s\n" "$status_output" | grep -qE '^\?\? '; then
+    echo "Task worktree has untracked files. Commit, remove, or ignore them explicitly before landing:" >&2
+    printf "%s\n" "$status_output" >&2
+    exit 1
+  fi
+
+  if printf "%s\n" "$status_output" | grep -qE '^(AA|AU|DD|DU|UA|UD|UU) '; then
+    echo "Task worktree has unresolved merge state. Resolve it before landing:" >&2
+    printf "%s\n" "$status_output" >&2
+    exit 1
+  fi
+
+  print_section "Task worktree checkpoint:"
+  printf "%s\n" "$status_output"
+  git add -A
+  git commit -m "chore(land-the-plane): checkpoint $issue_id"
 }
 
-ensure_worktree_clean() {
-  local path="$1"
-  local label="$2"
-  local status_branch
-
-  status_branch="$(git -C "$path" status --short)"
-
-  if [[ -n "$status_branch" ]]; then
-    echo "$label worktree is not clean: $path" >&2
-    printf "%s\n" "$status_branch" >&2
-    exit 1
-  fi
-}
-
-land_on_main() {
-  local branch
-  local main_worktree
-
-  branch="$(git rev-parse --abbrev-ref HEAD)"
-  main_worktree="$(find_main_worktree)"
-
-  if [[ -z "$main_worktree" ]]; then
-    echo "Could not locate the main worktree. Make sure branch 'main' is checked out in one worktree." >&2
-    exit 1
-  fi
-
-  if [[ "$branch" == "main" ]]; then
-    echo "dev/land-the-plane should be run from the task worktree, not from main." >&2
-    exit 1
-  fi
-
-  print_section "Landing on main:"
+land_on_root_main() {
+  print_section "Landing on root main:"
 
   bd_cmd sync --check
   bd_cmd sync --force
 
-  ensure_worktree_clean "$main_worktree" "Main"
+  ensure_worktree_clean "$repo_root" "Root main"
 
-  git -C "$main_worktree" fetch origin
-  git -C "$main_worktree" pull --ff-only origin main
-  git -C "$main_worktree" merge --no-edit "$branch"
-  git -C "$main_worktree" push origin main
+  git -C "$repo_root" fetch origin
+  git -C "$repo_root" pull --ff-only origin main
+  git -C "$repo_root" merge --no-edit "$current_branch"
+  git -C "$repo_root" push origin main
 }
 
-verify_main_is_synced() {
-  local main_worktree
-  local status_branch
+assert_task_commit_landed() {
+  local task_head="$1"
 
-  main_worktree="$(find_main_worktree)"
-
-  if [[ -z "$main_worktree" ]]; then
-    echo "Could not locate the main worktree to verify sync status." >&2
-    exit 1
-  fi
-
-  status_branch="$(git -C "$main_worktree" status --short --branch | head -n 1)"
-
-  if [[ "$status_branch" == *"ahead "* || "$status_branch" == *"behind "* || "$status_branch" == *"[gone]"* ]]; then
-    echo "Main is not fully synced with origin: $status_branch" >&2
+  if ! git -C "$repo_root" merge-base --is-ancestor "$task_head" HEAD; then
+    echo "Task branch HEAD was not merged into root main: $task_head" >&2
     exit 1
   fi
 }
 
+select_next_issue() {
+  local ready_output="$1"
+  local candidates
+  local candidate_id
+  local ready_index=0
+  local details
+  local priority=9
+  local type_name=""
+  local type_rank=1
+  local score_file
+
+  candidates="$(printf "%s\n" "$ready_output" | grep -oE 'beans-[a-z0-9.]+' | awk '!seen[$0]++' || true)"
+
+  if [[ -z "$candidates" ]]; then
+    return
+  fi
+
+  score_file="$(mktemp)"
+
+  while IFS= read -r candidate_id; do
+    [[ -n "$candidate_id" ]] || continue
+    details="$(bd_cmd show "$candidate_id" 2>/dev/null || true)"
+    priority="$(printf "%s\n" "$details" | grep -oE 'P[0-4]' | head -n 1 | tr -d 'P' || true)"
+    type_name="$(
+      printf "%s\n" "$details" |
+        grep -oE 'Type: [A-Za-z]+' |
+        head -n 1 |
+        awk '{ print tolower($2) }'
+    )"
+
+    if [[ -z "$priority" ]]; then
+      priority=9
+    fi
+
+    case "$type_name" in
+      task|bug)
+        type_rank=0
+        ;;
+      epic)
+        type_rank=2
+        ;;
+      *)
+        type_rank=1
+        ;;
+    esac
+
+    printf "%s\t%s\t%s\t%s\n" "$type_rank" "$priority" "$ready_index" "$candidate_id" >>"$score_file"
+    ready_index=$((ready_index + 1))
+  done <<<"$candidates"
+
+  sort -t $'\t' -k1,1n -k2,2n -k3,3n "$score_file" | head -n 1 | cut -f4
+  rm -f "$score_file"
+}
+
+print_final_state() {
+  local task_head="$1"
+  local main_head
+  local beads_sync_head
+
+  ensure_worktree_clean "$current_worktree" "Task"
+  ensure_worktree_clean "$repo_root" "Root main"
+  ensure_branch_is_synced "$repo_root" "Root main"
+
+  if [[ ! -d "$beads_sync_worktree" ]]; then
+    echo "Could not locate the beads-sync worktree at $beads_sync_worktree" >&2
+    exit 1
+  fi
+
+  ensure_worktree_clean "$beads_sync_worktree" "beads-sync"
+  ensure_branch_is_synced "$beads_sync_worktree" "beads-sync"
+  assert_task_commit_landed "$task_head"
+
+  main_head="$(git -C "$repo_root" rev-parse HEAD)"
+  beads_sync_head="$(git -C "$beads_sync_worktree" rev-parse HEAD)"
+
+  print_section "Final landed state:"
+  echo "Task branch: $current_branch @ $task_head"
+  echo "Root main: $main_head"
+  echo "beads-sync: $beads_sync_head"
+}
+
+ensure_not_running_from_main
+ensure_root_main_policy
 run_checks
 create_follow_ups
+auto_commit_task_worktree_if_safe
+task_head="$(git rev-parse HEAD)"
 "$script_dir/beads-finish" "$issue_id" "$notes"
-land_on_main
-verify_main_is_synced
+land_on_root_main
+print_final_state "$task_head"
 
-print_section "Final working tree review:"
+print_section "Task worktree review:"
 git status --short --branch
 
-main_worktree="$(find_main_worktree)"
-if [[ -n "$main_worktree" ]]; then
-  print_section "Main worktree review:"
-  git -C "$main_worktree" status --short --branch
-fi
+print_section "Root main review:"
+git -C "$repo_root" status --short --branch
 
 print_section "Untracked files to review before leaving:"
 untracked_files="$(git ls-files --others --exclude-standard || true)"
@@ -275,10 +383,11 @@ print_section "Ready Beads work:"
 ready_output="$(bd_cmd ready || true)"
 print_or_none "$ready_output"
 
-next_issue="$(printf "%s\n" "$ready_output" | grep -oE 'beans-[a-z0-9]+' | head -n 1 || true)"
+next_issue="$(select_next_issue "$ready_output")"
 
 if [[ -n "$next_issue" ]]; then
   print_section "Suggested next-session prompt:"
+  echo "Heuristic: prefer ready task/bug work, then lower P-number, then existing ready order."
   cat <<EOF
 Start with dev/beads-start $next_issue, read the issue with bd --no-daemon show $next_issue, confirm the worktree is clean, implement the task, then run dev/land-the-plane $next_issue before handing off.
 EOF
