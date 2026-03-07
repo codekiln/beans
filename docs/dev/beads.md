@@ -2,6 +2,14 @@
 
 This repo uses Beads (`bd`) for git-native issue tracking. Issues live in the repo, travel with the code, and sync through the `beads-sync` branch JSONL.
 
+## Durable metadata rule
+
+Creating or updating Beads metadata is not complete until the exported metadata change is committed in git. No commit means the enqueue/update action is not done.
+
+- Default behavior: sync/export the tracked Beads metadata and commit that change on `main`.
+- Exception: when you are already inside an active Beads task worktree, committing the metadata change on that task branch is acceptable, with the expectation that it lands in `main` through the normal merge/landing flow.
+- Verification requires both `bd --no-daemon show <issue-id>` and a matching entry in `.git/beads-worktrees/beads-sync/.beads/issues.jsonl`.
+
 ## How it is installed
 
 ### Devcontainer
@@ -161,6 +169,9 @@ bd --no-daemon hooks install
 
 - Use `bd --no-daemon sync --check` before syncing/pushing.
 - Use `bd --no-daemon sync --force` before pushing, then verify the issue is present in `.git/beads-worktrees/beads-sync/.beads/issues.jsonl`.
+- Treat issue creation/update as incomplete until that tracked JSONL change is part of a git commit.
+- Default path: make that commit on `main`.
+- Worktree exception: if the metadata change happens inside an active Beads task worktree, commit it on that task branch and let it reach `main` through the normal landing flow.
 - JSONL merges are handled via a custom git merge driver defined in `.gitattributes`.
 - If JSONL conflicts occur, use `bd --no-daemon resolve-conflicts` (or normal git merge flow with the Beads merge driver).
 - Keep sync branch consistent across clones/worktrees. This repo standard is `beads-sync`.
@@ -181,6 +192,34 @@ For this repo, treat the runtime DB and the exported JSONL as separate checks:
 - `bd --no-daemon show <issue-id>` proves the issue exists in SQLite.
 - `rg "<issue-id>" .git/beads-worktrees/beads-sync/.beads/issues.jsonl` proves the issue is durably exported to the tracked sync branch metadata.
 
+## Operator checklist for metadata changes
+
+Use this sequence whenever you create or update Beads issue metadata.
+
+```bash
+# 1. Create or update the issue in direct mode
+bd --no-daemon create "Title here"
+# or
+bd --no-daemon update <issue-id> --notes "Updated details"
+
+# 2. Sync/export the tracked metadata
+bd --no-daemon sync --check
+bd --no-daemon sync --force
+# If sync still misses the issue, export explicitly
+bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl
+
+# 3. Verify the issue ID is present in the tracked JSONL
+rg "<issue-id>" .git/beads-worktrees/beads-sync/.beads/issues.jsonl
+
+# 4. Make a git commit that contains the metadata change
+git add .git/beads-worktrees/beads-sync/.beads/issues.jsonl
+git commit -m "chore(beads): sync <issue-id> metadata"
+```
+
+Completion rule:
+
+- On `main`, the metadata change is complete only after the tracked JSONL change is committed on `main`.
+- In an active Beads task worktree, the metadata change is complete once that tracked JSONL change is committed on the task branch that will later merge back to `main`.
 
 ## Session checklists
 

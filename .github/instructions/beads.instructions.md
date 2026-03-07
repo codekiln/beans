@@ -10,6 +10,9 @@ This repo uses Beads (`bd`) for git-native issue tracking. Issues live in the re
 
 For this repo, Beads metadata on `beads-sync` is part of the durable landing path, not incidental cleanup noise.
 
+- Creating or updating Beads metadata is not complete until the exported metadata change is committed in git. No commit means the enqueue/update action is not done.
+- Default behavior: sync/export the tracked Beads metadata and commit that change on `main`.
+- Exception: when you are already working inside an active Beads task worktree, committing the metadata change on that task branch is acceptable, with the expectation that it lands in `main` through the normal merge/landing flow.
 - Do not describe a dirty `beads-sync` worktree as "just metadata" when deciding whether work is done.
 - A Beads-managed task is not fully landed until both `main` and `beads-sync` are clean and synced with `origin/main` and `origin/beads-sync`.
 - If `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` is modified, cleanup is not complete yet.
@@ -96,3 +99,32 @@ Successful closeout for a Beads-managed task means all of the following are true
 - no closed-task Beads worktree remains under `worktrees/`
 
 Humans can override the defaults with explicit flags. See `docs/dev/land-the-plane.md`.
+
+## Operator checklist for issue metadata changes
+
+Use this checklist whenever you create or update Beads issue metadata.
+
+```bash
+# 1. Create or update the issue in direct mode
+bd --no-daemon create "Title here"
+# or
+bd --no-daemon update <issue-id> --notes "Updated details"
+
+# 2. Sync/export the tracked metadata
+bd --no-daemon sync --check
+bd --no-daemon sync --force
+# If sync still misses the issue, export explicitly
+bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl
+
+# 3. Verify the issue ID is present in the tracked JSONL
+rg "<issue-id>" .git/beads-worktrees/beads-sync/.beads/issues.jsonl
+
+# 4. Commit the metadata change
+git add .git/beads-worktrees/beads-sync/.beads/issues.jsonl
+git commit -m "chore(beads): sync <issue-id> metadata"
+```
+
+Completion rule:
+
+- On `main`, the metadata change is complete only after the tracked JSONL change is committed on `main`.
+- In an active Beads task worktree, the metadata change is complete once that tracked JSONL change is committed on the task branch that will later merge back to `main`.
