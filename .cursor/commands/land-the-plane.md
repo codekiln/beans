@@ -13,13 +13,16 @@ Leave the branch, Beads metadata, and working tree in a state that another sessi
 3. Run the relevant validation for the task.
 4. Create any explicit follow-up Beads issues that are still needed.
 5. Run `dev/beads-finish <issue-id> ["notes"]` when the work is Beads-managed.
-6. Rebase from the remote branch when needed, then push.
-7. Prune closed-task worktrees with `dev/beads-prune-closed-worktrees`.
-8. End with a clean or intentionally-dirty working tree that is explained in the handoff.
+6. Land and push `main`.
+7. Commit and push `beads-sync` if `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` changed during the session.
+8. Prune closed-task worktrees with `dev/beads-prune-closed-worktrees`.
+9. End only after both `main` and `beads-sync` are clean and synced, or explain the concrete blocker.
 
 Final invariant:
 
 - After landing, no closed-task Beads worktree should remain under `worktrees/`.
+- After landing, `main` must be clean and synced with `origin/main`.
+- After landing, `beads-sync` must be clean and synced with `origin/beads-sync`.
 
 ## `.gitignore` cleanup rule
 
@@ -37,8 +40,11 @@ Before landing:
 git status --short
 npm run build
 dev/beads-finish <issue-id> "optional notes"
-git pull --rebase
-git push
+git push origin main
+git -C .git/beads-worktrees/beads-sync status --short --branch
+git -C .git/beads-worktrees/beads-sync add .beads/issues.jsonl
+git -C .git/beads-worktrees/beads-sync commit -m "chore(beads): sync issue metadata"
+git -C .git/beads-worktrees/beads-sync push origin beads-sync
 dev/beads-prune-closed-worktrees
 git status --short --branch
 ```
@@ -47,3 +53,4 @@ git status --short --branch
 
 - If `.gitignore` contains both intentional edits and Beads-generated noise, keep the intentional edits and scrub only the Beads-related lines.
 - If the task was not Beads-managed, skip `dev/beads-finish` and use the repo's normal closeout flow.
+- Do not describe a dirty `beads-sync` worktree as "just metadata" in the final handoff. In this repo that state means cleanup is still incomplete.

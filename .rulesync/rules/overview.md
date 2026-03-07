@@ -25,6 +25,8 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - Do not add per-worktree paths to `.gitignore`; rely on the existing wildcard rule `worktrees/beans-*/`.
 - Unless the user explicitly asks for a branch or PR workflow, land completed work by updating local `main` from `origin/main`, merging the task branch into `main` locally, and pushing `main` directly.
 - In this repo, the default handoff should sidestep PR creation entirely; do not treat pushing the task worktree branch as the normal landing path unless the user requests it.
+- Do not describe Beads sync changes as "just metadata" when deciding whether cleanup is complete. In this repo, the `beads-sync` worktree is part of the durable landing path.
+- A Beads-managed task is not fully landed until both `main` and `beads-sync` are clean and synced with their matching `origin/*` branches.
 
 ## Content Guidelines
 
