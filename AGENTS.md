@@ -32,6 +32,8 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - For Beads-managed work, prefer `dev/beads-start <issue-id>` so startup uses the repo's Beads worktree flow and cleanup.
 - Prefer `dev/beads-finish <issue-id>` for the close/sync path so metadata handling is consistent.
 - Task worktrees live at `worktrees/beans-<issue-id>` on branches like `codex/beans-<issue-id>`.
+- Product code changes belong on the task branch/worktree and land on `main`; `beads-sync` is not a code branch.
+- The shared `.beads/beads.db` is the live Beads metadata store in this clone, and `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on `beads-sync` is the durable git-exported metadata source of truth.
 - Do not add per-worktree paths to `.gitignore`; rely on the existing wildcard rule `worktrees/beans-*/`.
 - Unless the user explicitly asks for a branch or PR workflow, land completed work by updating local `main` from `origin/main`, merging the task branch into `main` locally, and pushing `main` directly.
 - In this repo, the default handoff should sidestep PR creation entirely; do not treat pushing the task worktree branch as the normal landing path unless the user requests it.

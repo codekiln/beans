@@ -2,6 +2,21 @@
 
 This repo uses Beads (`bd`) for git-native issue tracking. Issues live in the repo, travel with the code, and sync through the `beads-sync` branch JSONL.
 
+## Source of truth workflow
+
+Treat product code and Beads metadata as related but different artifacts with different durable homes:
+
+- Product code source of truth: the task branch and task worktree where you make code changes, usually `codex/<issue-id>` in `worktrees/beans-<issue-id>`, then `main` after landing.
+- Beads metadata source of truth while editing: the shared `.beads/beads.db` store that all Beads-managed worktrees in this clone use.
+- Beads metadata durable git source of truth: `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch after `bd --no-daemon sync --force` or the export fallback writes the latest DB state there.
+
+Commit intent follows that split:
+
+- Commit product code changes on the task branch worktree.
+- Let the Beads sync flow write durable metadata to the `beads-sync` worktree and branch.
+- Do not treat the task worktree's `.beads/issues.jsonl` as the durable export target.
+- Do not move product code onto `beads-sync` or use `beads-sync` as the review or landing branch for site changes.
+
 ## How it is installed
 
 ### Devcontainer
@@ -21,6 +36,30 @@ curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/insta
 - The current checkout's `.beads/issues.jsonl` can lag behind the sync branch copy, so do not treat it as proof that a DB mutation has been exported.
 - `.beads/config.yaml` stores repo-level Beads config.
 - Local SQLite/daemon files live under `.beads/` and are gitignored.
+
+## Branches and worktrees
+
+- `main`: the durable branch for product code after landing.
+- `codex/<issue-id>` in `worktrees/beans-<issue-id>`: the normal place to make code and doc changes for one task.
+- `beads-sync` in `.git/beads-worktrees/beads-sync/`: the durable place for exported Beads metadata that must stay in sync with `origin/beads-sync`.
+
+The expected pattern is:
+
+1. Start from a clean clone or worktree with Beads installed.
+2. Run `dev/beads-start <issue-id>` from the repo root checkout.
+3. Make code changes only in `worktrees/beans-<issue-id>` on `codex/<issue-id>`.
+4. Run `dev/beads-finish <issue-id>` or `dev/land-the-plane <issue-id>` so the shared DB is exported into `beads-sync`.
+5. Land code to `main`, and make sure `beads-sync` is also clean and pushed.
+
+## Preflight checklist
+
+Use this checklist the same way in a local devcontainer, Codespaces, Codex Desktop, or Codex Cloud:
+
+- Run commands from the repo root checkout, not from an unrelated clone.
+- Confirm `bd` is installed and prefer `bd --no-daemon` in this repo.
+- Confirm the current checkout is not carrying unrelated dirt before you create a new task worktree.
+- Verify the shared Beads store and worktree wiring with `bd --no-daemon where` or `bd --no-daemon worktree info`.
+- Use `dev/beads-start <issue-id>` instead of hand-rolling `git worktree` plus `bd` commands.
 
 ## Worktrees (required pattern)
 
@@ -53,6 +92,16 @@ It forces direct mode via `bd --no-daemon` because this repo has reproduced daem
 It also removes the redundant per-worktree `.gitignore` entry that some `bd worktree create` versions append even though the repo already has a wildcard ignore rule.
 It warns if the source checkout is already dirty and creates `codex/<issue-id>` first when the installed `bd` expects `--branch` to reference an existing branch.
 
+Concrete start sequence:
+
+```bash
+bd --no-daemon where
+bd --no-daemon show <issue-id>
+dev/beads-start <issue-id>
+cd worktrees/beans-<issue-id>
+git status --short
+```
+
 Finish helper:
 
 ```bash
@@ -60,6 +109,15 @@ dev/beads-finish <issue-id> ["notes"]
 ```
 
 This helper standardizes the close/sync path: show issue, optionally append notes, close it, run `bd --no-daemon sync --check`, show `git status --short`, run `bd --no-daemon sync --force`, fall back to `bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl` if needed, and fail if the issue is still missing from `beads-sync/.beads/issues.jsonl`.
+
+Concrete metadata sync sequence:
+
+```bash
+git -C worktrees/beans-<issue-id> status --short
+dev/beads-finish <issue-id> "optional notes"
+git -C .git/beads-worktrees/beads-sync status --short
+rg "<issue-id>" .git/beads-worktrees/beads-sync/.beads/issues.jsonl
+```
 
 Closed-worktree cleanup helper:
 
@@ -75,7 +133,7 @@ Land-the-plane helper:
 dev/land-the-plane <issue-id> ["notes"] [--check "<command>"]... [--follow-up "<title>"]...
 ```
 
-This is the repo's named session closeout ritual. By default it runs the repo's standard validation command when available, assumes no follow-up issue is needed, runs `dev/beads-finish`, rebases and pushes, verifies the branch is synced with origin, then surfaces cleanup state and a next-session prompt. Humans can override the defaults with explicit flags. See [Land the plane](/Users/pnore/Documents/GitHub/codekiln/beans/worktrees/beans-1g2/docs/dev/land-the-plane.md).
+This is the repo's named session closeout ritual. By default it runs the repo's standard validation command when available, assumes no follow-up issue is needed, runs `dev/beads-finish`, rebases and pushes, verifies the branch is synced with origin, then surfaces cleanup state and a next-session prompt. Humans can override the defaults with explicit flags. See `docs/dev/land-the-plane.md`.
 
 ## Quick start (this repo)
 
