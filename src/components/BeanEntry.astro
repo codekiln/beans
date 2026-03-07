@@ -1,9 +1,9 @@
 ---
 import TagRow from "./TagRow.astro";
-import PersonaComment from "./PersonaComment.astro";
+import CoffeeBuddyQuote from "./CoffeeBuddyQuote.astro";
 import { withBase } from "../utils/paths";
 
-const { bean, showPersonaComment = false } = Astro.props;
+const { bean, showBuddyComment = false } = Astro.props;
 const { Content } = await bean.render();
 const logCommand = `log ${bean.data.date} ${bean.data.beanKey}`;
 const command = `$ bean ${logCommand}`;
@@ -101,7 +101,7 @@ const gearItems = [
         )}
         <Content />
         <TagRow tags={bean.data.tags} />
-        {showPersonaComment && <PersonaComment comment={bean.data.personaComment} />}
+        {showBuddyComment && <CoffeeBuddyQuote comment={bean.data.personaComment} />}
       </section>
     </div>
     <aside class="bean-side" aria-label="Bean support panes">

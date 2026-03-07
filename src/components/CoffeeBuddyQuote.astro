@@ -1,0 +1,268 @@
+---
+import { withBase } from "../utils/paths";
+
+type BuddyComment = {
+  name: string;
+  title: string;
+  body: string;
+};
+
+interface Props {
+  comment?: BuddyComment;
+}
+
+const { comment } = Astro.props as Props;
+const titleId = `buddy-comment-${Math.random().toString(36).slice(2, 10)}`;
+---
+{comment && (
+  <aside class="buddy-quote" aria-labelledby={titleId}>
+    <div class="buddy-quote-shell">
+      <div class="buddy-portrait-frame" aria-hidden="true">
+        <img
+          data-rin-portrait
+          data-light-src={withBase("/images/rin-vale-portrait.png")}
+          data-dark-src={withBase("/images/rin-vale-portrait-dark.png")}
+          src={withBase("/images/rin-vale-portrait.png")}
+          alt=""
+          loading="lazy"
+        />
+      </div>
+      <div class="buddy-copy">
+        <p class="buddy-kicker">Coffee Buddy Comment</p>
+        <div class="buddy-nameplate">
+          <p class="buddy-name" id={titleId}>{comment.name}</p>
+          <p class="buddy-title">{comment.title}</p>
+        </div>
+        <blockquote class="buddy-dialogue">
+          <p>{comment.body}</p>
+        </blockquote>
+      </div>
+    </div>
+  </aside>
+)}
+
+<script is:inline>
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const applyRinPortrait = () => {
+    const theme = document.documentElement.dataset.theme ?? "auto";
+    const useDark = theme === "dark" || (theme === "auto" && prefersDark.matches);
+    document.querySelectorAll("[data-rin-portrait]").forEach((img) => {
+      const lightSrc = img.getAttribute("data-light-src");
+      const darkSrc = img.getAttribute("data-dark-src");
+      if (!lightSrc || !darkSrc) return;
+      const nextSrc = useDark ? darkSrc : lightSrc;
+      if (img.getAttribute("src") !== nextSrc) {
+        img.setAttribute("src", nextSrc);
+      }
+    });
+  };
+
+  applyRinPortrait();
+  new MutationObserver(applyRinPortrait).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"]
+  });
+  prefersDark.addEventListener("change", applyRinPortrait);
+</script>
+
+<style>
+  .buddy-quote {
+    margin-top: 1.75rem;
+    padding: 0.55rem;
+    border: 3px solid #22171a;
+    background:
+      linear-gradient(180deg, #f2ddae 0%, #e5be72 100%);
+    box-shadow:
+      0 0 0 3px #5c3b22,
+      0 0 0 6px #c89448;
+  }
+
+  .buddy-quote-shell {
+    display: grid;
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 0.85rem;
+    align-items: end;
+    border: 2px solid #22171a;
+    background:
+      linear-gradient(180deg, #fffaf0 0%, #f5ead2 100%);
+    padding: 0.75rem;
+  }
+
+  .buddy-portrait-frame {
+    align-self: stretch;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    padding: 0.45rem;
+    border: 2px solid #432914;
+    background:
+      linear-gradient(180deg, #7f5231 0%, #5e3b24 100%);
+    box-shadow: inset 0 0 0 2px #d4a160;
+  }
+
+  .buddy-portrait-frame img {
+    display: block;
+    width: 100%;
+    max-width: 92px;
+    height: auto;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 2px 0 rgba(24, 15, 12, 0.8));
+  }
+
+  .buddy-copy {
+    min-width: 0;
+  }
+
+  .buddy-kicker {
+    margin: 0 0 0.35rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #7a5533;
+  }
+
+  .buddy-nameplate {
+    margin-bottom: 0.7rem;
+    padding: 0.4rem 0.65rem;
+    border: 2px solid #4d2e18;
+    background: linear-gradient(180deg, #5d3a21 0%, #3d2413 100%);
+    color: #f9e6c5;
+  }
+
+  .buddy-name,
+  .buddy-title {
+    margin: 0;
+  }
+
+  .buddy-name {
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .buddy-title {
+    margin-top: 0.15rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #f1c991;
+  }
+
+  .buddy-dialogue {
+    margin: 0;
+    padding: 0.8rem 0.9rem;
+    border: 2px solid #342018;
+    background: #fffdf7;
+    color: #2a1d13;
+    line-height: 1.56;
+  }
+
+  .buddy-dialogue p {
+    margin: 0;
+    white-space: pre-line;
+    font-family: "Trebuchet MS", "Verdana", sans-serif;
+  }
+
+  :global(:root[data-theme="dark"]) .buddy-quote {
+    border-color: #130d0e;
+    background: linear-gradient(180deg, #3b2a24 0%, #251a17 100%);
+    box-shadow:
+      0 0 0 3px #0f0b0c,
+      0 0 0 6px #6b4727;
+  }
+
+  :global(:root[data-theme="dark"]) .buddy-quote-shell {
+    border-color: #a27c4e;
+    background: linear-gradient(180deg, #191311 0%, #241a18 100%);
+  }
+
+  :global(:root[data-theme="dark"]) .buddy-portrait-frame {
+    border-color: #c18b53;
+    background: linear-gradient(180deg, #3e2619 0%, #2c1a13 100%);
+    box-shadow: inset 0 0 0 2px #8e6439;
+  }
+
+  :global(:root[data-theme="dark"]) .buddy-portrait-frame img {
+    filter:
+      drop-shadow(0 1px 0 rgba(0, 0, 0, 0.55))
+      drop-shadow(0 0 8px rgba(177, 105, 48, 0.25));
+  }
+
+  :global(:root[data-theme="dark"]) .buddy-kicker {
+    color: #be935f;
+  }
+
+  :global(:root[data-theme="dark"]) .buddy-nameplate {
+    border-color: #c18b53;
+    background: linear-gradient(180deg, #53331d 0%, #362013 100%);
+    color: #f8d8aa;
+  }
+
+  :global(:root[data-theme="dark"]) .buddy-title {
+    color: #f2ba7a;
+  }
+
+  :global(:root[data-theme="dark"]) .buddy-dialogue {
+    border-color: #9f7746;
+    background: #120f0e;
+    color: #f4e6cf;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root[data-theme="auto"]) .buddy-quote {
+      border-color: #130d0e;
+      background: linear-gradient(180deg, #3b2a24 0%, #251a17 100%);
+      box-shadow:
+        0 0 0 3px #0f0b0c,
+        0 0 0 6px #6b4727;
+    }
+
+    :global(:root[data-theme="auto"]) .buddy-quote-shell {
+      border-color: #a27c4e;
+      background: linear-gradient(180deg, #191311 0%, #241a18 100%);
+    }
+
+    :global(:root[data-theme="auto"]) .buddy-portrait-frame {
+      border-color: #c18b53;
+      background: linear-gradient(180deg, #3e2619 0%, #2c1a13 100%);
+      box-shadow: inset 0 0 0 2px #8e6439;
+    }
+
+    :global(:root[data-theme="auto"]) .buddy-portrait-frame img {
+      filter:
+        drop-shadow(0 1px 0 rgba(0, 0, 0, 0.55))
+        drop-shadow(0 0 8px rgba(177, 105, 48, 0.25));
+    }
+
+    :global(:root[data-theme="auto"]) .buddy-kicker {
+      color: #be935f;
+    }
+
+    :global(:root[data-theme="auto"]) .buddy-nameplate {
+      border-color: #c18b53;
+      background: linear-gradient(180deg, #53331d 0%, #362013 100%);
+      color: #f8d8aa;
+    }
+
+    :global(:root[data-theme="auto"]) .buddy-title {
+      color: #f2ba7a;
+    }
+
+    :global(:root[data-theme="auto"]) .buddy-dialogue {
+      border-color: #9f7746;
+      background: #120f0e;
+      color: #f4e6cf;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .buddy-quote-shell {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    .buddy-portrait-frame {
+      max-width: 132px;
+    }
+  }
+</style>

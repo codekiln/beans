@@ -30,11 +30,15 @@ if (!html.includes("bean log 2026-02-06 bean1")) {
   throw new Error("Bean detail page is missing the expected CLI prompt text.");
 }
 
-const personaPagePath = await resolveBeanPagePath("2026-03-05-bean1");
-const personaHtml = await readFile(personaPagePath, "utf8");
+const buddyPagePath = await resolveBeanPagePath("2026-03-05-bean1");
+const buddyHtml = await readFile(buddyPagePath, "utf8");
 
-if (!personaHtml.includes("Rin Vale") || !personaHtml.includes("Campfire Cupping Companion")) {
-  throw new Error("Bean detail page is missing the expected persona comment metadata.");
+if (
+  !buddyHtml.includes("Coffee Buddy Comment") ||
+  !buddyHtml.includes("Rin Vale") ||
+  !buddyHtml.includes("Campfire Cupping Companion")
+) {
+  throw new Error("Bean detail page is missing the expected buddy comment metadata.");
 }
 
 console.log("bean-rendering check passed for 2026-02-06-bean1");

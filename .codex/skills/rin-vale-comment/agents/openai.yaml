@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rin Vale Comment"
+  short_description: "Generate or refresh a Rin Vale buddy comment for a bean entry."
+  default_prompt: "Use $rin-vale-comment to generate or replace the Rin Vale buddy comment in bean frontmatter for the requested bean entry."

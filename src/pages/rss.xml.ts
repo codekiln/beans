@@ -13,15 +13,28 @@ const escapeHtml = (value: string) =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-const renderPersonaComment = (entry: BeanEntry) => {
+const renderParagraphs = (value: string) =>
+  value
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+    .map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+const renderBuddyComment = (entry: BeanEntry) => {
   if (!entry.data.personaComment) {
     return "";
   }
 
   const { name, title, body } = entry.data.personaComment;
-  return `<section aria-label="Virtual persona comment"><h3>Virtual Persona Comment</h3><p><strong>${escapeHtml(
-    `${name} (${title})`
-  )}</strong></p><p>${escapeHtml(body)}</p></section>`;
+  return [
+    `<aside aria-label="Coffee buddy comment">`,
+    "<header>",
+    "<p><strong>Coffee Buddy Comment</strong></p>",
+    `<p><strong>${escapeHtml(name)}</strong><br><span>${escapeHtml(title)}</span></p>`,
+    "</header>",
+    `<blockquote>${renderParagraphs(body)}</blockquote>`,
+    "</aside>"
+  ].join("");
 };
 
 export const GET = async () => {
@@ -47,7 +60,7 @@ export const GET = async () => {
               )}"></figure>`
             : "",
           content,
-          renderPersonaComment(entry)
+          renderBuddyComment(entry)
         ].join(""),
         link: withBase(`log/${entry.slug}/`)
       };
