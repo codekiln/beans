@@ -34,6 +34,8 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - Keep the repo root checkout on `main` as an integration-only worktree; do not use it for active feature edits.
 - Personal non-task WIP belongs in `worktrees/my/main`.
 - Task worktrees live at `worktrees/beans-<issue-id>` on branches like `codex/beans-<issue-id>`.
+- Product code changes belong on the task branch/worktree and land on `main`; `beads-sync` is not a code branch.
+- The shared `.beads/beads.db` is the live Beads metadata store in this clone, and `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on `beads-sync` is the durable git-exported metadata source of truth.
 - Do not add per-worktree paths to `.gitignore`; rely on the existing wildcard rule `worktrees/beans-*/`.
 - Creating or updating Beads issue metadata is not complete until the exported metadata change is committed in git. Default to committing it on `main`; committing it on an active Beads task branch is acceptable when that branch will land in `main` through the normal merge flow.
 - Unless the user explicitly asks for a branch or PR workflow, land completed work by updating the root `main` checkout from `origin/main`, merging the task branch into root `main` locally, and pushing `main` directly.
