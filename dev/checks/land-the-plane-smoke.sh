@@ -16,6 +16,7 @@ run_success_scenario() {
 
   mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$task_worktree" "$my_main_worktree" "$tmp_dir/.git/beads-worktrees/beads-sync"
   cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
+  cp "$repo_root/dev/beads-prune-closed-worktrees" "$tmp_dir/dev/beads-prune-closed-worktrees"
 
   cat >"$task_worktree/package.json" <<'EOF'
 {
@@ -49,7 +50,11 @@ beads_sync_dirty_flag="$tmp_dir/beads-sync-dirty"
 case "\$1" in
   rev-parse)
     if [[ "\${2:-}" == "--show-toplevel" ]]; then
-      printf "%s\n" "\$task_worktree"
+      if [[ "\$PWD" == "\$task_worktree" ]]; then
+        printf "%s\n" "\$task_worktree"
+      else
+        printf "%s\n" "\$repo_root"
+      fi
       exit 0
     fi
 
@@ -111,6 +116,32 @@ case "\$1" in
   stash)
     printf "stash@{0}: WIP on codex/beans-test\n"
     exit 0
+    ;;
+  worktree)
+    case "\${2:-}" in
+      list)
+        if [[ "\${3:-}" == "--porcelain" ]]; then
+          cat <<LIST
+worktree \$repo_root
+branch refs/heads/main
+
+worktree \$task_worktree
+branch refs/heads/codex/beans-test
+
+worktree \$my_main_worktree
+branch refs/heads/main
+LIST
+          exit 0
+        fi
+        ;;
+      remove)
+        rm -rf "\${3:-}"
+        exit 0
+        ;;
+      prune)
+        exit 0
+        ;;
+    esac
     ;;
   -C)
     worktree_path="\$2"
@@ -228,6 +259,14 @@ while [[ "\${1:-}" == --* ]]; do
 done
 
 case "\${1:-}" in
+  list)
+    if [[ "\${2:-}" == "--status" && "\${3:-}" == "closed" ]]; then
+      cat <<'CLOSED'
+beans-test [closed]
+CLOSED
+      exit 0
+    fi
+    ;;
   ready)
     cat <<'READY'
 
@@ -261,7 +300,7 @@ SHOW
 esac
 EOF
 
-  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd" "$tmp_dir/bin/npm"
+  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-prune-closed-worktrees" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd" "$tmp_dir/bin/npm"
   : >"$tmp_dir/task-dirty"
   : >"$tmp_dir/beads-sync-dirty"
 
@@ -325,13 +364,28 @@ EOF
     exit 1
   fi
 
+  if ! grep -Fq "worktree remove $task_worktree" "$tmp_dir/git.log"; then
+    echo "land-the-plane did not prune the just-closed task worktree" >&2
+    exit 1
+  fi
+
   if ! grep -Fq -- "-C $tmp_dir merge-base --is-ancestor task-head-sha HEAD" "$tmp_dir/git.log"; then
     echo "land-the-plane did not assert that task HEAD landed on main" >&2
     exit 1
   fi
 
+  if [[ -d "$task_worktree" ]]; then
+    echo "land-the-plane left the closed task worktree on disk" >&2
+    exit 1
+  fi
+
   if grep -Fq -- "-C $my_main_worktree status --short" "$tmp_dir/git.log"; then
     echo "land-the-plane should ignore unrelated worktrees/my/main dirt" >&2
+    exit 1
+  fi
+
+  if [[ "$output" != *"Pruning closed task worktrees:"* ]]; then
+    echo "land-the-plane did not report the prune step" >&2
     exit 1
   fi
 

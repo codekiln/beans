@@ -29,12 +29,13 @@ The helper is intentionally automation-friendly. Work is not considered landed u
 11. Merges the current task branch into root `main`, and if that merge conflicts, fails with the unresolved file list.
 12. Pushes `main` to `origin`.
 13. Commits and pushes `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch when closeout dirties that worktree.
-14. Verifies the landed task commit is now reachable from root `main`.
-15. Verifies the task worktree, root `main`, and `beads-sync` worktree all end clean, and that root `main` plus `beads-sync` are synced with origin.
-16. Reports the landed SHAs for the task branch, root `main`, and `beads-sync`.
-17. Lists untracked files and stashes for cleanup review.
-18. Shows `bd --no-daemon ready`.
-19. Emits a next-session prompt built from the best ready issue, preferring ready task/bug work, then lower priority number, then current ready order.
+14. Prunes closed-task Beads worktrees with `dev/beads-prune-closed-worktrees`, including the task worktree that just landed, and fails if that worktree still exists afterward.
+15. Verifies the landed task commit is now reachable from root `main`.
+16. Verifies the task worktree has been pruned, root `main` plus `beads-sync` both end clean, and that root `main` plus `beads-sync` are synced with origin.
+17. Reports the landed SHAs for the task branch, root `main`, and `beads-sync`.
+18. Lists untracked files and stashes for cleanup review.
+19. Shows `bd --no-daemon ready`.
+20. Emits a next-session prompt built from the best ready issue, preferring ready task/bug work, then lower priority number, then current ready order.
 
 ## Defaults and overrides
 
@@ -65,7 +66,7 @@ The helper will fail if the root `main` checkout is dirty. That is intentional: 
 
 ## Cleanup expectations
 
-The helper still does not delete files, branches, or stashes automatically. In this repo that cleanup should stay explicit:
+The helper does prune closed Beads task worktrees automatically after a successful landing. Other cleanup still stays explicit:
 
 - Remove debugging artifacts and scratch files only when they are clearly disposable.
 - Drop stashes only when you created them and know they are obsolete.

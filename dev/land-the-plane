@@ -319,6 +319,18 @@ sync_beads_metadata_branch() {
   git -C "$beads_sync_worktree" push origin beads-sync
 }
 
+prune_closed_task_worktrees() {
+  print_section "Pruning closed task worktrees:"
+
+  cd "$repo_root"
+  "$script_dir/beads-prune-closed-worktrees"
+
+  if [[ -e "$current_worktree" ]]; then
+    echo "Closed task worktree still exists after prune: $current_worktree" >&2
+    exit 1
+  fi
+}
+
 assert_task_commit_landed() {
   local task_head="$1"
 
@@ -387,7 +399,11 @@ print_final_state() {
   local main_head
   local beads_sync_head
 
-  ensure_worktree_clean "$current_worktree" "Task"
+  if [[ -e "$current_worktree" ]]; then
+    echo "Closed task worktree should have been pruned during closeout: $current_worktree" >&2
+    exit 1
+  fi
+
   ensure_worktree_clean "$repo_root" "Root main"
   ensure_branch_is_synced "$repo_root" "Root main"
 
@@ -405,6 +421,7 @@ print_final_state() {
 
   print_section "Final landed state:"
   echo "Task branch: $current_branch @ $task_head"
+  echo "Task worktree pruned: $current_worktree"
   echo "Root main: $main_head"
   echo "beads-sync: $beads_sync_head"
 }
@@ -418,13 +435,15 @@ task_head="$(git rev-parse HEAD)"
 "$script_dir/beads-finish" "$issue_id" "$notes"
 land_on_root_main
 sync_beads_metadata_branch
-print_final_state "$task_head"
 
 print_section "Task worktree review:"
 git status --short --branch
 
 print_section "Root main review:"
 git -C "$repo_root" status --short --branch
+
+prune_closed_task_worktrees
+print_final_state "$task_head"
 
 print_section "Untracked files to review before leaving:"
 untracked_files="$(git ls-files --others --exclude-standard || true)"
