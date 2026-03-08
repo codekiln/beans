@@ -64,7 +64,11 @@ case "\$1" in
     fi
 
     if [[ "\${2:-}" == "HEAD" ]]; then
-      printf "task-head-sha\n"
+      if [[ -f "\$repo_root/task-commit-created" ]]; then
+        printf "task-head-sha\n"
+      else
+        printf "task-head-before-checkpoint\n"
+      fi
       exit 0
     fi
 
@@ -96,6 +100,7 @@ case "\$1" in
       rm -f "\$beads_sync_dirty_flag"
       exit 0
     fi
+    : >"\$repo_root/task-commit-created"
     rm -f "\$task_dirty_flag"
     exit 0
     ;;
@@ -535,8 +540,247 @@ EOF
   fi
 }
 
+run_checkpoint_still_dirty_failure() {
+  local tmp_dir
+  local task_worktree
+  local output
+
+  tmp_dir="$(mktemp -d)"
+  task_worktree="$tmp_dir/worktrees/beans-test"
+  trap 'rm -rf "$tmp_dir"' RETURN
+
+  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$task_worktree" "$tmp_dir/.git/beads-worktrees/beads-sync"
+  cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
+
+  cat >"$tmp_dir/dev/beads-finish" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "beads-finish should not run when checkpoint leaves the task worktree dirty" >&2
+exit 99
+EOF
+
+  cat >"$tmp_dir/bin/git" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$tmp_dir"
+task_worktree="$task_worktree"
+
+case "\$1" in
+  rev-parse)
+    case "\${2:-}" in
+      --show-toplevel)
+        printf "%s\n" "\$task_worktree"
+        exit 0
+        ;;
+      --abbrev-ref)
+        printf "codex/beans-test\n"
+        exit 0
+        ;;
+      --path-format=absolute)
+        printf "%s\n" "\$repo_root/.git"
+        exit 0
+        ;;
+      HEAD)
+        if [[ -f "\$repo_root/task-commit-created" ]]; then
+          printf "task-head-after\n"
+        else
+          printf "task-head-before\n"
+        fi
+        exit 0
+        ;;
+    esac
+    ;;
+  status)
+    if [[ "\${2:-}" == "--porcelain" ]]; then
+      printf " M docs/dev/beads.md\n"
+      exit 0
+    fi
+    if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
+      printf "## codex/beans-test...origin/codex/beans-test\n"
+      exit 0
+    fi
+    exit 0
+    ;;
+  add)
+    exit 0
+    ;;
+  commit)
+    : >"\$repo_root/task-commit-created"
+    exit 0
+    ;;
+  -C)
+    worktree_path="\$2"
+    shift 2
+    if [[ "\$worktree_path" == "\$repo_root" && "\${1:-}" == "rev-parse" ]]; then
+      printf "main\n"
+      exit 0
+    fi
+    exit 0
+    ;;
+  *)
+    exit 0
+    ;;
+esac
+EOF
+
+  cat >"$tmp_dir/bin/bd" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+
+  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd"
+
+  set +e
+  output="$(
+    cd "$task_worktree"
+    PATH="$tmp_dir/bin:$PATH" ../..//dev/land-the-plane beans-test 2>&1
+  )"
+  status=$?
+  set -e
+
+  if [[ $status -eq 0 ]]; then
+    echo "land-the-plane should fail when the checkpoint commit leaves the task worktree dirty" >&2
+    exit 1
+  fi
+
+  if [[ "$output" != *"Task worktree is still dirty after checkpoint commit."* ]]; then
+    echo "land-the-plane did not explain the dirty-after-checkpoint failure" >&2
+    exit 1
+  fi
+}
+
+run_root_merge_conflict_failure() {
+  local tmp_dir
+  local task_worktree
+  local output
+
+  tmp_dir="$(mktemp -d)"
+  task_worktree="$tmp_dir/worktrees/beans-test"
+  trap 'rm -rf "$tmp_dir"' RETURN
+
+  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$task_worktree" "$tmp_dir/.git/beads-worktrees/beads-sync"
+  cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
+
+  cat >"$tmp_dir/dev/beads-finish" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+
+  cat >"$tmp_dir/bin/git" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$tmp_dir"
+task_worktree="$task_worktree"
+
+case "\$1" in
+  rev-parse)
+    case "\${2:-}" in
+      --show-toplevel)
+        printf "%s\n" "\$task_worktree"
+        exit 0
+        ;;
+      --abbrev-ref)
+        printf "codex/beans-test\n"
+        exit 0
+        ;;
+      --path-format=absolute)
+        printf "%s\n" "\$repo_root/.git"
+        exit 0
+        ;;
+      HEAD)
+        printf "task-head-sha\n"
+        exit 0
+        ;;
+    esac
+    ;;
+  status)
+    if [[ "\${2:-}" == "--porcelain" ]]; then
+      exit 0
+    fi
+    if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
+      printf "## codex/beans-test...origin/codex/beans-test\n"
+      exit 0
+    fi
+    exit 0
+    ;;
+  add|commit)
+    exit 0
+    ;;
+  -C)
+    worktree_path="\$2"
+    shift 2
+    if [[ "\$worktree_path" == "\$repo_root" && "\${1:-}" == "rev-parse" ]]; then
+      if [[ "\${2:-}" == "--abbrev-ref" && "\${3:-}" == "HEAD" ]]; then
+        printf "main\n"
+      elif [[ "\${2:-}" == "HEAD" ]]; then
+        printf "main-head-sha\n"
+      fi
+      exit 0
+    fi
+    if [[ "\$worktree_path" == "\$repo_root" && "\${1:-}" == "status" ]]; then
+      exit 0
+    fi
+    if [[ "\$worktree_path" == "\$repo_root" && "\${1:-}" == "fetch" ]]; then
+      exit 0
+    fi
+    if [[ "\$worktree_path" == "\$repo_root" && "\${1:-}" == "pull" ]]; then
+      exit 0
+    fi
+    if [[ "\$worktree_path" == "\$repo_root" && "\${1:-}" == "merge" ]]; then
+      exit 1
+    fi
+    if [[ "\$worktree_path" == "\$repo_root" && "\${1:-}" == "diff" ]]; then
+      printf "docs/dev/beads.md\n"
+      exit 0
+    fi
+    exit 0
+    ;;
+  *)
+    exit 0
+    ;;
+esac
+EOF
+
+  cat >"$tmp_dir/bin/bd" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+
+  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd"
+
+  set +e
+  output="$(
+    cd "$task_worktree"
+    PATH="$tmp_dir/bin:$PATH" ../..//dev/land-the-plane beans-test 2>&1
+  )"
+  status=$?
+  set -e
+
+  if [[ $status -eq 0 ]]; then
+    echo "land-the-plane should fail when the root-main merge conflicts" >&2
+    exit 1
+  fi
+
+  if [[ "$output" != *"Root main merge conflict while landing codex/beans-test into main."* ]]; then
+    echo "land-the-plane did not explain the root-main merge conflict" >&2
+    exit 1
+  fi
+
+  if [[ "$output" != *"docs/dev/beads.md"* ]]; then
+    echo "land-the-plane did not list the conflicting root-main file" >&2
+    exit 1
+  fi
+}
+
 run_success_scenario
 run_dirty_root_failure
 run_untracked_failure
+run_checkpoint_still_dirty_failure
+run_root_merge_conflict_failure
 
 echo "land-the-plane smoke check passed"

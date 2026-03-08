@@ -226,6 +226,9 @@ create_follow_ups() {
 
 auto_commit_task_worktree_if_safe() {
   local status_output
+  local pre_commit_head
+  local post_commit_head
+  local post_commit_status
 
   status_output="$(git status --porcelain)"
 
@@ -247,11 +250,28 @@ auto_commit_task_worktree_if_safe() {
 
   print_section "Task worktree checkpoint:"
   printf "%s\n" "$status_output"
+  pre_commit_head="$(git rev-parse HEAD)"
   git add -A
   git commit -m "chore(land-the-plane): checkpoint $issue_id"
+
+  post_commit_head="$(git rev-parse HEAD)"
+  post_commit_status="$(git status --porcelain)"
+
+  if [[ "$post_commit_head" == "$pre_commit_head" ]]; then
+    echo "Task worktree checkpoint did not create a new commit. Refusing to close out with uncheckpointed task changes." >&2
+    exit 1
+  fi
+
+  if [[ -n "$post_commit_status" ]]; then
+    echo "Task worktree is still dirty after checkpoint commit. Refusing to close out:" >&2
+    printf "%s\n" "$post_commit_status" >&2
+    exit 1
+  fi
 }
 
 land_on_root_main() {
+  local merge_conflicts
+
   print_section "Landing on root main:"
 
   bd_cmd sync --check
@@ -261,7 +281,20 @@ land_on_root_main() {
 
   git -C "$repo_root" fetch origin
   git -C "$repo_root" pull --ff-only origin main
-  git -C "$repo_root" merge --no-edit "$current_branch"
+
+  if ! git -C "$repo_root" merge --no-edit "$current_branch"; then
+    merge_conflicts="$(git -C "$repo_root" diff --name-only --diff-filter=U || true)"
+
+    if [[ -n "$merge_conflicts" ]]; then
+      echo "Root main merge conflict while landing $current_branch into main. Resolve these files in $repo_root before continuing:" >&2
+      printf "%s\n" "$merge_conflicts" >&2
+    else
+      echo "Failed to merge $current_branch into root main at $repo_root." >&2
+    fi
+
+    exit 1
+  fi
+
   git -C "$repo_root" push origin main
 }
 
