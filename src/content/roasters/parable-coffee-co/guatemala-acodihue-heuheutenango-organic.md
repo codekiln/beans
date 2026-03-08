@@ -12,7 +12,7 @@ blend: "single-origin"
 - Variety: Bourbon, Catimor, Caturra, Maragogype, Pache
 - Altitude: 1400-2200 [masl](/beans/terms/masl/)
 - Region: Huehuetenango, Guatemala
-- Process: Washed
+- Process: [Washed](/beans/terms/process-washed-etc/)
 - Certifications: Organic and Fair Trade
 
 
@@ -41,7 +41,6 @@ poverty reduction, food security, and
 environmental stewardship."
 
 #### other
-
 
 
 
