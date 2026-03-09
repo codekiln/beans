@@ -20,6 +20,18 @@ const renderParagraphs = (value: string) =>
     .filter(Boolean)
     .map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`)
     .join("");
+const companionShellStyle = [
+  "margin:1.5em 0 0",
+  "padding:1em",
+  "border:1px solid #8c6b3c",
+  "background:#f8f1e3",
+  "color:#2b2118"
+].join(";");
+const companionBlockquoteStyle = [
+  "margin:0.85em 0 0",
+  "padding:0 0 0 0.9em",
+  "border-left:3px solid #8c6b3c"
+].join(";");
 const renderBuddyComment = (entry: BeanEntry) => {
   if (!entry.data.personaComment) {
     return "";
@@ -27,12 +39,14 @@ const renderBuddyComment = (entry: BeanEntry) => {
 
   const { name, title, body } = entry.data.personaComment;
   return [
-    `<aside aria-label="Coffee buddy comment">`,
+    `<aside aria-label="Virtual companion note" style="${companionShellStyle}">`,
     "<header>",
-    "<p><strong>Coffee Buddy Comment</strong></p>",
-    `<p><strong>${escapeHtml(name)}</strong><br><span>${escapeHtml(title)}</span></p>`,
+    "<p><strong>[ Virtual companion note ]</strong> This is a virtual companion comment, not the main post body.</p>",
+    "<h2 style=\"margin:0;font-size:1rem;line-height:1.4;\">Coffee buddy comment</h2>",
+    `<p style="margin:0.35em 0 0;"><strong>From:</strong> ${escapeHtml(name)}<br><span>${escapeHtml(title)}</span></p>`,
     "</header>",
-    `<blockquote>${renderParagraphs(body)}</blockquote>`,
+    `<blockquote aria-label="Quoted companion comment from ${escapeHtml(name)}" style="${companionBlockquoteStyle}">${renderParagraphs(body)}</blockquote>`,
+    `<p style="margin:0.75em 0 0;"><cite>Virtual companion note by ${escapeHtml(name)}</cite></p>`,
     "</aside>"
   ].join("");
 };
