@@ -22,11 +22,11 @@ Asociación de Cooperación al Desarrollo Integral de Huehuetenango (ACODIHUE)
 
 established in 1996, this is a co-op with over 40,000 farmers. 
 
-| region        | number of municipalities |
-|---------------|--------------------------|
-| Huehuetenango | 16                       |
-| San Marcos    | 2                        |
-| Totonicapán   | 2                        |
+|    region     | number of municipalities |
+|:-------------:|:------------------------:|
+| Huehuetenango |            16            |
+|  San Marcos   |            2             |
+|  Totonicapán  |            2             |
 
 these regions are noted here: 
 
@@ -41,6 +41,5 @@ poverty reduction, food security, and
 environmental stewardship."
 
 #### other
-
 
 
