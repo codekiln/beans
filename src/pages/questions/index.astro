@@ -1,0 +1,36 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getQuestions } from "../../data/questions";
+import { withBase } from "../../utils/paths";
+
+const questions = await getQuestions();
+---
+<BaseLayout
+  title="Questions · Beans"
+  description="Open coffee questions being tracked in the Beans notebook."
+  initialCommand="$ bean questions"
+>
+  <section class="hero">
+    <h1 class="bean-prompt">
+      <span class="bean-prompt-link">
+        <span class="bean-prompt-time">
+          <span class="bean-prompt-emoji" aria-hidden="true">🫘</span>
+          <span aria-hidden="true">&gt;</span>
+        </span>
+        <span class="bean-prompt-command">bean questions</span>
+      </span>
+    </h1>
+    <p>open coffee questions</p>
+  </section>
+  <section class="window">
+    <h2 class="section-title">Questions</h2>
+    <ul class="table-list">
+      {questions.map((question) => (
+        <li>
+          <a href={withBase(`/questions/${question.slug}/`)}>[{question.data.dateCreated}]</a>
+          {" "}· {question.data.title}
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

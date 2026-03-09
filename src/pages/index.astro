@@ -1,9 +1,9 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getBeans } from "../data/beans";
+import { getHomeEntries } from "../data/homeEntries";
 import { withBase } from "../utils/paths";
 
-const beans = await getBeans();
+const entries = await getHomeEntries();
 const initialCommand = "$ bean log list";
 ---
 <BaseLayout
@@ -21,7 +21,7 @@ const initialCommand = "$ bean log list";
         <span class="bean-prompt-command">bean log list</span>
       </span>
     </h1>
-    <p>coffee log entries</p>
+    <p>coffee log entries and open questions</p>
     <nav class="home-nav" aria-label="Site sections">
       <a href={withBase("/about/")}>[about]</a>
       <span aria-hidden="true">·</span>
@@ -33,16 +33,47 @@ const initialCommand = "$ bean log list";
       <span aria-hidden="true">·</span>
       <a href={withBase("/coffees/")}>[coffees]</a>
       <span aria-hidden="true">·</span>
+      <a href={withBase("/questions/")}>[questions]</a>
+      <span aria-hidden="true">·</span>
       <a href={withBase("/terms/")}>[terms]</a>
     </nav>
   </section>
-  <section class="window" aria-label="Coffee log entries">
+  <section class="window" aria-label="Beans notebook entries">
     <h2 class="section-title">Entries</h2>
-    <ul class="table-list">
-      {beans.map((bean) => (
-        <li>
-          <a href={withBase(`/log/${bean.slug}/`)}>[{bean.data.date} {bean.data.beanKey}]</a>
-          {" "}· {bean.data.title}
+    <ul class="table-list stream-list">
+      {entries.map((entry) => (
+        <li
+          class:list={[
+            "stream-entry",
+            entry.kind === "question" && "stream-entry-question"
+          ]}
+          data-cli-log={entry.cliLog}
+          data-cli-href={withBase(entry.href)}
+        >
+          {entry.kind === "bean" ? (
+            <>
+              <p class="stream-entry-command">
+                <a href={withBase(entry.href)}>$ bean {entry.cliLog}</a>
+              </p>
+              <p class="stream-entry-title">
+                <a href={withBase(entry.href)}>
+                  [{entry.bean.data.date} {entry.bean.data.beanKey}]
+                </a>
+                {" "}· {entry.bean.data.title}
+              </p>
+            </>
+          ) : (
+            <>
+              <p class="stream-entry-command">
+                <a href={withBase(entry.href)}>$ bean {entry.cliLog}</a>
+              </p>
+              <p class="stream-entry-title">
+                <a href={withBase(entry.href)}>[{entry.question.data.dateCreated} question]</a>
+                {" "}· {entry.question.data.title}
+              </p>
+              <p class="stream-entry-summary">{entry.question.data.summary}</p>
+            </>
+          )}
         </li>
       ))}
     </ul>

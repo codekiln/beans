@@ -1,0 +1,68 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getQuestionPath, getQuestions } from "../../data/questions";
+import { withBase } from "../../utils/paths";
+
+export async function getStaticPaths() {
+  const questions = await getQuestions();
+  return questions.map((question, index) => ({
+    params: { slug: question.slug },
+    props: {
+      question,
+      prev: index > 0 ? questions[index - 1] : null,
+      next: index < questions.length - 1 ? questions[index + 1] : null
+    }
+  }));
+}
+
+const { question, prev, next } = Astro.props;
+const { Content } = await question.render();
+const initialCommand = `$ bean question ${question.slug}`;
+const initialLinkHref = withBase(getQuestionPath(question.slug));
+---
+<BaseLayout
+  title={`${question.data.title} · Beans`}
+  description={question.data.summary}
+  initialCommand={initialCommand}
+  initialLinkHref={initialLinkHref}
+>
+  <section class="hero">
+    <h1 class="bean-prompt">
+      <a class="bean-prompt-link" href={initialLinkHref}>
+        <span class="bean-prompt-time">
+          <span class="bean-prompt-emoji" aria-hidden="true">🫘</span>
+          <span aria-hidden="true">&gt;</span>
+        </span>
+        <span class="bean-prompt-command">bean question {question.slug}</span>
+      </a>
+    </h1>
+    <p>{question.data.summary}</p>
+  </section>
+  <section class="window">
+    <h2 class="section-title">Question</h2>
+    <p class="stream-entry-title">{question.data.title}</p>
+    <p class="stream-entry-summary">date-created: {question.data.dateCreated}</p>
+    <div class="markdown">
+      <Content />
+    </div>
+  </section>
+  <nav class="bean-nav" aria-label="Question navigation">
+    {prev ? (
+      <a class="bean-nav-link" href={withBase(getQuestionPath(prev.slug))}>
+        ← Prev: {prev.data.title}
+      </a>
+    ) : (
+      <span class="bean-nav-muted">← Prev</span>
+    )}
+    {next ? (
+      <a class="bean-nav-link" href={withBase(getQuestionPath(next.slug))}>
+        Next: {next.data.title} →
+      </a>
+    ) : (
+      <span class="bean-nav-muted">Next →</span>
+    )}
+  </nav>
+  <p class="bean-back">
+    <a href={withBase("/questions/")}>Back to all questions</a>
+  </p>
+</BaseLayout>
