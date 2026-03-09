@@ -150,6 +150,15 @@ const terms = defineCollection({
   })
 });
 
+const questions = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    summary: z.string(),
+    dateCreated: z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+  })
+});
+
 const roasters = defineCollection({
   type: "content",
   schema: z.union([
@@ -178,4 +187,4 @@ const roasters = defineCollection({
   ])
 });
 
-export const collections = { beans, recipes, equipment, roasters, terms };
+export const collections = { beans, recipes, equipment, roasters, terms, questions };
