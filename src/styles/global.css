@@ -478,6 +478,16 @@ button:focus-visible {
   margin: 0.5rem 0 1rem;
 }
 
+.bean-closing-mark {
+  margin: 1.5rem 0 0;
+  padding-top: 0.45rem;
+  border-top: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  color: color-mix(in srgb, var(--muted) 82%, var(--border));
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-align: left;
+}
+
 .bean-observation-media {
   margin: 1rem 0 0.75rem;
   padding: 0;

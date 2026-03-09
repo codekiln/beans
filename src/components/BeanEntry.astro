@@ -3,7 +3,7 @@ import TagRow from "./TagRow.astro";
 import CoffeeBuddyQuote from "./CoffeeBuddyQuote.astro";
 import { withBase } from "../utils/paths";
 
-const { bean, showBuddyComment = false } = Astro.props;
+const { bean, showBuddyComment = false, showClosingMark = false } = Astro.props;
 const { Content } = await bean.render();
 const logCommand = `log ${bean.data.date} ${bean.data.beanKey}`;
 const command = `$ bean ${logCommand}`;
@@ -102,6 +102,11 @@ const gearItems = [
         <Content />
         <TagRow tags={bean.data.tags} />
         {showBuddyComment && <CoffeeBuddyQuote comment={bean.data.personaComment} />}
+        {showClosingMark && (
+          <p class="bean-closing-mark" aria-hidden="true">
+            :wq
+          </p>
+        )}
       </section>
     </div>
     <aside class="bean-side" aria-label="Bean support panes">
