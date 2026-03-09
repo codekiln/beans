@@ -10,8 +10,8 @@ export async function getStaticPaths() {
     params: { slug: bean.slug },
     props: {
       bean,
-      prev: index > 0 ? beans[index - 1] : null,
-      next: index < beans.length - 1 ? beans[index + 1] : null
+      prev: index < beans.length - 1 ? beans[index + 1] : null,
+      next: index > 0 ? beans[index - 1] : null
     }
   }));
 }
