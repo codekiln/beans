@@ -68,7 +68,7 @@ export const GET = async () => {
 
   return rss({
     title: "Beans",
-    description: "A coffee log rendered as a lab notebook.",
+    description: "A coffee log and knowledge garden.",
     site,
     items: await Promise.all(sortedBeans.map(async (entry) => {
       const content = (await markdown.render(entry.body)).code;
