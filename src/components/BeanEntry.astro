@@ -1,10 +1,14 @@
 ---
 import TagRow from "./TagRow.astro";
 import CoffeeBuddyQuote from "./CoffeeBuddyQuote.astro";
+import { getCompanionBySlug } from "../data/companions";
 import { withBase } from "../utils/paths";
 
 const { bean, showBuddyComment = false, showClosingMark = false } = Astro.props;
 const { Content } = await bean.render();
+const companion = bean.data.personaComment
+  ? await getCompanionBySlug(bean.data.personaComment.companion)
+  : null;
 const logCommand = `log ${bean.data.date} ${bean.data.beanKey}`;
 const command = `$ bean ${logCommand}`;
 const commandLabel = `bean ${logCommand}`;
@@ -101,7 +105,9 @@ const gearItems = [
         )}
         <Content />
         <TagRow tags={bean.data.tags} />
-        {showBuddyComment && <CoffeeBuddyQuote comment={bean.data.personaComment} />}
+        {showBuddyComment && (
+          <CoffeeBuddyQuote comment={bean.data.personaComment} companion={companion} />
+        )}
         {showClosingMark && (
           <p class="bean-closing-mark" aria-hidden="true">
             :wq

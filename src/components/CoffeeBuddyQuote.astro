@@ -1,42 +1,48 @@
 ---
+import type { CompanionEntry } from "../data/companions";
+import { getCompanionPath } from "../data/companions";
 import { withBase } from "../utils/paths";
 
 type BuddyComment = {
-  name: string;
-  title: string;
   body: string;
 };
 
 interface Props {
   comment?: BuddyComment;
+  companion?: CompanionEntry | null;
 }
 
-const { comment } = Astro.props as Props;
+const { comment, companion } = Astro.props as Props;
 const titleId = `buddy-comment-${Math.random().toString(36).slice(2, 10)}`;
-const companionHref = withBase("/companion/rin-vale/");
+const companionHref = companion ? withBase(getCompanionPath(companion.slug)) : null;
+const portrait = companion?.data.portrait;
+const companionName = companion?.data.name ?? "Virtual companion";
+const companionTitle = companion?.data.title;
 ---
 {comment && (
   <aside class="buddy-quote" aria-labelledby={titleId}>
     <div class="buddy-quote-shell">
       <div class="buddy-portrait-frame" aria-hidden="true">
-        <img
-          data-rin-portrait
-          data-light-src={withBase("/images/rin-vale-portrait.png")}
-          data-dark-src={withBase("/images/rin-vale-portrait-dark.png")}
-          src={withBase("/images/rin-vale-portrait.png")}
-          alt=""
-          loading="lazy"
-        />
+        {portrait && (
+          <img
+            data-companion-portrait
+            data-light-src={withBase(portrait.src)}
+            data-dark-src={withBase(portrait.darkSrc ?? portrait.src)}
+            src={withBase(portrait.src)}
+            alt=""
+            loading="lazy"
+          />
+        )}
       </div>
       <div class="buddy-copy">
         <p class="buddy-kicker">Coffee Buddy Comment</p>
-        <p class="buddy-source" id={titleId}>{comment.name}</p>
-        <blockquote class="buddy-dialogue" aria-label={`${comment.name} says`}>
+        <p class="buddy-source" id={titleId}>{companionName}</p>
+        <blockquote class="buddy-dialogue" aria-label={`${companionName} says`}>
           <p>{comment.body}</p>
           <footer class="buddy-attribution">
             <span aria-hidden="true">--</span>
-            <a href={companionHref}>{comment.name}</a>
-            <span class="sr-only">, {comment.title}</span>
+            {companionHref ? <a href={companionHref}>{companionName}</a> : companionName}
+            {companionTitle && <span class="sr-only">, {companionTitle}</span>}
           </footer>
         </blockquote>
       </div>
@@ -46,10 +52,10 @@ const companionHref = withBase("/companion/rin-vale/");
 
 <script is:inline>
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
-  const applyRinPortrait = () => {
+  const applyCompanionPortrait = () => {
     const theme = document.documentElement.dataset.theme ?? "auto";
     const useDark = theme === "dark" || (theme === "auto" && prefersDark.matches);
-    document.querySelectorAll("[data-rin-portrait]").forEach((img) => {
+    document.querySelectorAll("[data-companion-portrait]").forEach((img) => {
       const lightSrc = img.getAttribute("data-light-src");
       const darkSrc = img.getAttribute("data-dark-src");
       if (!lightSrc || !darkSrc) return;
@@ -60,12 +66,12 @@ const companionHref = withBase("/companion/rin-vale/");
     });
   };
 
-  applyRinPortrait();
-  new MutationObserver(applyRinPortrait).observe(document.documentElement, {
+  applyCompanionPortrait();
+  new MutationObserver(applyCompanionPortrait).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["data-theme"]
   });
-  prefersDark.addEventListener("change", applyRinPortrait);
+  prefersDark.addEventListener("change", applyCompanionPortrait);
 </script>
 
 <style>

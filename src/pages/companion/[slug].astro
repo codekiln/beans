@@ -1,0 +1,192 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getBeans } from "../../data/beans";
+import { getCompanionBySlug, getCompanionPath, getCompanions } from "../../data/companions";
+import { withBase } from "../../utils/paths";
+
+export async function getStaticPaths() {
+  const companions = await getCompanions();
+  return companions.map((companion) => ({ params: { slug: companion.slug } }));
+}
+
+const { slug } = Astro.params;
+const companion = slug ? await getCompanionBySlug(slug) : null;
+const renderResult = companion ? await companion.render() : null;
+const NotesContent = renderResult?.Content;
+const allBeans = await getBeans();
+const companionBeans = companion
+  ? allBeans.filter((bean) =>
+      bean.data.personaComment &&
+      bean.data.personaComment.companion === companion.slug
+    )
+  : [];
+const initialCommand = `companion ${companion?.slug ?? ""}`.trim();
+const initialLinkHref = withBase(getCompanionPath(companion?.slug ?? ""));
+---
+<BaseLayout
+  title={`${companion?.data.name ?? "Companion"} · Beans`}
+  description={companion?.data.summary ?? "Virtual companion profile."}
+  initialCommand={initialCommand}
+  initialLinkHref={initialLinkHref}
+>
+  <section class="companion-page">
+    <div class="window companion-hero">
+      <div class="companion-hero-grid">
+        <figure class="companion-portrait">
+          {companion?.data.portrait && (
+            <img
+              data-companion-portrait
+              data-light-src={withBase(companion.data.portrait.src)}
+              data-dark-src={withBase(companion.data.portrait.darkSrc ?? companion.data.portrait.src)}
+              src={withBase(companion.data.portrait.src)}
+              alt={companion.data.portrait.alt}
+              loading="lazy"
+            />
+          )}
+        </figure>
+        <div>
+          <h1>{companion?.data.name}</h1>
+          <p class="companion-title">{companion?.data.title}</p>
+          <p>{companion?.data.summary}</p>
+        </div>
+      </div>
+    </div>
+
+    {NotesContent ? (
+      <div class="window companion-notes">
+        <h2>Lore</h2>
+        <div class="markdown">
+          <NotesContent />
+        </div>
+      </div>
+    ) : null}
+
+    <div class="window companion-logbook">
+      <h2>Commented Cups</h2>
+      {companionBeans.length > 0 ? (
+        <ul class="companion-links">
+          {companionBeans.map((bean) => (
+            <li>
+              <a href={withBase(`/log/${bean.slug}/`)}>
+                {bean.data.date} {bean.data.beanKey}
+              </a>
+              <span>{bean.data.title}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No buddy comments logged yet.</p>
+      )}
+    </div>
+
+    <p class="companion-back">
+      <a href={withBase("/companion/")}>Back to companions</a>
+    </p>
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const applyCompanionPortrait = () => {
+    const theme = document.documentElement.dataset.theme ?? "auto";
+    const useDark = theme === "dark" || (theme === "auto" && prefersDark.matches);
+    document.querySelectorAll("[data-companion-portrait]").forEach((img) => {
+      const lightSrc = img.getAttribute("data-light-src");
+      const darkSrc = img.getAttribute("data-dark-src");
+      if (!lightSrc || !darkSrc) return;
+      const nextSrc = useDark ? darkSrc : lightSrc;
+      if (img.getAttribute("src") !== nextSrc) {
+        img.setAttribute("src", nextSrc);
+      }
+    });
+  };
+
+  applyCompanionPortrait();
+  new MutationObserver(applyCompanionPortrait).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"]
+  });
+  prefersDark.addEventListener("change", applyCompanionPortrait);
+</script>
+
+<style>
+  .companion-page {
+    display: grid;
+    gap: 1.4rem;
+  }
+
+  .companion-hero,
+  .companion-notes,
+  .companion-logbook {
+    padding: 1rem 1.1rem;
+  }
+
+  .companion-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 136px) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .companion-portrait {
+    margin: 0;
+    padding: 0.6rem;
+    border: 2px solid #432914;
+    background: linear-gradient(180deg, #7f5231 0%, #5e3b24 100%);
+    box-shadow: inset 0 0 0 2px #d4a160;
+  }
+
+  .companion-portrait img {
+    display: block;
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+  }
+
+  .companion-hero h1,
+  .companion-notes h2,
+  .companion-logbook h2 {
+    margin-top: 0;
+  }
+
+  .companion-title {
+    margin-top: -0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+  }
+
+  .companion-links {
+    margin: 0;
+    padding-left: 1.15rem;
+  }
+
+  .companion-links li + li {
+    margin-top: 0.45rem;
+  }
+
+  .companion-links span {
+    display: block;
+    color: var(--muted);
+  }
+
+  .companion-back {
+    margin: 0;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-portrait {
+    border-color: #c18b53;
+    background: linear-gradient(180deg, #3e2619 0%, #2c1a13 100%);
+    box-shadow: inset 0 0 0 2px #8e6439;
+  }
+
+  @media (max-width: 720px) {
+    .companion-hero-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .companion-portrait {
+      max-width: 180px;
+    }
+  }
+</style>

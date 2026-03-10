@@ -37,12 +37,11 @@ Bean entries may include optional Rin Vale buddy comment metadata in frontmatter
 
 ```yaml
 personaComment:
-  name: "Rin Vale"
-  title: "Campfire Cupping Companion"
+  companion: "rin-vale"
   body: "<single comment body>"
 ```
 
-- Keep the persona identity as `Rin Vale` with title `Campfire Cupping Companion` unless explicitly asked to edit these values.
+- `personaComment.companion` should point to the companion slug from `src/content/companions/`.
 - When a `personaComment` is present, include the tag `comment/rin-vale` in the bean entry `tags` list.
 - Regeneration replaces `personaComment.body` instead of appending additional comments.
 - Buddy comments should read like a knowledgeable coffee friend and include practical, actionable brew advice linked to the logged details.

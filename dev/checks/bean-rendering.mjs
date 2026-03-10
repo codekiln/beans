@@ -36,7 +36,7 @@ const buddyHtml = await readFile(buddyPagePath, "utf8");
 if (
   !buddyHtml.includes("Coffee Buddy Comment") ||
   !buddyHtml.includes("Rin Vale") ||
-  !buddyHtml.includes("Campfire Cupping Companion")
+  !buddyHtml.includes("wandering coffee connoisseur")
 ) {
   throw new Error("Bean detail page is missing the expected buddy comment metadata.");
 }

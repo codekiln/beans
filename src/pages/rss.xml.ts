@@ -1,6 +1,7 @@
 import rss from "@astrojs/rss";
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import { getBeans } from "../data/beans";
+import { getCompanionBySlug, getCompanionPath } from "../data/companions";
 import { withBase } from "../utils/paths";
 
 type BeanEntry = Awaited<ReturnType<typeof getBeans>>[number];
@@ -32,12 +33,18 @@ const companionBlockquoteStyle = [
   "padding:0 0 0 0.9em",
   "border-left:3px solid #8c6b3c"
 ].join(";");
-const renderBuddyComment = (entry: BeanEntry) => {
+const renderBuddyComment = async (entry: BeanEntry, site: URL) => {
   if (!entry.data.personaComment) {
     return "";
   }
 
-  const { name, title, body } = entry.data.personaComment;
+  const { body, companion: companionRef } = entry.data.personaComment;
+  const companion = await getCompanionBySlug(companionRef);
+  const name = companion?.data.name ?? "Virtual companion";
+  const title = companion?.data.title ?? "";
+  const companionLink = companion
+    ? new URL(withBase(getCompanionPath(companion.slug)), site).toString()
+    : null;
   return [
     `<aside aria-label="Virtual companion note" style="${companionShellStyle}">`,
     "<header>",
@@ -46,7 +53,9 @@ const renderBuddyComment = (entry: BeanEntry) => {
     `<p style="margin:0.35em 0 0;"><strong>From:</strong> ${escapeHtml(name)}<br><span>${escapeHtml(title)}</span></p>`,
     "</header>",
     `<blockquote aria-label="Quoted companion comment from ${escapeHtml(name)}" style="${companionBlockquoteStyle}">${renderParagraphs(body)}</blockquote>`,
-    `<p style="margin:0.75em 0 0;"><cite>Virtual companion note by ${escapeHtml(name)}</cite></p>`,
+    companionLink
+      ? `<p style="margin:0.75em 0 0;"><cite><a href="${companionLink}">Virtual companion note by ${escapeHtml(name)}</a></cite></p>`
+      : `<p style="margin:0.75em 0 0;"><cite>Virtual companion note by ${escapeHtml(name)}</cite></p>`,
     "</aside>"
   ].join("");
 };
@@ -74,7 +83,7 @@ export const GET = async () => {
               )}"></figure>`
             : "",
           content,
-          renderBuddyComment(entry)
+          await renderBuddyComment(entry, site)
         ].join(""),
         link: withBase(`log/${entry.slug}/`)
       };

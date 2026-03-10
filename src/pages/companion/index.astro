@@ -1,0 +1,152 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCompanions, getCompanionPath } from "../../data/companions";
+import { withBase } from "../../utils/paths";
+
+const companions = await getCompanions();
+const initialCommand = "companion list";
+const initialLinkHref = withBase("/companion/");
+---
+<BaseLayout
+  title="Companions · Beans"
+  description="Virtual coffee buddies cataloged in the Beans log."
+  initialCommand={initialCommand}
+  initialLinkHref={initialLinkHref}
+>
+  <section class="hero">
+    <h1 class="bean-prompt">
+      <span class="bean-prompt-link">
+        <span class="bean-prompt-time">
+          <span class="bean-prompt-emoji" aria-hidden="true">🫘</span>
+          <span aria-hidden="true">&gt;</span>
+        </span>
+        <span class="bean-prompt-command">bean companion list</span>
+      </span>
+    </h1>
+    <p>Virtual coffee buddies in the Beans log.</p>
+  </section>
+  <section class="window">
+    {companions.length ? (
+      <ul class="table-list companion-list">
+        {companions.map((companion) => (
+          <li class="companion-item">
+            <figure class="companion-portrait">
+              <img
+                data-companion-portrait
+                data-light-src={withBase(companion.data.portrait.src)}
+                data-dark-src={withBase(companion.data.portrait.darkSrc ?? companion.data.portrait.src)}
+                src={withBase(companion.data.portrait.src)}
+                alt={companion.data.portrait.alt}
+                loading="lazy"
+              />
+            </figure>
+            <div class="companion-copy">
+              <p class="companion-name">
+                <a href={withBase(getCompanionPath(companion.slug))}>{companion.data.name}</a>
+              </p>
+              <p class="companion-summary">
+                <strong>{companion.data.title}</strong>
+                {" "}· {companion.data.summary}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No companions cataloged yet.</p>
+    )}
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const applyCompanionPortrait = () => {
+    const theme = document.documentElement.dataset.theme ?? "auto";
+    const useDark = theme === "dark" || (theme === "auto" && prefersDark.matches);
+    document.querySelectorAll("[data-companion-portrait]").forEach((img) => {
+      const lightSrc = img.getAttribute("data-light-src");
+      const darkSrc = img.getAttribute("data-dark-src");
+      if (!lightSrc || !darkSrc) return;
+      const nextSrc = useDark ? darkSrc : lightSrc;
+      if (img.getAttribute("src") !== nextSrc) {
+        img.setAttribute("src", nextSrc);
+      }
+    });
+  };
+
+  applyCompanionPortrait();
+  new MutationObserver(applyCompanionPortrait).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"]
+  });
+  prefersDark.addEventListener("change", applyCompanionPortrait);
+</script>
+
+<style>
+  .companion-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .companion-item {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    border: 1px dashed var(--border);
+  }
+
+  .companion-portrait {
+    margin: 0;
+    padding: 0.4rem;
+    border: 2px solid #432914;
+    background: linear-gradient(180deg, #7f5231 0%, #5e3b24 100%);
+    box-shadow: inset 0 0 0 2px #d4a160;
+  }
+
+  .companion-portrait img {
+    display: block;
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+  }
+
+  .companion-name,
+  .companion-summary {
+    margin: 0;
+  }
+
+  .companion-name {
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+
+  .companion-name a {
+    color: inherit;
+  }
+
+  .companion-summary {
+    color: var(--muted);
+  }
+
+  .companion-summary strong {
+    color: var(--body);
+  }
+
+  :global(:root[data-theme="dark"]) .companion-portrait {
+    border-color: #c18b53;
+    background: linear-gradient(180deg, #3e2619 0%, #2c1a13 100%);
+    box-shadow: inset 0 0 0 2px #8e6439;
+  }
+
+  @media (max-width: 640px) {
+    .companion-item {
+      grid-template-columns: 1fr;
+    }
+
+    .companion-portrait {
+      max-width: 128px;
+    }
+  }
+</style>

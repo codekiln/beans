@@ -74,11 +74,25 @@ const beans = defineCollection({
       .optional(),
     personaComment: z
       .object({
-        name: z.string(),
-        title: z.string(),
+        companion: z.string(),
         body: z.string()
       })
       .optional()
+  })
+});
+
+const companions = defineCollection({
+  type: "content",
+  schema: z.object({
+    name: z.string(),
+    title: z.string(),
+    summary: z.string(),
+    portrait: z.object({
+      src: z.string(),
+      darkSrc: z.string().optional(),
+      alt: z.string()
+    }),
+    order: z.number()
   })
 });
 
@@ -187,4 +201,4 @@ const roasters = defineCollection({
   ])
 });
 
-export const collections = { beans, recipes, equipment, roasters, terms, questions };
+export const collections = { beans, companions, recipes, equipment, roasters, terms, questions };
