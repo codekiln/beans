@@ -32,6 +32,10 @@ bd_cmd() {
   bd --no-daemon "$@"
 }
 
+refresh_bd_hooks() {
+  bd hooks install --force >/dev/null
+}
+
 cleanup_gitignore_entry() {
   local entry="$1"
   local tmp_file
@@ -76,6 +80,7 @@ ensure_issue_is_claimed() {
 
 bd_cmd prime >/dev/null || true
 bd_cmd show "$issue_id" >/dev/null
+refresh_bd_hooks
 
 warn_if_checkout_dirty
 ensure_issue_is_claimed

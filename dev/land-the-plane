@@ -274,9 +274,6 @@ land_on_root_main() {
 
   print_section "Landing on root main:"
 
-  bd_cmd sync --check
-  bd_cmd sync --force
-
   ensure_worktree_clean "$repo_root" "Root main"
 
   git -C "$repo_root" fetch origin
@@ -300,6 +297,7 @@ land_on_root_main() {
 
 sync_beads_metadata_branch() {
   local sync_status
+  local sync_branch_status
 
   if [[ ! -d "$beads_sync_worktree" ]]; then
     echo "Could not locate the beads-sync worktree at $beads_sync_worktree" >&2
@@ -307,15 +305,19 @@ sync_beads_metadata_branch() {
   fi
 
   sync_status="$(git -C "$beads_sync_worktree" status --short)"
+  sync_branch_status="$(git -C "$beads_sync_worktree" status --short --branch | head -n 1)"
 
-  if [[ -z "$sync_status" ]]; then
+  if [[ -z "$sync_status" && "$sync_branch_status" != *"ahead "* ]]; then
     return
   fi
 
   print_section "Syncing beads-sync:"
-  printf "%s\n" "$sync_status"
-  git -C "$beads_sync_worktree" add .beads/issues.jsonl
-  git -C "$beads_sync_worktree" commit -m "chore(beads): sync $issue_id metadata"
+  printf "%s\n" "$sync_branch_status"
+  if [[ -n "$sync_status" ]]; then
+    printf "%s\n" "$sync_status"
+    git -C "$beads_sync_worktree" add .beads/issues.jsonl
+    git -C "$beads_sync_worktree" commit -m "chore(beads): sync $issue_id metadata"
+  fi
   git -C "$beads_sync_worktree" push origin beads-sync
 }
 

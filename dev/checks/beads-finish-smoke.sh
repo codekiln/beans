@@ -86,8 +86,8 @@ if ! grep -Fq -- "--no-daemon show beans-test" "$tmp_dir/bd.log"; then
   exit 1
 fi
 
-if ! grep -Fq -- "--no-daemon update beans-test --append-notes note" "$tmp_dir/bd.log"; then
-  echo "beads-finish did not use --no-daemon when appending notes" >&2
+if ! grep -Fq -- "--no-daemon update beans-test --notes note" "$tmp_dir/bd.log"; then
+  echo "beads-finish did not use the supported --notes flag in direct mode" >&2
   exit 1
 fi
 
@@ -101,13 +101,8 @@ if ! grep -Fq -- "--no-daemon sync --check" "$tmp_dir/bd.log"; then
   exit 1
 fi
 
-if ! grep -Fq -- "--no-daemon sync --force" "$tmp_dir/bd.log"; then
-  echo "beads-finish did not force a direct-mode sync export" >&2
-  exit 1
-fi
-
 if ! grep -Fq -- "--no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl" "$tmp_dir/bd.log"; then
-  echo "beads-finish did not fall back to full JSONL export when sync left metadata missing" >&2
+  echo "beads-finish did not export the shared DB state into beads-sync JSONL" >&2
   exit 1
 fi
 
