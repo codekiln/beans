@@ -8,7 +8,7 @@ Treat product code and Beads metadata as related but different artifacts with di
 
 - Product code source of truth: the task branch and task worktree where you make code changes, usually `codex/<issue-id>` in `worktrees/beans-<issue-id>`, then `main` after landing.
 - Beads metadata source of truth while editing: the shared `.beads/beads.db` store that all Beads-managed worktrees in this clone use.
-- Beads metadata durable git source of truth: `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch after `bd --no-daemon sync --force` or the export fallback writes the latest DB state there.
+- Beads metadata durable git source of truth: `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch after this repo's export flow writes the latest DB state there.
 
 Commit intent follows that split:
 
@@ -123,7 +123,7 @@ Finish helper:
 dev/beads-finish <issue-id> ["notes"]
 ```
 
-This helper standardizes the close/sync path: show issue, optionally append notes, close it, run `bd --no-daemon sync --check`, show `git status --short`, run `bd --no-daemon sync --force`, fall back to `bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl` if needed, and fail if the issue is still missing from `beads-sync/.beads/issues.jsonl`.
+This helper standardizes the close/sync path: show issue, optionally add notes, close it, run `bd --no-daemon sync --check`, show `git status --short`, export the shared DB into `.git/beads-worktrees/beads-sync/.beads/issues.jsonl`, and fail if the issue is still missing from `beads-sync/.beads/issues.jsonl`.
 
 Concrete metadata sync sequence:
 
@@ -178,8 +178,8 @@ bd --no-daemon update <issue-id> --acceptance "- CI fails on broken slugs"
 # Finish work
 bd --no-daemon update <issue-id> --status closed
 
-# Sync JSONL with local changes and force export to beads-sync JSONL
-bd --no-daemon sync --force
+# Export the shared DB state to the tracked beads-sync JSONL
+bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl
 ```
 
 ## Core commands
@@ -235,14 +235,15 @@ bd --no-daemon merge-slot release
 
 ## Sync + git workflow
 
-- Install hooks in each active clone/worktree:
+- Install or refresh hooks in each active clone/worktree:
 
 ```bash
-bd --no-daemon hooks install
+bd hooks install --force
 ```
 
-- Use `bd --no-daemon sync --check` before syncing/pushing.
-- Use `bd --no-daemon sync --force` before pushing, then verify the issue is present in `.git/beads-worktrees/beads-sync/.beads/issues.jsonl`.
+- `dev/beads-start` refreshes the shared hook shims automatically so `git commit` does not keep old `bd hook ...` stubs after a CLI upgrade.
+- Use `bd --no-daemon sync --check` before exporting/pushing.
+- Export durable metadata with `bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl`, then verify the issue is present there.
 - Treat issue creation/update as incomplete until that tracked JSONL change is part of a git commit.
 - Default path: make that commit on `main`.
 - Worktree exception: if the metadata change happens inside an active Beads task worktree, commit it on that task branch and let it reach `main` through the normal landing flow.
@@ -258,7 +259,7 @@ Observed on March 1, 2026:
 - `bd show <issue-id>` and direct SQLite queries could see `beans-e2z` in `.beads/beads.db` even while both the main checkout `.beads/issues.jsonl` and `beads-sync` JSONL were missing it.
 - Plain `bd` commands sometimes stalled until rerun with `--no-daemon`.
 - `bd --no-daemon sync --flush-only` updated the `beads-sync` JSONL timestamp without exporting the new issue.
-- `bd --no-daemon sync --force` was not sufficient on its own; in this repo it could still leave a valid DB row absent from the exported `beads-sync` JSONL.
+- Older repo guidance used `bd --no-daemon sync --force`, but current `bd` versions removed that flag and this repo now uses explicit export to the tracked `beads-sync` JSONL instead.
 - `bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl` reliably wrote the full SQLite state when `sync` missed a dirty issue.
 
 For this repo, treat the runtime DB and the exported JSONL as separate checks:
@@ -276,10 +277,8 @@ bd --no-daemon create "Title here"
 # or
 bd --no-daemon update <issue-id> --notes "Updated details"
 
-# 2. Sync/export the tracked metadata
+# 2. Check sync health and export the tracked metadata
 bd --no-daemon sync --check
-bd --no-daemon sync --force
-# If sync still misses the issue, export explicitly
 bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl
 
 # 3. Verify the issue ID is present in the tracked JSONL

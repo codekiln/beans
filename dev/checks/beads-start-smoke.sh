@@ -37,7 +37,7 @@ set -euo pipefail
 echo "\$*" >>"$tmp_dir/bd.log"
 
 case "\$1" in
-  prime|show|update)
+  prime|show|update|hooks)
     exit 0
     ;;
   worktree)
@@ -92,6 +92,11 @@ fi
 
 if ! grep -Fq -- "--no-daemon show beans-test" "$tmp_dir/bd.log"; then
   echo "beads-start did not use --no-daemon for bd show" >&2
+  exit 1
+fi
+
+if ! grep -Fq "hooks install --force" "$tmp_dir/bd.log"; then
+  echo "beads-start did not refresh bd hooks before starting work" >&2
   exit 1
 fi
 

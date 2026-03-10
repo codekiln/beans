@@ -11,7 +11,7 @@ Treat product code and Beads metadata as related but different artifacts with di
 
 - Product code source of truth: the task branch and task worktree where you make code changes, usually `codex/<issue-id>` in `worktrees/beans-<issue-id>`, then `main` after landing.
 - Beads metadata source of truth while editing: the shared `.beads/beads.db` store that all Beads-managed worktrees in this clone use.
-- Beads metadata durable git source of truth: `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch after `bd --no-daemon sync --force` or the export fallback writes the latest DB state there.
+- Beads metadata durable git source of truth: `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch after this repo's export flow writes the latest DB state there.
 
 Commit intent follows that split:
 
@@ -129,7 +129,7 @@ Finish helper:
 dev/beads-finish <issue-id> ["notes"]
 ```
 
-This helper standardizes the close/sync path: show issue, optionally append notes, close it, run `bd --no-daemon sync --check`, show `git status --short`, run `bd --no-daemon sync --force`, fall back to `bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl` if needed, and fail if the issue is still missing from `beads-sync/.beads/issues.jsonl`.
+This helper standardizes the close/sync path: show issue, optionally add notes, close it, run `bd --no-daemon sync --check`, show `git status --short`, export the shared DB into `.git/beads-worktrees/beads-sync/.beads/issues.jsonl`, and fail if the issue is still missing from `beads-sync/.beads/issues.jsonl`.
 
 Concrete metadata sync sequence:
 
@@ -177,10 +177,8 @@ bd --no-daemon create "Title here"
 # or
 bd --no-daemon update <issue-id> --notes "Updated details"
 
-# 2. Sync/export the tracked metadata
+# 2. Check sync health and export the tracked metadata
 bd --no-daemon sync --check
-bd --no-daemon sync --force
-# If sync still misses the issue, export explicitly
 bd --no-daemon export -o .git/beads-worktrees/beads-sync/.beads/issues.jsonl
 
 # 3. Verify the issue ID is present in the tracked JSONL

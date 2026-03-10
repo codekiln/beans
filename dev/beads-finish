@@ -11,7 +11,7 @@ Wraps the common Beads finish sequence:
   3) Close the issue
   4) Run sync integrity check
   5) Show git status
-  6) Run bd sync
+  6) Export the shared DB state into beads-sync JSONL
   7) Report whether beads-sync now has uncommitted metadata changes
 USAGE
 }
@@ -34,19 +34,15 @@ bd_cmd() {
 bd_cmd show "$issue_id"
 
 if [[ -n "$notes" ]]; then
-  bd_cmd update "$issue_id" --append-notes "$notes" >/dev/null
+  bd_cmd update "$issue_id" --notes "$notes" >/dev/null
 fi
 
 bd_cmd update "$issue_id" --status closed >/dev/null
 bd_cmd sync --check
 git status --short
-bd_cmd sync --force
+bd_cmd export -o "$beads_sync_jsonl"
 
 if [[ -f "$beads_sync_jsonl" ]]; then
-  if ! grep -Fq "\"id\":\"$issue_id\"" "$beads_sync_jsonl"; then
-    bd_cmd export -o "$beads_sync_jsonl"
-  fi
-
   if grep -Fq "\"id\":\"$issue_id\"" "$beads_sync_jsonl"; then
     echo "Metadata durable: $issue_id is present in $beads_sync_jsonl"
   else
