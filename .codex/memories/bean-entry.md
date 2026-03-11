@@ -3,12 +3,24 @@
 Use this CLI-style command when creating a new Bean entry:
 
 ```bash
-$ bean log <YYYY-MM-DD> <beanKey>
+$ bean log <YYYY-MM-DD> [HHMM]
 ```
 
 Then create a matching file at `src/content/beans/<YYYY-MM-DD>-<beanKey>.md` with frontmatter fields that align with the beans collection schema, and keep the primary descriptive content in the markdown body.
 
 `bean` is not an installed command in this repository. Treat this as display text for UI/agent responses and file naming only.
+
+## Identifier rules
+
+- Keep `beanKey` and `id` in frontmatter, plus the `src/content/beans/<YYYY-MM-DD>-<beanKey>.md` filename, as the internal content identity.
+- For display commands and public URLs, use the date alone when that date has exactly one bean entry:
+  - command: `$ bean log 2026-03-08`
+  - URL: `/beans/log/2026-03-08/`
+- When a date has multiple bean entries, derive the public identifier from the top-level `time` using 24-hour `HHMM`:
+  - command: `$ bean log 2026-02-05 0452`
+  - URL: `/beans/log/2026-02-05-0452/`
+- If a multi-entry date ever lacks `time`, fall back to a simple ordinal such as `1` or `2` for the public identifier.
+- Preserve backward compatibility for existing `/beans/log/<YYYY-MM-DD>-beanN/` links by keeping those legacy paths available as aliases.
 
 ## Worktree convention for bean-entry tasks
 
@@ -24,7 +36,7 @@ The markdown body is rendered directly using Astro's content rendering. You can 
 - Images: `![alt text](/beans/images/filename.png)`
 
 **Important**: Images in the markdown body must use the full `/beans/images/` path prefix, not `/images/`. This is different from frontmatter images which use `/images/` and are handled by the `withBase` utility in the component.
-**Important**: Do not add an inline body preamble like `` `$ bean log YYYY-MM-DD beanX` `` in the markdown body. The UI renders the bean log command prompt in the entry header.
+**Important**: Do not add an inline body preamble like `` `$ bean log YYYY-MM-DD` `` or `` `$ bean log YYYY-MM-DD HHMM` `` in the markdown body. The UI renders the bean log command prompt in the entry header.
 
 ## Rin Vale Buddy Comment Frontmatter
 

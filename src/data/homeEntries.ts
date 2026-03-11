@@ -1,9 +1,10 @@
-import { getBeans, type BeanEntry } from "./beans";
+import { getBeanRouteInfoMap, getBeans, type BeanEntry } from "./beans";
 import { getQuestionPath, getQuestions, type QuestionEntry } from "./questions";
 
 type HomeEntryBase = {
   href: string;
   cliLog: string;
+  displayLabel: string;
   sortDate: string;
   sortTime: string;
   sortSlug: string;
@@ -36,13 +37,15 @@ const compareHomeEntries = (a: HomeEntry, b: HomeEntry) => {
 
 export const getHomeEntries = async () => {
   const [beans, questions] = await Promise.all([getBeans(), getQuestions()]);
+  const beanRouteInfo = getBeanRouteInfoMap(beans);
   const entries: HomeEntry[] = [
     ...beans.map(
       (bean): HomeBeanEntry => ({
         kind: "bean",
         bean,
-        href: `/log/${bean.slug}/`,
-        cliLog: `log ${bean.data.date} ${bean.data.beanKey}`,
+        displayLabel: beanRouteInfo.get(bean.slug)?.displayLabel ?? bean.data.date,
+        href: beanRouteInfo.get(bean.slug)?.path ?? `/log/${bean.slug}/`,
+        cliLog: beanRouteInfo.get(bean.slug)?.commandText ?? `log ${bean.data.date}`,
         sortDate: bean.data.date,
         sortTime: bean.data.time ?? "",
         sortSlug: bean.slug
@@ -52,6 +55,7 @@ export const getHomeEntries = async () => {
       (question): HomeQuestionEntry => ({
         kind: "question",
         question,
+        displayLabel: `${question.data.dateCreated} question`,
         href: getQuestionPath(question.slug),
         cliLog: `question ${question.slug}`,
         sortDate: question.data.dateCreated,

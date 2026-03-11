@@ -1,6 +1,6 @@
 import rss from "@astrojs/rss";
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
-import { getBeans } from "../data/beans";
+import { getBeanRouteInfoMap, getBeans } from "../data/beans";
 import { getCompanionBySlug, getCompanionPath } from "../data/companions";
 import { withBase } from "../utils/paths";
 
@@ -63,6 +63,7 @@ const renderBuddyComment = async (entry: BeanEntry, site: URL) => {
 export const GET = async () => {
   const markdown = await createMarkdownProcessor();
   const beans = await getBeans();
+  const beanRouteInfo = getBeanRouteInfoMap(beans);
   const sortedBeans = [...beans].sort((a, b) => toDate(b).getTime() - toDate(a).getTime());
   const site = new URL(withBase("/"), import.meta.env.SITE);
 
@@ -85,7 +86,7 @@ export const GET = async () => {
           content,
           await renderBuddyComment(entry, site)
         ].join(""),
-        link: withBase(`log/${entry.slug}/`)
+        link: withBase(beanRouteInfo.get(entry.slug)?.path ?? `/log/${entry.slug}/`)
       };
     }))
   });

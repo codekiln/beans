@@ -1,44 +1,54 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import BeanEntry from "../../components/BeanEntry.astro";
-import { getBeans } from "../../data/beans";
+import { getBeanRouteInfoMap, getBeans } from "../../data/beans";
 import { withBase } from "../../utils/paths";
 
 export async function getStaticPaths() {
   const beans = await getBeans();
-  return beans.map((bean, index) => ({
-    params: { slug: bean.slug },
-    props: {
-      bean,
-      prev: index < beans.length - 1 ? beans[index + 1] : null,
-      next: index > 0 ? beans[index - 1] : null
-    }
-  }));
+  const beanRouteInfo = getBeanRouteInfoMap(beans);
+
+  return beans.flatMap((bean, index) => {
+    const info = beanRouteInfo.get(bean.slug);
+
+    return (info?.aliases ?? [bean.slug]).map((slug) => ({
+      params: { slug },
+      props: {
+        bean,
+        beanRouteInfo: info,
+        prev: index < beans.length - 1 ? beans[index + 1] : null,
+        prevRouteInfo:
+          index < beans.length - 1 ? beanRouteInfo.get(beans[index + 1].slug) ?? null : null,
+        next: index > 0 ? beans[index - 1] : null,
+        nextRouteInfo: index > 0 ? beanRouteInfo.get(beans[index - 1].slug) ?? null : null
+      }
+    }));
+  });
 }
 
-const { bean, prev, next } = Astro.props;
-const initialCommand = `$ bean log ${bean.data.date} ${bean.data.beanKey}`;
-const initialLinkHref = withBase(`/log/${bean.slug}/`);
+const { bean, beanRouteInfo, prev, prevRouteInfo, next, nextRouteInfo } = Astro.props;
+const initialCommand = `$ bean ${beanRouteInfo.commandText}`;
+const initialLinkHref = withBase(beanRouteInfo.path);
 ---
 <BaseLayout
-  title={`Bean ${bean.data.date} ${bean.data.beanKey} · Beans`}
+  title={`${beanRouteInfo.titleLabel} · Beans`}
   description={bean.data.title}
   initialCommand={initialCommand}
   initialLinkHref={initialLinkHref}
 >
   <section class="bean-detail">
-    <BeanEntry bean={bean} showBuddyComment={true} showClosingMark={true} />
+    <BeanEntry bean={bean} routeInfo={beanRouteInfo} showBuddyComment={true} showClosingMark={true} />
     <nav class="bean-nav" aria-label="Bean log navigation">
       {prev ? (
-        <a class="bean-nav-link" href={withBase(`/log/${prev.slug}/`)}>
-          ← Prev: {prev.data.date} {prev.data.beanKey}
+        <a class="bean-nav-link" href={withBase(prevRouteInfo?.path ?? `/log/${prev.slug}/`)}>
+          ← Prev: {prevRouteInfo?.displayLabel ?? prev.data.date}
         </a>
       ) : (
         <span class="bean-nav-muted">← Prev</span>
       )}
       {next ? (
-        <a class="bean-nav-link" href={withBase(`/log/${next.slug}/`)}>
-          Next: {next.data.date} {next.data.beanKey} →
+        <a class="bean-nav-link" href={withBase(nextRouteInfo?.path ?? `/log/${next.slug}/`)}>
+          Next: {nextRouteInfo?.displayLabel ?? next.data.date} →
         </a>
       ) : (
         <span class="bean-nav-muted">Next →</span>

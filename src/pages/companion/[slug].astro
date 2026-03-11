@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getBeans } from "../../data/beans";
+import { getBeanRouteInfoMap, getBeans } from "../../data/beans";
 import { getCompanionBySlug, getCompanionPath, getCompanions } from "../../data/companions";
 import { withBase } from "../../utils/paths";
 
@@ -14,6 +14,7 @@ const companion = slug ? await getCompanionBySlug(slug) : null;
 const renderResult = companion ? await companion.render() : null;
 const NotesContent = renderResult?.Content;
 const allBeans = await getBeans();
+const beanRouteInfo = getBeanRouteInfoMap(allBeans);
 const companionBeans = companion
   ? allBeans.filter((bean) =>
       bean.data.personaComment &&
@@ -67,8 +68,8 @@ const initialLinkHref = withBase(getCompanionPath(companion?.slug ?? ""));
         <ul class="companion-links">
           {companionBeans.map((bean) => (
             <li>
-              <a href={withBase(`/log/${bean.slug}/`)}>
-                {bean.data.date} {bean.data.beanKey}
+              <a href={withBase(beanRouteInfo.get(bean.slug)?.path ?? `/log/${bean.slug}/`)}>
+                {beanRouteInfo.get(bean.slug)?.displayLabel ?? bean.data.date}
               </a>
               <span>{bean.data.title}</span>
             </li>

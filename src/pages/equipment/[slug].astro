@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getEquipment } from "../../data/equipment";
-import { getBeans } from "../../data/beans";
+import { getBeanRouteInfoMap, getBeans } from "../../data/beans";
 import { withBase } from "../../utils/paths";
 
 export async function getStaticPaths() {
@@ -15,6 +15,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const equipment = await getEquipment();
 const beans = await getBeans();
+const beanRouteInfo = getBeanRouteInfoMap(beans);
 const currency = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD"
@@ -94,9 +95,8 @@ const relatedBeans = beans
       <ul>
         {relatedBeans.map((bean) => (
           <li>
-            <a href={withBase(`/log/${bean.slug}/`)}>
-              {bean.data.date}
-              {bean.data.time ? ` ${bean.data.time}` : ""} · {bean.data.title}
+            <a href={withBase(beanRouteInfo.get(bean.slug)?.path ?? `/log/${bean.slug}/`)}>
+              {beanRouteInfo.get(bean.slug)?.displayLabel ?? bean.data.date} · {bean.data.title}
             </a>
           </li>
         ))}

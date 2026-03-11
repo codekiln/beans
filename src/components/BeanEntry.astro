@@ -2,17 +2,19 @@
 import TagRow from "./TagRow.astro";
 import CoffeeBuddyQuote from "./CoffeeBuddyQuote.astro";
 import { getCompanionBySlug } from "../data/companions";
+import { getBeanRouteInfo, getBeans } from "../data/beans";
 import { withBase } from "../utils/paths";
 
-const { bean, showBuddyComment = false, showClosingMark = false } = Astro.props;
+const { bean, routeInfo = null, showBuddyComment = false, showClosingMark = false } = Astro.props;
 const { Content } = await bean.render();
+const beanRouteInfo = routeInfo ?? getBeanRouteInfo(bean, await getBeans());
 const companion = bean.data.personaComment
   ? await getCompanionBySlug(bean.data.personaComment.companion)
   : null;
-const logCommand = `log ${bean.data.date} ${bean.data.beanKey}`;
+const logCommand = beanRouteInfo.commandText;
 const command = `$ bean ${logCommand}`;
 const commandLabel = `bean ${logCommand}`;
-const detailHref = withBase(`/log/${bean.slug}/`);
+const detailHref = withBase(beanRouteInfo.path);
 const promptTime = bean.data.time
   ? bean.data.time
       .split(":")

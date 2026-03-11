@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import BeanEntry from "../../components/BeanEntry.astro";
-import { getAllTags, getBeans } from "../../data/beans";
+import { getAllTags, getBeanRouteInfoMap, getBeans } from "../../data/beans";
 import { withBase } from "../../utils/paths";
 
 export async function getStaticPaths() {
@@ -11,6 +11,7 @@ export async function getStaticPaths() {
 
 const { tag } = Astro.params;
 const beans = await getBeans();
+const beanRouteInfo = getBeanRouteInfoMap(beans);
 const taggedBeans = beans.filter((bean) => bean.data.tags.includes(tag));
 ---
 <BaseLayout title={`Tag: ${tag} · Beans`} description={`Beans tagged with ${tag}.`} initialCommand={`$ bean tag ${tag}`}>
@@ -22,6 +23,6 @@ const taggedBeans = beans.filter((bean) => bean.data.tags.includes(tag));
     </p>
   </section>
   {taggedBeans.map((bean) => (
-    <BeanEntry bean={bean} />
+    <BeanEntry bean={bean} routeInfo={beanRouteInfo.get(bean.slug)} />
   ))}
 </BaseLayout>

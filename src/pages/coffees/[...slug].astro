@@ -2,7 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCoffees } from "../../data/coffees";
 import { getRoasters } from "../../data/roasters";
-import { getBeans } from "../../data/beans";
+import { getBeanRouteInfoMap, getBeans } from "../../data/beans";
 import { withBase } from "../../utils/paths";
 
 export async function getStaticPaths() {
@@ -18,6 +18,7 @@ const coffee = coffees.find((entry) => entry.slug === slug);
 const roasters = await getRoasters();
 const roaster = roasters.find((entry) => entry.slug === coffee?.roaster);
 const beans = await getBeans();
+const beanRouteInfo = getBeanRouteInfoMap(beans);
 const compareBeansByRecent = (a, b) => {
   const dateCompare = b.data.date.localeCompare(a.data.date);
   if (dateCompare !== 0) return dateCompare;
@@ -25,10 +26,8 @@ const compareBeansByRecent = (a, b) => {
   const timeB = b.data.time ?? "";
   return timeB.localeCompare(timeA);
 };
-const formatBeanLogLabel = (bean) => {
-  const suffix = bean.data.beanKey ?? bean.data.time ?? "";
-  return suffix ? `bean log ${bean.data.date} ${suffix}` : `bean log ${bean.data.date}`;
-};
+const formatBeanLogLabel = (bean) =>
+  `bean ${beanRouteInfo.get(bean.slug)?.commandText ?? `log ${bean.data.date}`}`;
 const relatedBeans = beans
   .filter((bean) => bean.data.coffee.roast?.slug === slug)
   .sort(compareBeansByRecent)
@@ -94,7 +93,9 @@ const hasNotes = Boolean(coffee?.body?.trim());
       <ul class="table-list">
         {relatedBeans.map((bean) => (
           <li>
-            <a href={withBase(`/log/${bean.slug}/`)}>[{formatBeanLogLabel(bean)}]</a>
+            <a href={withBase(beanRouteInfo.get(bean.slug)?.path ?? `/log/${bean.slug}/`)}>
+              [{formatBeanLogLabel(bean)}]
+            </a>
           </li>
         ))}
       </ul>

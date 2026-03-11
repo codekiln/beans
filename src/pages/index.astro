@@ -42,7 +42,7 @@ const initialCommand = "$ bean log list";
               </p>
               <p class="stream-entry-title">
                 <a href={withBase(entry.href)}>
-                  [{entry.bean.data.date} {entry.bean.data.beanKey}]
+                  [{entry.displayLabel}]
                 </a>
                 {" "}· {entry.bean.data.title}
               </p>
@@ -53,7 +53,7 @@ const initialCommand = "$ bean log list";
                 <a href={withBase(entry.href)}>$ bean {entry.cliLog}</a>
               </p>
               <p class="stream-entry-title">
-                <a href={withBase(entry.href)}>[{entry.question.data.dateCreated} question]</a>
+                <a href={withBase(entry.href)}>[{entry.displayLabel}]</a>
                 {" "}· {entry.question.data.title}
               </p>
               <p class="stream-entry-summary">{entry.question.data.summary}</p>
