@@ -110,4 +110,9 @@ if ! grep -Fq "worktree create worktrees/beans-test --branch codex/beans-test" "
   exit 1
 fi
 
+if [[ "$(cat "$tmp_dir/worktrees/beans-test/.beads/redirect")" != "../../.beads" ]]; then
+  echo "beads-start did not repair the Beads redirect for repo-local worktrees" >&2
+  exit 1
+fi
+
 echo "beads-start smoke check passed"

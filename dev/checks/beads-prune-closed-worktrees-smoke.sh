@@ -5,7 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
 
-mkdir -p "$tmp_dir/bin" "$tmp_dir/worktrees/beans-open" "$tmp_dir/worktrees/beans-cld" "$tmp_dir/worktrees/beans-c29"
+mkdir -p "$tmp_dir/bin" "$tmp_dir/worktrees/beans-open" "$tmp_dir/worktrees/beans-cld" "$tmp_dir/worktrees/beans-c29" "$tmp_dir/worktrees/beans-zpt.1"
 cp "$repo_root/dev/beads-prune-closed-worktrees" "$tmp_dir/beads-prune-closed-worktrees"
 
 cat >"$tmp_dir/bin/git" <<EOF
@@ -36,6 +36,9 @@ branch refs/heads/codex/beans-cld
 
 worktree $tmp_dir/worktrees/beans-c29
 branch refs/heads/codex/beans-c29
+
+worktree $tmp_dir/worktrees/beans-zpt.1
+branch refs/heads/codex/beans-zpt.1
 LIST
         exit 0
         ;;
@@ -65,6 +68,7 @@ case "${1:-}" in
     cat <<'LIST'
 ✓ beans-cld [P2] [task] - Closed issue
 ✓ beans-c29 [P2] [task] - Another closed issue
+✓ beans-zpt.1 [P2] [task] - Closed dotted issue
 LIST
     exit 0
     ;;
@@ -95,6 +99,11 @@ if [[ "$dry_run_output" == *"$tmp_dir/worktrees/beans-open"* ]]; then
   exit 1
 fi
 
+if [[ "$dry_run_output" != *"$tmp_dir/worktrees/beans-zpt.1"* ]]; then
+  echo "cleanup script did not report a closed dotted-id worktree during dry run" >&2
+  exit 1
+fi
+
 run_output="$(
   cd "$tmp_dir"
   PATH="$tmp_dir/bin:$PATH" ./beads-prune-closed-worktrees
@@ -115,12 +124,17 @@ if grep -Fq "worktree remove $tmp_dir/worktrees/beans-open" "$tmp_dir/git.log"; 
   exit 1
 fi
 
+if ! grep -Fq "worktree remove $tmp_dir/worktrees/beans-zpt.1" "$tmp_dir/git.log"; then
+  echo "cleanup script did not remove the dotted-id closed worktree" >&2
+  exit 1
+fi
+
 if ! grep -Fq "worktree prune" "$tmp_dir/git.log"; then
   echo "cleanup script did not prune git worktrees after removal" >&2
   exit 1
 fi
 
-if [[ "$run_output" != *"Removed 2 closed-task worktree(s)."* ]]; then
+if [[ "$run_output" != *"Removed 3 closed-task worktree(s)."* ]]; then
   echo "cleanup script did not report the removal count" >&2
   exit 1
 fi

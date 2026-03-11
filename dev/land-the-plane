@@ -130,6 +130,10 @@ ensure_root_main_policy() {
   fi
 }
 
+ensure_root_main_clean_before_closeout() {
+  ensure_worktree_clean "$repo_root" "Root main"
+}
+
 ensure_worktree_clean() {
   local path="$1"
   local label="$2"
@@ -236,12 +240,6 @@ auto_commit_task_worktree_if_safe() {
     return
   fi
 
-  if printf "%s\n" "$status_output" | grep -qE '^\?\? '; then
-    echo "Task worktree has untracked files. Commit, remove, or ignore them explicitly before landing:" >&2
-    printf "%s\n" "$status_output" >&2
-    exit 1
-  fi
-
   if printf "%s\n" "$status_output" | grep -qE '^(AA|AU|DD|DU|UA|UD|UU) '; then
     echo "Task worktree has unresolved merge state. Resolve it before landing:" >&2
     printf "%s\n" "$status_output" >&2
@@ -267,6 +265,21 @@ auto_commit_task_worktree_if_safe() {
     printf "%s\n" "$post_commit_status" >&2
     exit 1
   fi
+}
+
+cleanup_root_main_metadata_mirror() {
+  local metadata_path=".beads/issues.jsonl"
+  local metadata_status
+
+  metadata_status="$(git -C "$repo_root" status --short -- "$metadata_path")"
+
+  if [[ -z "$metadata_status" ]]; then
+    return
+  fi
+
+  print_section "Cleaning root main metadata mirror:"
+  printf "%s\n" "$metadata_status"
+  git -C "$repo_root" restore --staged --worktree -- "$metadata_path"
 }
 
 land_on_root_main() {
@@ -430,11 +443,13 @@ print_final_state() {
 
 ensure_not_running_from_main
 ensure_root_main_policy
+ensure_root_main_clean_before_closeout
 run_checks
 create_follow_ups
 auto_commit_task_worktree_if_safe
 task_head="$(git rev-parse HEAD)"
 "$script_dir/beads-finish" "$issue_id" "$notes"
+cleanup_root_main_metadata_mirror
 land_on_root_main
 sync_beads_metadata_branch
 

@@ -27,6 +27,9 @@ fi
 
 worktree_path="worktrees/$issue_id"
 gitignore_path=".gitignore"
+worktree_beads_path="$worktree_path/.beads"
+worktree_redirect_path="$worktree_beads_path/redirect"
+repo_beads_redirect="../../.beads"
 
 bd_cmd() {
   bd --no-daemon "$@"
@@ -55,6 +58,11 @@ cleanup_gitignore_entry() {
     printf '%s\n' "$line" >>"$tmp_file"
   done <"$gitignore_path"
   mv "$tmp_file" "$gitignore_path"
+}
+
+repair_beads_redirect() {
+  mkdir -p "$worktree_beads_path"
+  printf "%s\n" "$repo_beads_redirect" >"$worktree_redirect_path"
 }
 
 warn_if_checkout_dirty() {
@@ -92,6 +100,8 @@ else
   bd_cmd worktree create "$worktree_path" --branch "$branch"
   cleanup_gitignore_entry "$worktree_path/"
 fi
+
+repair_beads_redirect
 
 echo "Issue: $issue_id"
 echo "Branch: $branch"

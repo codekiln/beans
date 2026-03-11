@@ -20,22 +20,23 @@ The helper is intentionally automation-friendly. Work is not considered landed u
 2. Otherwise runs the repo default validation commands when configured. In Beans, the defaults are `npm run check:beads-start` and `npm run build`.
 3. If `--no-checks` is passed, skips validation for that one landing.
 4. Creates any requested follow-up Beads issues before closeout.
-5. If the task worktree has tracked edits, auto-commits them with a checkpoint commit before closeout.
+5. If the task worktree has tracked or untracked repo edits, auto-commits them with a checkpoint commit before closeout.
 6. Verifies that the checkpoint commit actually advanced `HEAD` and left the task worktree clean before closeout continues.
-7. If the task worktree is ambiguous (for example because of untracked files or unresolved merges), fails before closeout.
+7. If the task worktree is ambiguous because of unresolved merges, fails before closeout.
 8. Runs `dev/beads-finish <issue-id> ["notes"]`.
-9. Verifies the root `main` checkout is clean before changing it. Dirty `worktrees/my/main` does not block landing.
+9. Verifies the root `main` checkout is clean before closeout starts. Dirty `worktrees/my/main` does not block landing.
 10. Updates root `main` from `origin/main` with `git pull --ff-only origin main`.
 11. Merges the current task branch into root `main`, and if that merge conflicts, fails with the unresolved file list.
 12. Pushes `main` to `origin`.
-13. Commits and pushes `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch when closeout dirties that worktree.
-14. Prunes closed-task Beads worktrees with `dev/beads-prune-closed-worktrees`, including the task worktree that just landed, and fails if that worktree still exists afterward.
-15. Verifies the landed task commit is now reachable from root `main`.
-16. Verifies the task worktree has been pruned, root `main` plus `beads-sync` both end clean, and that root `main` plus `beads-sync` are synced with origin.
-17. Reports the landed SHAs for the task branch, root `main`, and `beads-sync`.
-18. Lists untracked files and stashes for cleanup review.
-19. Shows `bd --no-daemon ready`.
-20. Emits a next-session prompt built from the best ready issue, preferring ready task/bug work, then lower priority number, then current ready order.
+13. Restores the root checkout's local `.beads/issues.jsonl` mirror if `dev/beads-finish` dirtied it during closeout.
+14. Commits and pushes `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch when closeout dirties that worktree.
+15. Prunes closed-task Beads worktrees with `dev/beads-prune-closed-worktrees`, including the task worktree that just landed, and fails if that worktree still exists afterward.
+16. Verifies the landed task commit is now reachable from root `main`.
+17. Verifies the task worktree has been pruned, root `main` plus `beads-sync` both end clean, and that root `main` plus `beads-sync` are synced with origin.
+18. Reports the landed SHAs for the task branch, root `main`, and `beads-sync`.
+19. Lists untracked files and stashes for cleanup review.
+20. Shows `bd --no-daemon ready`.
+21. Emits a next-session prompt built from the best ready issue, preferring ready task/bug work, then lower priority number, then current ready order.
 
 ## Defaults and overrides
 

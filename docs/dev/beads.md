@@ -4,17 +4,18 @@ This repo uses Beads (`bd`) for git-native issue tracking. Issues live in the re
 
 ## Source of truth workflow
 
-Treat product code and Beads metadata as related but different artifacts with different durable homes:
+Treat product code and Beads metadata as related but different artifacts with different authoritative homes:
 
-- Product code source of truth: the task branch and task worktree where you make code changes, usually `codex/<issue-id>` in `worktrees/beans-<issue-id>`, then `main` after landing.
-- Beads metadata source of truth while editing: the shared `.beads/beads.db` store that all Beads-managed worktrees in this clone use.
-- Beads metadata durable git source of truth: `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch after this repo's export flow writes the latest DB state there.
+- Product code authoritative branch: the task branch and task worktree where you make code changes, usually `codex/<issue-id>` in `worktrees/beans-<issue-id>`, then `main` after landing.
+- Beads metadata authoritative working store: the shared `.beads/beads.db` database that all Beads-managed worktrees in this clone use while issues are being edited.
+- Beads metadata authoritative tracked export: `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch after this repo's export flow writes the latest DB state there.
+- Checkout-local mirror files: each checkout's `.beads/issues.jsonl` reflects local working state for that checkout and may change during Beads commands even when no authoritative export commit has happened yet.
 
 Commit intent follows that split:
 
 - Commit product code changes on the task branch worktree.
-- Let the Beads sync flow write durable metadata to the `beads-sync` worktree and branch.
-- Do not treat the task worktree's `.beads/issues.jsonl` as the durable export target.
+- Let the Beads sync flow write the authoritative tracked metadata export to the `beads-sync` worktree and branch.
+- Do not treat the task worktree's `.beads/issues.jsonl` as the authoritative export target.
 - Do not move product code onto `beads-sync` or use `beads-sync` as the review or landing branch for site changes.
 
 ## Durable metadata rule
@@ -40,8 +41,8 @@ curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/insta
 ## Where data lives
 
 - `.beads/beads.db` is the runtime issue database that `bd show`, `bd list`, and other CRUD commands read from in this repo.
-- `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` is the durable sync artifact for the `beads-sync` branch workflow used here.
-- The current checkout's `.beads/issues.jsonl` can lag behind the sync branch copy, so do not treat it as proof that a DB mutation has been exported.
+- `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` is the authoritative tracked export for the `beads-sync` branch workflow used here.
+- The current checkout's `.beads/issues.jsonl` is only a checkout-local mirror, so do not treat it as proof that a DB mutation has been exported.
 - `.beads/config.yaml` stores repo-level Beads config.
 - Local SQLite/daemon files live under `.beads/` and are gitignored.
 
@@ -102,7 +103,7 @@ Fast-start helper:
 dev/beads-start <issue-id>
 ```
 
-This helper runs Beads startup steps in one command: claim issue, ensure worktree, and select branch.
+This helper runs Beads startup steps in one command: claim issue, ensure worktree, repair the repo-local `.beads` redirect when needed, and select branch.
 It forces direct mode via `bd --no-daemon` because this repo has reproduced daemon-path hangs in local and worktree sessions.
 It also removes the redundant per-worktree `.gitignore` entry that some `bd worktree create` versions append even though the repo already has a wildcard ignore rule.
 It warns if the source checkout is already dirty and creates `codex/<issue-id>` first when the installed `bd` expects `--branch` to reference an existing branch.
@@ -123,7 +124,7 @@ Finish helper:
 dev/beads-finish <issue-id> ["notes"]
 ```
 
-This helper standardizes the close/sync path: show issue, optionally add notes, close it, run `bd --no-daemon sync --check`, show `git status --short`, export the shared DB into `.git/beads-worktrees/beads-sync/.beads/issues.jsonl`, and fail if the issue is still missing from `beads-sync/.beads/issues.jsonl`.
+This helper standardizes the close/sync path: show issue, optionally add notes, close it, run `bd --no-daemon sync --check`, show `git status --short`, export the shared DB into `.git/beads-worktrees/beads-sync/.beads/issues.jsonl`, and fail if the issue is still missing from the authoritative tracked export in `beads-sync/.beads/issues.jsonl`.
 
 Concrete metadata sync sequence:
 
@@ -157,7 +158,7 @@ Successful closeout for a Beads-managed task means all of the following are true
 - `beads-sync` is clean and synced with `origin/beads-sync`
 - no closed-task Beads worktree remains under `worktrees/`
 
-`dev/land-the-plane` treats the root checkout as the integration target. It fails if the root `main` checkout is dirty, ignores unrelated dirt in worktrees such as `worktrees/my/main`, auto-commits tracked task-worktree changes when safe, commits and pushes `beads-sync` metadata when closeout dirties that worktree, prunes closed-task Beads worktrees before declaring success, and fails if the task worktree is ambiguous (for example because of untracked files or merge conflicts).
+`dev/land-the-plane` treats the root checkout as the integration target. It fails if the root `main` checkout starts dirty, ignores unrelated dirt in worktrees such as `worktrees/my/main`, auto-commits tracked or untracked task-worktree changes when safe, restores the root checkout's local `.beads/issues.jsonl` mirror after `dev/beads-finish`, commits and pushes the authoritative `beads-sync` export when closeout dirties that worktree, prunes closed-task Beads worktrees before declaring success, and fails if the task worktree is ambiguous because of merge conflicts.
 
 ## Quick start (this repo)
 
