@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { siteNavigation } from "../data/siteNavigation";
 import { withBase } from "../utils/paths";
 
 const {
@@ -14,6 +15,21 @@ const initialLog = initialCommand.startsWith(beanPrefix)
   ? initialCommand.slice(beanPrefix.length).trim()
   : initialCommand;
 const resolvedLinkHref = initialLinkHref ?? withBase(Astro.url.pathname);
+const currentPath = Astro.url.pathname;
+const normalizedPath = currentPath === "/" ? "/" : currentPath.endsWith("/") ? currentPath : `${currentPath}/`;
+const navItems = siteNavigation.map((item) => {
+  const href = withBase(item.href);
+  const matchPrefix = withBase(item.matchPrefix ?? item.href);
+  const isActive =
+    normalizedPath === href ||
+    (matchPrefix !== "/" && normalizedPath.startsWith(matchPrefix));
+
+  return {
+    ...item,
+    href,
+    isActive
+  };
+});
 ---
 <!doctype html>
 <html lang="en" data-theme="auto">
@@ -45,12 +61,60 @@ const resolvedLinkHref = initialLinkHref ?? withBase(Astro.url.pathname);
     <header class="cli-float">
       <div class="cli-command-group" aria-label="Beans command">
         <a class="cli-command" data-cli-home href={withBase("/")}>$ bean</a>
-        <a class="cli-command" data-cli-link href={resolvedLinkHref}>{initialLog}</a>
+        <a class="cli-command cli-command-current" data-cli-link href={resolvedLinkHref}>
+          {initialLog}
+        </a>
       </div>
-      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme">
-        <span aria-hidden="true">🫘</span>
-        <span class="theme-toggle-text sr-only">Theme</span>
-      </button>
+      <div class="command-menu" data-command-menu>
+        <button
+          class="command-trigger"
+          type="button"
+          data-command-trigger
+          aria-expanded="false"
+          aria-controls="command-drawer"
+          aria-label="Open command menu"
+        >
+          <span aria-hidden="true">🫘&gt;</span>
+        </button>
+        <div
+          id="command-drawer"
+          class="command-drawer"
+          data-command-drawer
+          hidden
+        >
+          <p class="command-drawer-current">
+            <span class="command-drawer-label">current:</span>
+            <span data-command-current>{`bean ${initialLog}`}</span>
+          </p>
+          <nav class="command-drawer-nav" aria-label="Site sections">
+            <ul class="command-drawer-list">
+              {navItems.map((item) => (
+                <li>
+                  <a
+                    class:list={["command-drawer-link", item.isActive && "is-active"]}
+                    href={item.href}
+                    data-command-link
+                    aria-current={item.isActive ? "page" : undefined}
+                  >
+                    <span class="command-drawer-prefix" aria-hidden="true">$</span>
+                    <span>{item.command}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div class="command-drawer-divider" aria-hidden="true"></div>
+          <button
+            class="theme-toggle theme-toggle-menu"
+            type="button"
+            data-theme-toggle
+            aria-label="Toggle theme"
+          >
+            <span class="command-drawer-prefix" aria-hidden="true">$</span>
+            <span data-theme-toggle-label>theme: light</span>
+          </button>
+        </div>
+      </div>
     </header>
     <main id="main" class="page-shell">
       <slot />
@@ -62,6 +126,10 @@ const resolvedLinkHref = initialLinkHref ?? withBase(Astro.url.pathname);
       const root = document.documentElement;
       const storedTheme = localStorage.getItem("beans-theme");
       const media = window.matchMedia("(prefers-color-scheme: dark)");
+      const menu = document.querySelector("[data-command-menu]");
+      const trigger = menu?.querySelector("[data-command-trigger]");
+      const drawer = menu?.querySelector("[data-command-drawer]");
+      const drawerCurrent = menu?.querySelector("[data-command-current]");
       const applyTheme = (value) => {
         root.dataset.theme = value;
       };
@@ -71,11 +139,11 @@ const resolvedLinkHref = initialLinkHref ?? withBase(Astro.url.pathname);
         applyTheme(media.matches ? "dark" : "light");
       }
       const toggle = document.querySelector("[data-theme-toggle]");
-      const toggleText = document.querySelector(".theme-toggle-text");
+      const toggleText = document.querySelector("[data-theme-toggle-label]");
       if (toggle) {
         const updateLabel = () => {
           if (toggleText) {
-            toggleText.textContent = root.dataset.theme === "dark" ? "Dark" : "Light";
+            toggleText.textContent = `theme: ${root.dataset.theme === "dark" ? "dark" : "light"}`;
           }
         };
         updateLabel();
@@ -84,6 +152,69 @@ const resolvedLinkHref = initialLinkHref ?? withBase(Astro.url.pathname);
           applyTheme(next);
           localStorage.setItem("beans-theme", next);
           updateLabel();
+        });
+      }
+      if (trigger && drawer) {
+        let previousFocus = null;
+        const getFocusable = () =>
+          [...drawer.querySelectorAll("a[href], button:not([disabled])")].filter(
+            (element) => !element.hasAttribute("hidden")
+          );
+        const openMenu = () => {
+          previousFocus = document.activeElement;
+          drawer.hidden = false;
+          trigger.setAttribute("aria-expanded", "true");
+          trigger.setAttribute("aria-label", "Close command menu");
+          const focusTarget = drawer.querySelector("[aria-current='page']") ?? getFocusable()[0];
+          focusTarget?.focus();
+        };
+        const closeMenu = () => {
+          drawer.hidden = true;
+          trigger.setAttribute("aria-expanded", "false");
+          trigger.setAttribute("aria-label", "Open command menu");
+          if (previousFocus instanceof HTMLElement) {
+            previousFocus.focus();
+          }
+        };
+        trigger.addEventListener("click", () => {
+          if (drawer.hidden) {
+            openMenu();
+          } else {
+            closeMenu();
+          }
+        });
+        drawer.addEventListener("click", (event) => {
+          const target = event.target;
+          if (target instanceof HTMLElement && target.closest("[data-command-link]")) {
+            closeMenu();
+          }
+        });
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && !drawer.hidden) {
+            event.preventDefault();
+            closeMenu();
+            return;
+          }
+          if (event.key === "Tab" && !drawer.hidden) {
+            const focusable = getFocusable();
+            if (!focusable.length) {
+              return;
+            }
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+              event.preventDefault();
+              last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+              event.preventDefault();
+              first.focus();
+            }
+          }
+        });
+        document.addEventListener("pointerdown", (event) => {
+          if (!drawer.hidden && event.target instanceof Node && !menu.contains(event.target)) {
+            closeMenu();
+          }
         });
       }
       const commandLink = document.querySelector("[data-cli-link]");
@@ -98,6 +229,9 @@ const resolvedLinkHref = initialLinkHref ?? withBase(Astro.url.pathname);
               const { cliLog, cliHref } = visible[0].target.dataset;
               if (cliLog) {
                 commandLink.textContent = cliLog;
+                if (drawerCurrent) {
+                  drawerCurrent.textContent = `bean ${cliLog}`;
+                }
               }
               if (cliHref) {
                 commandLink.href = cliHref;
