@@ -75,6 +75,7 @@ In short, the current implementation has no real responsive navigation state. It
 ## Handoff for follow-on tasks
 
 - `beans-zpt.2` should propose a single navigation model that works globally, not just a prettier `home-nav` wrap.
+- Recommended proposal: see `docs/dev/header-navigation-directions.md`.
 - `beans-zpt.3` will likely need to:
   - extract shared navigation data
   - introduce a dedicated header/menu component
