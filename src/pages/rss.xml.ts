@@ -1,6 +1,6 @@
 import rss from "@astrojs/rss";
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
-import { getBeanRouteInfoMap, getBeans } from "../data/beans";
+import { extractInlineCompanionComments, getBeanRouteInfoMap, getBeans } from "../data/beans";
 import { getCompanionBySlug, getCompanionPath } from "../data/companions";
 import { withBase } from "../utils/paths";
 
@@ -33,6 +33,13 @@ const companionBlockquoteStyle = [
   "padding:0 0 0 0.9em",
   "border-left:3px solid #8c6b3c"
 ].join(";");
+const inlineCommentStyle = [
+  "margin:0.85em 0",
+  "padding:0.65em 0.85em",
+  "border-left:3px solid #8c6b3c",
+  "background:#faf6ed",
+  "color:#2b2118"
+].join(";");
 const renderBuddyComment = async (entry: BeanEntry, site: URL) => {
   if (!entry.data.personaComment) {
     return "";
@@ -60,6 +67,41 @@ const renderBuddyComment = async (entry: BeanEntry, site: URL) => {
   ].join("");
 };
 
+const renderInlineCompanionComment = async (
+  companionSlug: string,
+  commentBody: string,
+  site: URL
+) => {
+  const companion = await getCompanionBySlug(companionSlug);
+  const name = companion?.data.name ?? companionSlug;
+  const companionLink = companion
+    ? new URL(withBase(getCompanionPath(companion.slug)), site).toString()
+    : null;
+  const attribution = companionLink
+    ? `<a href="${companionLink}">${escapeHtml(name)}</a>`
+    : escapeHtml(name);
+  return [
+    `<blockquote style="${inlineCommentStyle}">`,
+    `<p style="margin:0;font-style:italic;">${escapeHtml(commentBody)}</p>`,
+    `<footer style="margin-top:0.45em;font-size:0.88em;color:#6b4b36;">-- ${attribution}</footer>`,
+    "</blockquote>"
+  ].join("");
+};
+
+const transformInlineComments = async (body: string, site: URL) => {
+  const comments = extractInlineCompanionComments(body);
+  let result = body;
+  for (const comment of comments) {
+    const rendered = await renderInlineCompanionComment(comment.companion, comment.body, site);
+    const pattern = new RegExp(
+      `<CompanionComment\\s+from=["']${comment.companion}["']\\s*>${comment.body.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}</CompanionComment>`,
+      "g"
+    );
+    result = result.replace(pattern, rendered);
+  }
+  return result;
+};
+
 export const GET = async () => {
   const markdown = await createMarkdownProcessor();
   const beans = await getBeans();
@@ -72,7 +114,8 @@ export const GET = async () => {
     description: "A coffee log and knowledge garden.",
     site,
     items: await Promise.all(sortedBeans.map(async (entry) => {
-      const content = (await markdown.render(entry.body)).code;
+      const bodyWithInlineComments = await transformInlineComments(entry.body, site);
+      const content = (await markdown.render(bodyWithInlineComments)).code;
 
       return {
         title: entry.data.title,

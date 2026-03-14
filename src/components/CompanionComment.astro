@@ -1,0 +1,93 @@
+---
+/**
+ * Inline companion comment component for use in MDX bean entries.
+ * Usage: <CompanionComment from="unicorn">bed of crystalline flowers</CompanionComment>
+ *
+ * Renders as a styled blockquote with a link to the companion page.
+ * Companion backreferences are tracked via getBeansWithInlineCompanionComments().
+ */
+import { getCompanionBySlug, getCompanionPath } from "../data/companions";
+import { withBase } from "../utils/paths";
+
+interface Props {
+  from: string;
+}
+
+const { from } = Astro.props;
+const companion = await getCompanionBySlug(from);
+const companionName = companion?.data.name ?? from;
+const companionHref = companion ? withBase(getCompanionPath(companion.slug)) : null;
+---
+<blockquote class="companion-comment">
+  <p class="companion-comment-body"><slot /></p>
+  <footer class="companion-comment-attribution">
+    <span aria-hidden="true">--</span>
+    {companionHref ? (
+      <a href={companionHref}>{companionName}</a>
+    ) : (
+      <span>{companionName}</span>
+    )}
+  </footer>
+</blockquote>
+
+<style>
+  .companion-comment {
+    margin: 0.85em 0;
+    padding: 0.65em 0.85em;
+    border-left: 3px solid #8c6b3c;
+    background: linear-gradient(90deg, #faf6ed 0%, transparent 100%);
+    color: #2b2118;
+  }
+
+  .companion-comment-body {
+    margin: 0;
+    font-style: italic;
+    white-space: pre-line;
+  }
+
+  .companion-comment-attribution {
+    margin-top: 0.45em;
+    font-size: 0.88em;
+    color: #6b4b36;
+  }
+
+  .companion-comment-attribution a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: #c89448;
+  }
+
+  .companion-comment-attribution a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-comment {
+    border-color: #c18b53;
+    background: linear-gradient(90deg, rgba(62, 38, 25, 0.5) 0%, transparent 100%);
+    color: #f4e6cf;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-comment-attribution {
+    color: #d7b48a;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-comment-attribution a {
+    text-decoration-color: #8e6439;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root[data-theme="auto"]) .companion-comment {
+      border-color: #c18b53;
+      background: linear-gradient(90deg, rgba(62, 38, 25, 0.5) 0%, transparent 100%);
+      color: #f4e6cf;
+    }
+
+    :global(:root[data-theme="auto"]) .companion-comment-attribution {
+      color: #d7b48a;
+    }
+
+    :global(:root[data-theme="auto"]) .companion-comment-attribution a {
+      text-decoration-color: #8e6439;
+    }
+  }
+</style>

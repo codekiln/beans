@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getBeanRouteInfoMap, getBeans } from "../../data/beans";
+import { getBeanRouteInfoMap, getBeans, getBeansForCompanion } from "../../data/beans";
 import {
   getCompanionBySlug,
   getCompanionPath,
@@ -21,10 +21,7 @@ const NotesContent = renderResult?.Content;
 const allBeans = await getBeans();
 const beanRouteInfo = getBeanRouteInfoMap(allBeans);
 const companionBeans = companion
-  ? allBeans.filter((bean) =>
-      bean.data.personaComment &&
-      bean.data.personaComment.companion === companion.slug
-    )
+  ? getBeansForCompanion(allBeans, companion.slug)
   : [];
 const portrait = companion ? getCompanionPortrait(companion.data) : null;
 const initialCommand = `companion ${companion?.slug ?? ""}`.trim();
