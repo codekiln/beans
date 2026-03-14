@@ -2,6 +2,9 @@
 name: "sproglo"
 title: "'spresso glo"
 summary: "musician, coffee nerd, traveler, mycological alchemist"
+portrait:
+  src: "/images/2026-03-14-sat-0740-cup1-sproglo-finca.jpg"
+  alt: "handwritten brew notes from march 14 with sproglo visiting for the first finca cup."
 order: 2
 ---
 
