@@ -305,7 +305,6 @@ land_on_root_main() {
     exit 1
   fi
 
-  git -C "$repo_root" push origin main
 }
 
 sync_beads_metadata_branch() {
@@ -452,6 +451,7 @@ task_head="$(git rev-parse HEAD)"
 cleanup_root_main_metadata_mirror
 land_on_root_main
 sync_beads_metadata_branch
+git -C "$repo_root" push origin main
 
 print_section "Task worktree review:"
 git status --short --branch

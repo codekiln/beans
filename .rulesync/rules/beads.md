@@ -115,6 +115,7 @@ dev/beads-start <issue-id>
 
 This helper runs Beads startup steps in one command: claim issue, ensure worktree, repair the repo-local `.beads` redirect when needed, and select branch.
 It forces direct mode via `bd --no-daemon` because this repo has reproduced daemon-path hangs in local and worktree sessions.
+It refreshes the shared git hooks and installs the repo-owned `main` push guard so merged `codex/beans-*` task branches cannot be pushed to `main` while their Beads issue is still open or their `beads-sync` export is unsynced.
 It also removes the redundant per-worktree `.gitignore` entry that some `bd worktree create` versions append even though the repo already has a wildcard ignore rule.
 It warns if the source checkout is already dirty and creates `codex/<issue-id>` first when the installed `bd` expects `--branch` to reference an existing branch.
 
@@ -168,7 +169,7 @@ Successful closeout for a Beads-managed task means all of the following are true
 - `beads-sync` is clean and synced with `origin/beads-sync`
 - no closed-task Beads worktree remains under `worktrees/`
 
-`dev/land-the-plane` treats the root checkout as the integration target. It fails if the root `main` checkout starts dirty, ignores unrelated dirt in worktrees such as `worktrees/my/main`, auto-commits tracked or untracked task-worktree changes when safe, restores the root checkout's local `.beads/issues.jsonl` mirror after `dev/beads-finish`, commits and pushes the authoritative `beads-sync` export when closeout dirties that worktree, prunes closed-task Beads worktrees before declaring success, and fails if the task worktree is ambiguous because of merge conflicts.
+`dev/land-the-plane` treats the root checkout as the integration target. It fails if the root `main` checkout starts dirty, ignores unrelated dirt in worktrees such as `worktrees/my/main`, auto-commits tracked or untracked task-worktree changes when safe, restores the root checkout's local `.beads/issues.jsonl` mirror after `dev/beads-finish`, commits and pushes the authoritative `beads-sync` export before pushing `main`, prunes closed-task Beads worktrees before declaring success, and fails if the task worktree is ambiguous because of merge conflicts.
 
 Humans can override the defaults with explicit flags. See `docs/dev/land-the-plane.md`.
 
