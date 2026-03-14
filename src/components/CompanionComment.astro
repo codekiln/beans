@@ -6,7 +6,7 @@
  * Renders as a styled blockquote with a link to the companion page.
  * Companion backreferences are tracked via getBeansWithInlineCompanionComments().
  */
-import { getCompanionBySlug, getCompanionPath } from "../data/companions";
+import { getCompanionBySlug, getCompanionPath, getCompanionPortrait } from "../data/companions";
 import { withBase } from "../utils/paths";
 
 interface Props {
@@ -17,26 +17,91 @@ const { from } = Astro.props;
 const companion = await getCompanionBySlug(from);
 const companionName = companion?.data.name ?? from;
 const companionHref = companion ? withBase(getCompanionPath(companion.slug)) : null;
+const portrait = companion ? getCompanionPortrait(companion.data) : null;
 ---
 <blockquote class="companion-comment">
-  <p class="companion-comment-body"><slot /></p>
-  <footer class="companion-comment-attribution">
-    <span aria-hidden="true">--</span>
-    {companionHref ? (
-      <a href={companionHref}>{companionName}</a>
-    ) : (
-      <span>{companionName}</span>
-    )}
-  </footer>
+  {portrait && (
+    <div class="companion-comment-portrait" aria-hidden="true">
+      <img
+        data-companion-portrait
+        data-light-src={withBase(portrait.src)}
+        data-dark-src={withBase(portrait.darkSrc ?? portrait.src)}
+        src={withBase(portrait.src)}
+        alt=""
+        loading="lazy"
+      />
+    </div>
+  )}
+  <div class="companion-comment-content">
+    <p class="companion-comment-body"><slot /></p>
+    <footer class="companion-comment-attribution">
+      <span aria-hidden="true">--</span>
+      {companionHref ? (
+        <a href={companionHref}>{companionName}</a>
+      ) : (
+        <span>{companionName}</span>
+      )}
+    </footer>
+  </div>
 </blockquote>
+
+<script is:inline>
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const applyCompanionPortrait = () => {
+    const theme = document.documentElement.dataset.theme ?? "auto";
+    const useDark = theme === "dark" || (theme === "auto" && prefersDark.matches);
+    document.querySelectorAll("[data-companion-portrait]").forEach((img) => {
+      const lightSrc = img.getAttribute("data-light-src");
+      const darkSrc = img.getAttribute("data-dark-src");
+      if (!lightSrc || !darkSrc) return;
+      const nextSrc = useDark ? darkSrc : lightSrc;
+      if (img.getAttribute("src") !== nextSrc) {
+        img.setAttribute("src", nextSrc);
+      }
+    });
+  };
+
+  applyCompanionPortrait();
+  new MutationObserver(applyCompanionPortrait).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"]
+  });
+  prefersDark.addEventListener("change", applyCompanionPortrait);
+</script>
 
 <style>
   .companion-comment {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 0.65em;
+    align-items: start;
     margin: 0.85em 0;
     padding: 0.65em 0.85em;
     border-left: 3px solid #8c6b3c;
     background: linear-gradient(90deg, #faf6ed 0%, transparent 100%);
     color: #2b2118;
+  }
+
+  .companion-comment-portrait {
+    width: 48px;
+    height: 48px;
+    padding: 3px;
+    border: 2px solid #432914;
+    background: linear-gradient(180deg, #7f5231 0%, #5e3b24 100%);
+    box-shadow: inset 0 0 0 1px #d4a160;
+    overflow: hidden;
+  }
+
+  .companion-comment-portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: pixelated;
+  }
+
+  .companion-comment-content {
+    min-width: 0;
   }
 
   .companion-comment-body {
@@ -67,6 +132,12 @@ const companionHref = companion ? withBase(getCompanionPath(companion.slug)) : n
     color: #f4e6cf;
   }
 
+  :global(:root[data-theme="dark"]) .companion-comment-portrait {
+    border-color: #c18b53;
+    background: linear-gradient(180deg, #3e2619 0%, #2c1a13 100%);
+    box-shadow: inset 0 0 0 1px #8e6439;
+  }
+
   :global(:root[data-theme="dark"]) .companion-comment-attribution {
     color: #d7b48a;
   }
@@ -80,6 +151,12 @@ const companionHref = companion ? withBase(getCompanionPath(companion.slug)) : n
       border-color: #c18b53;
       background: linear-gradient(90deg, rgba(62, 38, 25, 0.5) 0%, transparent 100%);
       color: #f4e6cf;
+    }
+
+    :global(:root[data-theme="auto"]) .companion-comment-portrait {
+      border-color: #c18b53;
+      background: linear-gradient(180deg, #3e2619 0%, #2c1a13 100%);
+      box-shadow: inset 0 0 0 1px #8e6439;
     }
 
     :global(:root[data-theme="auto"]) .companion-comment-attribution {
