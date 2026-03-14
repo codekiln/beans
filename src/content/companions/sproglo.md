@@ -1,10 +1,11 @@
 ---
 name: "sproglo"
 title: "'spresso glo"
-summary: "musician, coffee nerd, traveler, mycological alchemist"
+summary: "musician, lever-shot pilgrim, traveler, mycological alchemist"
 portrait:
-  src: "/images/2026-03-14-sat-0740-cup1-sproglo-finca.jpg"
-  alt: "handwritten brew notes from march 14 with sproglo visiting for the first finca cup."
+  src: "/images/sproglo-portrait.png"
+  darkSrc: "/images/sproglo-portrait-dark.png"
+  alt: "Pixel portrait of Sproglo holding a demitasse in a mushroom grove, with day and night variants."
 order: 2
 ---
 
