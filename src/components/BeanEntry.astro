@@ -67,14 +67,24 @@ const gearItems = [
   bean.data.brew.brewer && {
     label: "brewer",
     value: bean.data.brew.brewer.name,
-    slug: bean.data.brew.brewer.slug
+    slug: bean.data.brew.brewer.slug,
+    href: withBase(`/equipment/${bean.data.brew.brewer.slug}/`)
   },
   bean.data.brewDetails.grinder && {
     label: "grinder",
     value: bean.data.brewDetails.grinder.name,
-    slug: bean.data.brewDetails.grinder.slug
+    slug: bean.data.brewDetails.grinder.slug,
+    href: withBase(`/equipment/${bean.data.brewDetails.grinder.slug}/`)
   },
-  ...(bean.data.gear ?? [])
+  ...(bean.data.gear ?? []).map((item) => ({
+    ...item,
+    href:
+      item.label.toLowerCase() === "companion" && item.slug
+        ? withBase(`/companion/${item.slug}/`)
+        : item.slug
+          ? withBase(`/equipment/${item.slug}/`)
+          : undefined
+  }))
 ].filter(Boolean);
 ---
 <article
@@ -169,8 +179,8 @@ const gearItems = [
             {gearItems.map((item) => (
               <li>
                 {item.label}:{" "}
-                {item.slug ? (
-                  <a href={withBase(`/equipment/${item.slug}/`)}>{item.value}</a>
+                {item.href ? (
+                  <a href={item.href}>{item.value}</a>
                 ) : (
                   item.value
                 )}
