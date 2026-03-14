@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCompanions, getCompanionPath } from "../../data/companions";
+import { getCompanions, getCompanionPath, getCompanionPortrait } from "../../data/companions";
 import { withBase } from "../../utils/paths";
 
 const companions = await getCompanions();
@@ -27,30 +27,33 @@ const initialLinkHref = withBase("/companion/");
   </section>
   <section class="window">
     {companions.length ? (
-      <ul class="table-list companion-list">
-        {companions.map((companion) => (
-          <li class="companion-item">
-            <figure class="companion-portrait">
-              <img
-                data-companion-portrait
-                data-light-src={withBase(companion.data.portrait.src)}
-                data-dark-src={withBase(companion.data.portrait.darkSrc ?? companion.data.portrait.src)}
-                src={withBase(companion.data.portrait.src)}
-                alt={companion.data.portrait.alt}
-                loading="lazy"
-              />
-            </figure>
-            <div class="companion-copy">
-              <p class="companion-name">
-                <a href={withBase(getCompanionPath(companion.slug))}>{companion.data.name}</a>
-              </p>
-              <p class="companion-summary">
-                <strong>{companion.data.title}</strong>
-                {" "}· {companion.data.summary}
-              </p>
-            </div>
-          </li>
-        ))}
+        <ul class="table-list companion-list">
+        {companions.map((companion) => {
+          const portrait = getCompanionPortrait(companion.data);
+          return (
+            <li class="companion-item">
+              <figure class="companion-portrait">
+                <img
+                  data-companion-portrait
+                  data-light-src={withBase(portrait.src)}
+                  data-dark-src={withBase(portrait.darkSrc ?? portrait.src)}
+                  src={withBase(portrait.src)}
+                  alt={portrait.alt}
+                  loading="lazy"
+                />
+              </figure>
+              <div class="companion-copy">
+                <p class="companion-name">
+                  <a href={withBase(getCompanionPath(companion.slug))}>{companion.data.name}</a>
+                </p>
+                <p class="companion-summary">
+                  <strong>{companion.data.title}</strong>
+                  {" "}· {companion.data.summary}
+                </p>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     ) : (
       <p>No companions cataloged yet.</p>

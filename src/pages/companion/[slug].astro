@@ -1,7 +1,12 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getBeanRouteInfoMap, getBeans } from "../../data/beans";
-import { getCompanionBySlug, getCompanionPath, getCompanions } from "../../data/companions";
+import {
+  getCompanionBySlug,
+  getCompanionPath,
+  getCompanionPortrait,
+  getCompanions
+} from "../../data/companions";
 import { withBase } from "../../utils/paths";
 
 export async function getStaticPaths() {
@@ -21,6 +26,7 @@ const companionBeans = companion
       bean.data.personaComment.companion === companion.slug
     )
   : [];
+const portrait = companion ? getCompanionPortrait(companion.data) : null;
 const initialCommand = `companion ${companion?.slug ?? ""}`.trim();
 const initialLinkHref = withBase(getCompanionPath(companion?.slug ?? ""));
 ---
@@ -34,13 +40,13 @@ const initialLinkHref = withBase(getCompanionPath(companion?.slug ?? ""));
     <div class="window companion-hero">
       <div class="companion-hero-grid">
         <figure class="companion-portrait">
-          {companion?.data.portrait && (
+          {portrait && (
             <img
               data-companion-portrait
-              data-light-src={withBase(companion.data.portrait.src)}
-              data-dark-src={withBase(companion.data.portrait.darkSrc ?? companion.data.portrait.src)}
-              src={withBase(companion.data.portrait.src)}
-              alt={companion.data.portrait.alt}
+              data-light-src={withBase(portrait.src)}
+              data-dark-src={withBase(portrait.darkSrc ?? portrait.src)}
+              src={withBase(portrait.src)}
+              alt={portrait.alt}
               loading="lazy"
             />
           )}
@@ -55,7 +61,7 @@ const initialLinkHref = withBase(getCompanionPath(companion?.slug ?? ""));
 
     {NotesContent ? (
       <div class="window companion-notes">
-        <h2>Lore</h2>
+        <h2>Field Notes</h2>
         <div class="markdown">
           <NotesContent />
         </div>

@@ -87,11 +87,13 @@ const companions = defineCollection({
     name: z.string(),
     title: z.string(),
     summary: z.string(),
-    portrait: z.object({
-      src: z.string(),
-      darkSrc: z.string().optional(),
-      alt: z.string()
-    }),
+    portrait: z
+      .object({
+        src: z.string(),
+        darkSrc: z.string().optional(),
+        alt: z.string()
+      })
+      .optional(),
     order: z.number()
   })
 });

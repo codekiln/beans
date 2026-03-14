@@ -1,6 +1,6 @@
 ---
 import type { CompanionEntry } from "../data/companions";
-import { getCompanionPath } from "../data/companions";
+import { getCompanionPath, getCompanionPortrait } from "../data/companions";
 import { withBase } from "../utils/paths";
 
 type BuddyComment = {
@@ -15,7 +15,7 @@ interface Props {
 const { comment, companion } = Astro.props as Props;
 const titleId = `buddy-comment-${Math.random().toString(36).slice(2, 10)}`;
 const companionHref = companion ? withBase(getCompanionPath(companion.slug)) : null;
-const portrait = companion?.data.portrait;
+const portrait = companion ? getCompanionPortrait(companion.data) : null;
 const companionName = companion?.data.name ?? "Virtual companion";
 const companionTitle = companion?.data.title;
 ---

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Companion placeholder portrait dark</title>
+  <desc id="desc">A pixel-style placeholder pattern for companions without custom art, in dark mode colors.</desc>
+  <rect width="96" height="96" fill="#130f10"/>
+  <rect x="8" y="8" width="80" height="80" fill="#241a19" stroke="#b7834d" stroke-width="4"/>
+  <rect x="16" y="16" width="64" height="64" fill="#5f3f27"/>
+  <rect x="24" y="24" width="48" height="48" fill="#2a1b18"/>
+  <rect x="32" y="20" width="8" height="8" fill="#ffd8a2"/>
+  <rect x="56" y="20" width="8" height="8" fill="#ffd8a2"/>
+  <rect x="20" y="32" width="8" height="8" fill="#ffd8a2"/>
+  <rect x="68" y="32" width="8" height="8" fill="#ffd8a2"/>
+  <rect x="36" y="36" width="24" height="24" fill="#c89a63"/>
+  <rect x="40" y="40" width="16" height="16" fill="#120d0d"/>
+  <rect x="28" y="68" width="40" height="4" fill="#ffd8a2"/>
+  <rect x="12" y="12" width="72" height="72" fill="none" stroke="#f0c78d" stroke-width="2" opacity=".55"/>
+</svg>
