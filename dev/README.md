@@ -3,6 +3,9 @@
 - forward the 4322 port when the dialog pops up. Open it in a new tab for full preview.
 - To view in Github Codespaces, enter command palette and search for `Simple Browser: Show`
 - open up the **same** address as the external preview (for example, https://<codespace-id>-<hash>-4322.app.github.dev/beans/) in the simple browser
+- `npm run dev-worktree` will start `astro dev --host 127.0.0.1` on the first free local port
+- prefer `npm run dev-worktree` inside `worktrees/beans-*` when multiple Beans worktrees may be running at once; it avoids the fixed `4322` collision that `dev-local` can hit
+- use `npm run dev-local` when you specifically need the server reachable beyond localhost, such as Codespaces or another forwarded-port workflow
 
 ## Codex previews (Playwright)
 - See `docs/dev/playwright-preview.md` for Playwright install + screenshot instructions.
