@@ -5,7 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
 
-mkdir -p "$tmp_dir/bin" "$tmp_dir/worktrees"
+mkdir -p "$tmp_dir/bin" "$tmp_dir/worktrees" "$tmp_dir/.git"
 cp "$repo_root/dev/beads-start" "$tmp_dir/beads-start"
 
 cat >"$tmp_dir/bin/git" <<EOF
@@ -13,6 +13,16 @@ cat >"$tmp_dir/bin/git" <<EOF
 set -euo pipefail
 
 case "\$1" in
+  rev-parse)
+    if [[ "\${2:-}" == "--git-common-dir" ]]; then
+      printf "%s\n" "$tmp_dir/.git"
+      exit 0
+    fi
+    if [[ "\${2:-}" == "--show-toplevel" ]]; then
+      printf "%s\n" "$tmp_dir"
+      exit 0
+    fi
+    ;;
   status)
     exit 0
     ;;
@@ -97,6 +107,16 @@ fi
 
 if ! grep -Fq "hooks install --force" "$tmp_dir/bd.log"; then
   echo "beads-start did not refresh bd hooks before starting work" >&2
+  exit 1
+fi
+
+if [[ ! -x "$tmp_dir/.git/hooks/pre-push" ]]; then
+  echo "beads-start did not install the repo pre-push hook wrapper" >&2
+  exit 1
+fi
+
+if ! grep -Fq "dev/hooks/pre-push" "$tmp_dir/.git/hooks/pre-push"; then
+  echo "beads-start did not point the pre-push hook wrapper at the repo guard" >&2
   exit 1
 fi
 

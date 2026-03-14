@@ -382,6 +382,14 @@ EOF
     exit 1
   fi
 
+  beads_sync_push_line="$(grep -n -F -- "-C $tmp_dir/.git/beads-worktrees/beads-sync push origin beads-sync" "$tmp_dir/git.log" | head -n 1 | cut -d: -f1)"
+  main_push_line="$(grep -n -F -- "-C $tmp_dir push origin main" "$tmp_dir/git.log" | head -n 1 | cut -d: -f1)"
+
+  if [[ -z "$beads_sync_push_line" || -z "$main_push_line" || "$beads_sync_push_line" -ge "$main_push_line" ]]; then
+    echo "land-the-plane should push beads-sync before pushing main" >&2
+    exit 1
+  fi
+
   if ! grep -Fq "worktree remove $task_worktree" "$tmp_dir/git.log"; then
     echo "land-the-plane did not prune the just-closed task worktree" >&2
     exit 1

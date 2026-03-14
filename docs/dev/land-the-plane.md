@@ -27,9 +27,9 @@ The helper is intentionally automation-friendly. Work is not considered landed u
 9. Verifies the root `main` checkout is clean before closeout starts. Dirty `worktrees/my/main` does not block landing.
 10. Updates root `main` from `origin/main` with `git pull --ff-only origin main`.
 11. Merges the current task branch into root `main`, and if that merge conflicts, fails with the unresolved file list.
-12. Pushes `main` to `origin`.
-13. Restores the root checkout's local `.beads/issues.jsonl` mirror if `dev/beads-finish` dirtied it during closeout.
-14. Commits and pushes `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch when closeout dirties that worktree.
+12. Restores the root checkout's local `.beads/issues.jsonl` mirror if `dev/beads-finish` dirtied it during closeout.
+13. Commits and pushes `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch when closeout dirties that worktree.
+14. Pushes `main` to `origin` only after `beads-sync` is durably synced, so the repo's `main` push guard sees the closed/exported issue state.
 15. Prunes closed-task Beads worktrees with `dev/beads-prune-closed-worktrees`, including the task worktree that just landed, and fails if that worktree still exists afterward.
 16. Verifies the landed task commit is now reachable from root `main`.
 17. Verifies the task worktree has been pruned, root `main` plus `beads-sync` both end clean, and that root `main` plus `beads-sync` are synced with origin.
@@ -64,6 +64,7 @@ dev/land-the-plane beans-2wm "Documented the new workflow" \
 ```
 
 The helper will fail if the root `main` checkout is dirty. That is intentional: in this repo, landing should not silently merge into the integration checkout when the root already has unrelated local work.
+The repo's `pre-push` guard also blocks manual `git push origin main` when a merged `codex/beans-*` task branch still has an open Beads issue or unsynced `beads-sync` metadata. `dev/land-the-plane` satisfies that guard by pushing `beads-sync` before `main`.
 
 ## Cleanup expectations
 

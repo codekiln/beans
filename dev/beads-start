@@ -30,6 +30,11 @@ gitignore_path=".gitignore"
 worktree_beads_path="$worktree_path/.beads"
 worktree_redirect_path="$worktree_beads_path/redirect"
 repo_beads_redirect="../../.beads"
+git_common_dir="$(git rev-parse --git-common-dir)"
+hooks_dir="$git_common_dir/hooks"
+repo_root="$(git rev-parse --show-toplevel)"
+repo_pre_push_hook="$repo_root/dev/hooks/pre-push"
+pre_push_hook_path="$hooks_dir/pre-push"
 
 bd_cmd() {
   bd --no-daemon "$@"
@@ -37,6 +42,32 @@ bd_cmd() {
 
 refresh_bd_hooks() {
   bd hooks install --force >/dev/null
+}
+
+install_repo_pre_push_hook() {
+  mkdir -p "$hooks_dir"
+
+  cat >"$pre_push_hook_path" <<EOF
+#!/bin/sh
+set -eu
+
+repo_hook="$repo_pre_push_hook"
+tmp_file="\$(mktemp)"
+trap 'rm -f "\$tmp_file"' EXIT HUP INT TERM
+cat >"\$tmp_file"
+
+if command -v bd >/dev/null 2>&1; then
+  bd hooks run pre-push "\$@" <"\$tmp_file"
+fi
+
+if [ -x "\$repo_hook" ]; then
+  exec "\$repo_hook" "\$@" <"\$tmp_file"
+fi
+
+exit 0
+EOF
+
+  chmod +x "$pre_push_hook_path"
 }
 
 cleanup_gitignore_entry() {
@@ -89,6 +120,7 @@ ensure_issue_is_claimed() {
 bd_cmd prime >/dev/null || true
 bd_cmd show "$issue_id" >/dev/null
 refresh_bd_hooks
+install_repo_pre_push_hook
 
 warn_if_checkout_dirty
 ensure_issue_is_claimed
