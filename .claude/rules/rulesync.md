@@ -1,5 +1,6 @@
 ---
-paths: docs/dev/rulesync.md
+paths:
+  - docs/dev/rulesync.md
 ---
 # Rulesync in Beans
 

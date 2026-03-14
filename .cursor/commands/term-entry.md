@@ -1,3 +1,6 @@
+---
+description: Create a new glossary term entry
+---
 # Term entry
 
 Create a new term entry file for the requested topic and term at:

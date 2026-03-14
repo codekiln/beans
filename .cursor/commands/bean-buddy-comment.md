@@ -1,3 +1,6 @@
+---
+description: Generate or regenerate a Rin Vale buddy comment for an existing bean entry
+---
 # Bean buddy comment
 
 Use this workflow command when asked to generate or regenerate a Rin Vale buddy comment for an existing bean entry.

@@ -1,5 +1,6 @@
 ---
-paths: docs/dev/beads.md
+paths:
+  - docs/dev/beads.md
 ---
 # [Beads](https://github.com/steveyegge/beads) in Beans
 

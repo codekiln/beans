@@ -1,5 +1,8 @@
 ---
-paths: 'src/content/companions/**, src/pages/companion/**, src/data/companions.ts'
+paths:
+  - src/content/companions/**
+  - src/pages/companion/**
+  - src/data/companions.ts
 ---
 # Companion content
 

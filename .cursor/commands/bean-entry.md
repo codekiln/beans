@@ -1,3 +1,6 @@
+---
+description: Create a new bean entry
+---
 # Bean entry template
 
 Create a new bean entry file at:
