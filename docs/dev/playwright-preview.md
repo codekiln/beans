@@ -17,6 +17,9 @@ node_modules/.bin/playwright install --with-deps chromium
 # Default Astro port (4321)
 npm run dev
 
+# Worktree-friendly localhost server with automatic port selection
+npm run dev-worktree
+
 # Codespaces-friendly port (4322)
 npm run dev-local
 ```
@@ -34,6 +37,7 @@ node dev/playwright/screenshot.mjs \
 Notes:
 - Use container-local `http://localhost:<port>` so the headless browser can reach the dev server.
 - Pass `--full-page` for long pages and `--wait=500` (ms) if you need a short settle time.
+- If you are working in `worktrees/beans-*`, prefer `npm run dev-worktree` so Astro can choose a free localhost port automatically.
 - If you started `npm run dev-local`, switch the URL to port `4322`.
 
 ## MCP vision loop (screenshots + accessibility tree)

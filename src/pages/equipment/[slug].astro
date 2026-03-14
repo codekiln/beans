@@ -53,7 +53,7 @@ const relatedBeans = beans
 >
   <section class="hero">
     <h1>{item?.name}</h1>
-    <p>Namespace: {item?.type}</p>
+    <p>{item?.type}</p>
     {typeof item?.cost === "number" && <p>Cost: {currency.format(item.cost)}</p>}
     {item?.purchaseDate && <p>Purchase date: {item.purchaseDate}</p>}
     {alias && <p>Alias: {alias.name}</p>}
