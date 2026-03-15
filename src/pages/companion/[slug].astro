@@ -39,7 +39,7 @@ const initialLinkHref = withBase(getCompanionPath(companion?.slug ?? ""));
         <figure class="companion-portrait">
           {portrait && (
             <img
-              data-companion-portrait
+              data-companion-portrait=""
               data-light-src={withBase(portrait.src)}
               data-dark-src={withBase(portrait.darkSrc ?? portrait.src)}
               src={withBase(portrait.src)}

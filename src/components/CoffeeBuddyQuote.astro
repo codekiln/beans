@@ -25,7 +25,7 @@ const companionTitle = companion?.data.title;
       <div class="buddy-portrait-frame" aria-hidden="true">
         {portrait && (
           <img
-            data-companion-portrait
+            data-companion-portrait=""
             data-light-src={withBase(portrait.src)}
             data-dark-src={withBase(portrait.darkSrc ?? portrait.src)}
             src={withBase(portrait.src)}
