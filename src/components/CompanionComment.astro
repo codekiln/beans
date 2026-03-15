@@ -34,61 +34,38 @@ const portraitDarkSrc = portrait ? withBase(portrait.darkSrc ?? portrait.src) : 
   <blockquote class="companion-comment__quote">
     {variant === "ascii" ? (
       <div class="companion-comment__ascii-box">
-        <div class="companion-comment__ascii-border-row companion-comment__ascii-border-row--top" aria-hidden="true">
-          <span class="companion-comment__ascii-corner">+</span>
-          <span class="companion-comment__ascii-h"></span>
-          <span class="companion-comment__ascii-corner">+</span>
-          <span class="companion-comment__ascii-corner-right">+---+</span>
-        </div>
-        <div class="companion-comment__ascii-content-row">
-          <span class="companion-comment__ascii-v" aria-hidden="true">|</span>
-          <div class="companion-comment__ascii-body-cell">
-            <span class="companion-comment__ascii-comment-open">/*</span>
+        <span class="companion-comment__ascii-corner companion-comment__ascii-corner--tl" aria-hidden="true">/*</span>
+        <span class="companion-comment__ascii-corner companion-comment__ascii-corner--tr" aria-hidden="true">*\</span>
+        <span class="companion-comment__ascii-corner companion-comment__ascii-corner--bl" aria-hidden="true">\*</span>
+        <span class="companion-comment__ascii-corner companion-comment__ascii-corner--br" aria-hidden="true">*/</span>
+        <div class="companion-comment__ascii-inner">
+          <div class="companion-comment__ascii-quote-zone">
             <p class="companion-comment__body companion-comment__body--ascii"><slot /></p>
-            <span class="companion-comment__ascii-comment-close">*/</span>
           </div>
-          <span class="companion-comment__ascii-v" aria-hidden="true">|</span>
-          <div class="companion-comment__ascii-portrait-cell">
+          <div class="companion-comment__ascii-panel">
             {portraitSrc ? (
-              <>
-                <span class="companion-comment__ascii-frame-edge" aria-hidden="true">+---+</span>
-                <div class="companion-comment__portrait-wrap companion-comment__portrait-wrap--ascii">
-                  {companionHref ? (
-                    <a href={companionHref} class="companion-comment__portrait-link">
-                      <img data-companion-portrait="" data-light-src={portraitSrc} data-dark-src={portraitDarkSrc} src={portraitSrc} alt="" loading="lazy" />
-                    </a>
-                  ) : (
-                    <span class="companion-comment__portrait-link">
-                      <img data-companion-portrait="" data-light-src={portraitSrc} data-dark-src={portraitDarkSrc} src={portraitSrc} alt="" loading="lazy" />
-                    </span>
-                  )}
-                </div>
-                <span class="companion-comment__ascii-frame-edge" aria-hidden="true">+---+</span>
-              </>
-            ) : (
-              <>
-                <span class="companion-comment__ascii-frame-edge" aria-hidden="true">+---+</span>
-                <span class="companion-comment__ascii-frame-placeholder" aria-hidden="true">|   |</span>
-                <span class="companion-comment__ascii-frame-edge" aria-hidden="true">+---+</span>
-              </>
-            )}
+              <div class="companion-comment__portrait-wrap companion-comment__portrait-wrap--ascii">
+                {companionHref ? (
+                  <a href={companionHref} class="companion-comment__portrait-link">
+                    <img data-companion-portrait="" data-light-src={portraitSrc} data-dark-src={portraitDarkSrc} src={portraitSrc} alt="" loading="lazy" />
+                  </a>
+                ) : (
+                  <span class="companion-comment__portrait-link">
+                    <img data-companion-portrait="" data-light-src={portraitSrc} data-dark-src={portraitDarkSrc} src={portraitSrc} alt="" loading="lazy" />
+                  </span>
+                )}
+              </div>
+            ) : null}
+            <span class="companion-comment__name companion-comment__name--ascii">
+              {companionHref ? (
+                <a href={companionHref}>&gt; {companionName}</a>
+              ) : (
+                <span>&gt; {companionName}</span>
+              )}
+              {companionTitle && <span class="sr-only">, {companionTitle}</span>}
+            </span>
           </div>
-          <span class="companion-comment__ascii-v" aria-hidden="true">|</span>
         </div>
-        <div class="companion-comment__ascii-border-row companion-comment__ascii-border-row--bottom" aria-hidden="true">
-          <span class="companion-comment__ascii-corner">+</span>
-          <span class="companion-comment__ascii-h"></span>
-          <span class="companion-comment__ascii-corner">+</span>
-          <span class="companion-comment__ascii-corner-right">+---+</span>
-        </div>
-        <span class="companion-comment__name companion-comment__name--ascii">
-          {companionHref ? (
-            <a href={companionHref}>{companionName}</a>
-          ) : (
-            companionName
-          )}
-          {companionTitle && <span class="sr-only">, {companionTitle}</span>}
-        </span>
       </div>
     ) : (
       <div class="companion-comment__row">
@@ -264,116 +241,101 @@ const portraitDarkSrc = portrait ? withBase(portrait.darkSrc ?? portrait.src) : 
     color: var(--cc-muted, #555);
   }
 
-  /* ---- Variant: ascii (comment block with ASCII box + rectangular portrait) ---- */
-  .companion-comment--ascii .companion-comment__quote {
+  /* ---- Variant: ascii (CSS-comment box with dashed border + rectangular portrait) ---- */
+  /* :global(.markdown) needed so this rule beats the global .markdown blockquote style */
+  :global(.markdown) .companion-comment--ascii .companion-comment__quote {
     display: block;
     padding: 0;
     background: transparent;
     color: var(--cc-fg, #2a2a2a);
     border: none;
+    border-left: none;
+    border-radius: 0;
+    box-shadow: none;
+    font-family: inherit;
+    font-style: normal;
+    font-weight: inherit;
   }
 
   .companion-comment__ascii-box {
+    position: relative;
     display: inline-block;
     min-width: 18rem;
     max-width: 100%;
+    border: 2px dashed var(--cc-border, #6b6b6b);
+    background: var(--cc-bg, #f8f6f1);
     font-family: ui-monospace, monospace;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     line-height: 1.4;
     color: var(--cc-fg, #2a2a2a);
+  }
+
+  .companion-comment__ascii-corner {
+    position: absolute;
+    font-family: ui-monospace, monospace;
+    font-size: 1em;
+    font-weight: bold;
+    color: var(--cc-border, #6b6b6b);
     background: var(--cc-bg, #f8f6f1);
-    vertical-align: top;
+    padding: 0 0.15em;
+    line-height: 1;
+    z-index: 1;
   }
 
-  .companion-comment__ascii-border-row {
+  .companion-comment__ascii-corner--tl {
+    top: -0.55em;
+    left: -0.2em;
+  }
+
+  .companion-comment__ascii-corner--tr {
+    top: -0.55em;
+    right: -0.2em;
+  }
+
+  .companion-comment__ascii-corner--bl {
+    bottom: -0.55em;
+    left: -0.2em;
+  }
+
+  .companion-comment__ascii-corner--br {
+    bottom: -0.55em;
+    right: -0.2em;
+  }
+
+  .companion-comment__ascii-inner {
     display: flex;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    min-height: 1.2em;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem 1.25rem;
   }
 
-  .companion-comment__ascii-corner,
-  .companion-comment__ascii-corner-right {
-    color: var(--cc-border, #6b6b6b);
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-
-  .companion-comment__ascii-h {
+  .companion-comment__ascii-quote-zone {
     flex: 1 1 auto;
-    min-width: 3rem;
-    min-height: 1px;
-    border-bottom: 1px solid var(--cc-border, #6b6b6b);
-    margin-bottom: -1px;
-  }
-
-  .companion-comment__ascii-border-row--bottom .companion-comment__ascii-h {
-    border-bottom: none;
-    border-top: 1px solid var(--cc-border, #6b6b6b);
-    margin-bottom: 0;
-    margin-top: -1px;
-  }
-
-  .companion-comment__ascii-content-row {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: stretch;
-  }
-
-  .companion-comment__ascii-v {
-    color: var(--cc-border, #6b6b6b);
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-
-  .companion-comment__ascii-body-cell {
-    flex: 1 1 auto;
-    min-width: 6rem;
-    padding: 0.2rem 0.5rem 0.35rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-  }
-
-  .companion-comment__ascii-comment-open,
-  .companion-comment__ascii-comment-close {
-    color: var(--cc-muted, #888);
-    font-size: 0.85em;
+    min-width: 0;
   }
 
   .companion-comment--ascii .companion-comment__body--ascii {
     margin: 0;
-    padding-left: 0.35rem;
     font-style: italic;
+    font-size: 1.1em;
     color: inherit;
     white-space: pre-line;
   }
 
-  .companion-comment__ascii-body-cell .companion-comment__body--ascii::before {
-    content: "* ";
-    color: var(--cc-muted, #888);
+  .companion-comment--ascii .companion-comment__body--ascii::before {
+    content: "\201C";
   }
 
-  .companion-comment__ascii-portrait-cell {
+  .companion-comment--ascii .companion-comment__body--ascii::after {
+    content: "\201D";
+  }
+
+  .companion-comment__ascii-panel {
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0.2rem 0.35rem 0.35rem;
-  }
-
-  .companion-comment__ascii-frame-edge {
-    display: block;
-    font-size: 0.75em;
-    line-height: 1;
-    color: var(--cc-border, #6b6b6b);
-  }
-
-  .companion-comment__ascii-frame-placeholder {
-    display: block;
-    font-size: 0.75em;
-    line-height: 1;
-    color: var(--cc-border, #6b6b6b);
+    gap: 0.4rem;
   }
 
   .companion-comment__portrait-wrap--ascii {
@@ -387,14 +349,13 @@ const portraitDarkSrc = portrait ? withBase(portrait.darkSrc ?? portrait.src) : 
     object-fit: cover;
     image-rendering: pixelated;
     border-radius: 0;
+    border: 2px solid var(--cc-border, #6b6b6b);
   }
 
   .companion-comment__name--ascii {
     display: block;
-    text-align: center;
-    margin-top: 0.25rem;
-    padding-bottom: 0.15rem;
-    font-size: 0.7rem;
+    text-align: right;
+    font-size: 0.8rem;
     font-weight: 500;
     color: var(--cc-muted, #555);
   }
@@ -430,11 +391,6 @@ const portraitDarkSrc = portrait ? withBase(portrait.darkSrc ?? portrait.src) : 
     --cc-fg: #e8e6e2;
   }
 
-  :global(:root[data-theme="dark"]) .companion-comment--ascii .companion-comment__ascii-comment-open,
-  :global(:root[data-theme="dark"]) .companion-comment--ascii .companion-comment__ascii-comment-close {
-    --cc-muted: #7a7874;
-  }
-
   :global(:root[data-theme="dark"]) .companion-comment--ascii .companion-comment__name--ascii {
     --cc-muted: #9a9894;
   }
@@ -468,11 +424,6 @@ const portraitDarkSrc = portrait ? withBase(portrait.darkSrc ?? portrait.src) : 
       --cc-border: #6a6a6a;
       --cc-bg: #2a2825;
       --cc-fg: #e8e6e2;
-    }
-
-    :global(:root[data-theme="auto"]) .companion-comment--ascii .companion-comment__ascii-comment-open,
-    :global(:root[data-theme="auto"]) .companion-comment--ascii .companion-comment__ascii-comment-close {
-      --cc-muted: #7a7874;
     }
 
     :global(:root[data-theme="auto"]) .companion-comment--ascii .companion-comment__name--ascii {
