@@ -1,93 +1,380 @@
 ---
 /**
- * Inline companion comment component for use in MDX bean entries.
+ * Inline companion comment: terminal-native quoted aside with optional portrait.
  * Usage: <CompanionComment from="unicorn">bed of crystalline flowers</CompanionComment>
+ * Optional: <CompanionComment from="sproglo" variant="bubble">sharp</CompanionComment>
  *
- * Renders as a styled blockquote with a link to the companion page.
- * Companion backreferences are tracked via getBeansWithInlineCompanionComments().
+ * Variants: "terminal" (default) | "bubble" | "ascii"
+ * - terminal: simple bordered box, quote left, avatar + name right (no extra glyphs)
+ * - bubble: rounded speech bubble, larger circular avatar, name below avatar
+ * - ascii: comment-syntax pun (slash-star markers), left border, avatar in frame, name below
+ *
+ * Portrait and name link to companion detail. Decorative borders are aria-hidden.
  */
-import { getCompanionBySlug, getCompanionPath } from "../data/companions";
+import { getCompanionBySlug, getCompanionPath, getCompanionPortrait } from "../data/companions";
 import { withBase } from "../utils/paths";
 
 interface Props {
   from: string;
+  variant?: "terminal" | "bubble" | "ascii";
 }
 
-const { from } = Astro.props;
+const { from, variant = "terminal" } = Astro.props;
 const companion = await getCompanionBySlug(from);
 const companionName = companion?.data.name ?? from;
+const companionTitle = companion?.data.title;
 const companionHref = companion ? withBase(getCompanionPath(companion.slug)) : null;
+const portrait = companion ? getCompanionPortrait(companion.data) : null;
+const portraitSrc = portrait ? withBase(portrait.src) : null;
+const portraitDarkSrc = portrait ? withBase(portrait.darkSrc ?? portrait.src) : null;
 ---
-<blockquote class="companion-comment">
-  <p class="companion-comment-body"><slot /></p>
-  <footer class="companion-comment-attribution">
-    <span aria-hidden="true">--</span>
-    {companionHref ? (
-      <a href={companionHref}>{companionName}</a>
-    ) : (
-      <span>{companionName}</span>
-    )}
-  </footer>
-</blockquote>
+
+<aside class={`companion-comment companion-comment--${variant}`} aria-label={`${companionName} says`}>
+  {/* Single semantic blockquote: quote text left, companion attribution panel right */}
+  <blockquote class="companion-comment__quote">
+    <div class="companion-comment__row">
+      <div class="companion-comment__body-zone">
+        {variant === "ascii" && (
+          <span class="companion-comment__decoration companion-comment__decoration--ascii" aria-hidden="true">
+            <span class="companion-comment__ascii-top">/*</span>
+            <span class="companion-comment__ascii-bottom">*/</span>
+          </span>
+        )}
+        <p class="companion-comment__body"><slot /></p>
+      </div>
+      <div class="companion-comment__panel">
+        {variant === "ascii" && portraitSrc && (
+          <>
+            <span class="companion-comment__frame-ascii-edge" aria-hidden="true">+---+</span>
+            <div class="companion-comment__portrait-wrap companion-comment__portrait-wrap--ascii-frame">
+              {companionHref ? (
+                <a href={companionHref} class="companion-comment__portrait-link">
+                  <img data-companion-portrait="" data-light-src={portraitSrc} data-dark-src={portraitDarkSrc} src={portraitSrc} alt="" loading="lazy" />
+                </a>
+              ) : (
+                <span class="companion-comment__portrait-link">
+                  <img data-companion-portrait="" data-light-src={portraitSrc} data-dark-src={portraitDarkSrc} src={portraitSrc} alt="" loading="lazy" />
+                </span>
+              )}
+            </div>
+            <span class="companion-comment__frame-ascii-edge" aria-hidden="true">+---+</span>
+          </>
+        )}
+        {variant !== "ascii" && (
+          <div class="companion-comment__portrait-wrap">
+            {portraitSrc && (companionHref ? (
+              <a href={companionHref} class="companion-comment__portrait-link">
+                <img data-companion-portrait="" data-light-src={portraitSrc} data-dark-src={portraitDarkSrc} src={portraitSrc} alt="" loading="lazy" />
+              </a>
+            ) : (
+              <span class="companion-comment__portrait-link">
+                <img data-companion-portrait="" data-light-src={portraitSrc} data-dark-src={portraitDarkSrc} src={portraitSrc} alt="" loading="lazy" />
+              </span>
+            ))}
+          </div>
+        )}
+        <span class="companion-comment__name">
+          {companionHref ? (
+            <a href={companionHref}>{companionName}</a>
+          ) : (
+            companionName
+          )}
+          {companionTitle && <span class="sr-only">, {companionTitle}</span>}
+        </span>
+      </div>
+    </div>
+  </blockquote>
+</aside>
 
 <style>
+  /* Shared: compact, content-led, strong contrast */
   .companion-comment {
-    margin: 0.85em 0;
-    padding: 0.65em 0.85em;
-    border-left: 3px solid #8c6b3c;
-    background: linear-gradient(90deg, #faf6ed 0%, transparent 100%);
-    color: #2b2118;
+    margin: 1.25rem 0;
   }
 
-  .companion-comment-body {
+  /* Single blockquote: content-sized, quote left + panel right */
+  .companion-comment__quote {
     margin: 0;
-    font-style: italic;
+    display: inline-flex;
+    max-width: 100%;
+    position: relative;
+  }
+
+  .companion-comment__row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.75rem 1rem;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .companion-comment__body-zone {
+    flex: 1 1 auto;
+    min-width: 0;
+    position: relative;
+  }
+
+  .companion-comment__body {
+    margin: 0;
     white-space: pre-line;
+    font-style: italic;
+    line-height: 1.5;
   }
 
-  .companion-comment-attribution {
-    margin-top: 0.45em;
-    font-size: 0.88em;
-    color: #6b4b36;
+  .companion-comment__panel {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
   }
 
-  .companion-comment-attribution a {
+  .companion-comment__portrait-wrap {
+    display: block;
+    line-height: 0;
+  }
+
+  .companion-comment__portrait-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .companion-comment__portrait-link img {
+    display: block;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    image-rendering: pixelated;
+    border-radius: 50%;
+  }
+
+  .companion-comment__name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .companion-comment__name a {
     color: inherit;
     text-decoration: underline;
-    text-decoration-color: #c89448;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
   }
 
-  .companion-comment-attribution a:hover {
-    text-decoration-color: currentColor;
+  .companion-comment__name a:hover {
+    text-decoration-thickness: 2px;
   }
 
-  :global(:root[data-theme="dark"]) .companion-comment {
-    border-color: #c18b53;
-    background: linear-gradient(90deg, rgba(62, 38, 25, 0.5) 0%, transparent 100%);
-    color: #f4e6cf;
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
-  :global(:root[data-theme="dark"]) .companion-comment-attribution {
-    color: #d7b48a;
+  /* ---- Variant: terminal (box-drawing) ---- */
+  .companion-comment--terminal .companion-comment__quote {
+    padding: 0.5rem 0.75rem 0.5rem 1rem;
+    border: 1px solid var(--cc-border, #5a5a5a);
+    background: var(--cc-bg, #f5f2ec);
+    color: var(--cc-fg, #2a2a2a);
   }
 
-  :global(:root[data-theme="dark"]) .companion-comment-attribution a {
-    text-decoration-color: #8e6439;
+  .companion-comment--terminal .companion-comment__body {
+    font-style: italic;
+    color: inherit;
+  }
+
+  /* Full overlay so corners don't take flow space; corners are absolutely positioned within it */
+  /* Suppress global .markdown blockquote::before so companion blockquotes stay clean */
+  :global(.markdown) .companion-comment__quote::before {
+    content: none;
+  }
+
+  .companion-comment--terminal .companion-comment__name {
+    color: var(--cc-muted, #555);
+  }
+
+  /* ---- Variant: bubble (rounded, circular avatar) ---- */
+  .companion-comment--bubble .companion-comment__quote {
+    padding: 0.5rem 0.9rem 0.6rem;
+    border-radius: 1rem 1rem 1rem 0.1rem;
+    background: var(--cc-bg, #f0ede6);
+    color: var(--cc-fg, #2a2a2a);
+    border: 1px solid var(--cc-border, #b8b4a8);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+
+  .companion-comment--bubble .companion-comment__body {
+    font-style: italic;
+    color: inherit;
+  }
+
+  .companion-comment--bubble .companion-comment__portrait-link img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--cc-border, #b8b4a8);
+  }
+
+  .companion-comment--bubble .companion-comment__name {
+    color: var(--cc-muted, #555);
+  }
+
+  /* ---- Variant: ascii (comment box + ASCII frame) ---- */
+  .companion-comment--ascii .companion-comment__quote {
+    padding: 0.4rem 0.6rem 0.4rem 1.25rem;
+    background: var(--cc-bg, #f8f6f1);
+    color: var(--cc-fg, #2a2a2a);
+    border-left: 3px solid var(--cc-border, #6b6b6b);
+  }
+
+  .companion-comment--ascii .companion-comment__body {
+    font-style: italic;
+    color: inherit;
+    padding-left: 1.75rem;
+  }
+
+  .companion-comment--ascii .companion-comment__decoration--ascii {
+    position: absolute;
+    pointer-events: none;
+    color: var(--cc-muted, #888);
+    font-size: 0.7rem;
+    font-family: ui-monospace, monospace;
+  }
+
+  .companion-comment--ascii .companion-comment__ascii-top {
+    position: absolute;
+    top: 0.2rem;
+    left: 0.35rem;
+  }
+
+  .companion-comment--ascii .companion-comment__ascii-bottom {
+    position: absolute;
+    bottom: 0.2rem;
+    left: 0.35rem;
+    top: auto;
+  }
+
+  .companion-comment--ascii .companion-comment__frame-ascii-edge {
+    display: block;
+    font-size: 0.6rem;
+    line-height: 1;
+    font-family: ui-monospace, monospace;
+    color: var(--cc-border, #6b6b6b);
+    letter-spacing: 0.02em;
+  }
+
+  .companion-comment--ascii .companion-comment__portrait-wrap--ascii-frame {
+    border-left: 1px solid var(--cc-border, #6b6b6b);
+    border-right: 1px solid var(--cc-border, #6b6b6b);
+    padding: 0 4px;
+  }
+
+  .companion-comment--ascii .companion-comment__portrait-link img {
+    width: 40px;
+    height: 40px;
+    display: block;
+    border-radius: 50%;
+  }
+
+  .companion-comment--ascii .companion-comment__name {
+    color: var(--cc-muted, #555);
+    margin-top: 0.15rem;
+  }
+
+  /* Dark theme: neutral grays, no saturated blue */
+  :global(:root[data-theme="dark"]) .companion-comment--terminal .companion-comment__quote {
+    --cc-border: #6a6a6a;
+    --cc-bg: #2a2825;
+    --cc-fg: #e8e6e2;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-comment--terminal .companion-comment__name {
+    --cc-muted: #9a9894;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-comment--bubble .companion-comment__quote {
+    --cc-border: #4a4844;
+    --cc-bg: #2a2825;
+    --cc-fg: #e8e6e2;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-comment--bubble .companion-comment__portrait-link img {
+    border-color: #4a4844;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-comment--bubble .companion-comment__name {
+    --cc-muted: #9a9894;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-comment--ascii .companion-comment__quote {
+    --cc-border: #6a6a6a;
+    --cc-bg: #2a2825;
+    --cc-fg: #e8e6e2;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-comment--ascii .companion-comment__decoration--ascii {
+    --cc-muted: #7a7874;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-comment--ascii .companion-comment__panel {
+    --cc-border: #5a5854;
+  }
+
+  :global(:root[data-theme="dark"]) .companion-comment--ascii .companion-comment__name {
+    --cc-muted: #9a9894;
   }
 
   @media (prefers-color-scheme: dark) {
-    :global(:root[data-theme="auto"]) .companion-comment {
-      border-color: #c18b53;
-      background: linear-gradient(90deg, rgba(62, 38, 25, 0.5) 0%, transparent 100%);
-      color: #f4e6cf;
+    :global(:root[data-theme="auto"]) .companion-comment--terminal .companion-comment__quote {
+      --cc-border: #6a6a6a;
+      --cc-bg: #2a2825;
+      --cc-fg: #e8e6e2;
     }
 
-    :global(:root[data-theme="auto"]) .companion-comment-attribution {
-      color: #d7b48a;
+    :global(:root[data-theme="auto"]) .companion-comment--terminal .companion-comment__name {
+      --cc-muted: #9a9894;
     }
 
-    :global(:root[data-theme="auto"]) .companion-comment-attribution a {
-      text-decoration-color: #8e6439;
+    :global(:root[data-theme="auto"]) .companion-comment--bubble .companion-comment__quote {
+      --cc-border: #4a4844;
+      --cc-bg: #2a2825;
+      --cc-fg: #e8e6e2;
+    }
+
+    :global(:root[data-theme="auto"]) .companion-comment--bubble .companion-comment__portrait-link img {
+      border-color: #4a4844;
+    }
+
+    :global(:root[data-theme="auto"]) .companion-comment--bubble .companion-comment__name {
+      --cc-muted: #9a9894;
+    }
+
+    :global(:root[data-theme="auto"]) .companion-comment--ascii .companion-comment__quote {
+      --cc-border: #6a6a6a;
+      --cc-bg: #2a2825;
+      --cc-fg: #e8e6e2;
+    }
+
+    :global(:root[data-theme="auto"]) .companion-comment--ascii .companion-comment__decoration--ascii {
+      --cc-muted: #7a7874;
+    }
+
+    :global(:root[data-theme="auto"]) .companion-comment--ascii .companion-comment__panel {
+      --cc-border: #5a5854;
+    }
+
+    :global(:root[data-theme="auto"]) .companion-comment--ascii .companion-comment__name {
+      --cc-muted: #9a9894;
     }
   }
 </style>
