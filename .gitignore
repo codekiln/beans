@@ -16,6 +16,7 @@ pnpm-debug.log*
 
 # Editor/OS files
 *.swp
+.cursor/
 
 # Beads runtime files
 .beads/bd.sock
