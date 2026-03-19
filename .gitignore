@@ -31,3 +31,7 @@ worktrees/beans-*/
 
 # Playwright preview artifacts
 dev/playwright/*.png
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db
