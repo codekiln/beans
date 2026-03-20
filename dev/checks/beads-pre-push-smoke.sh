@@ -10,46 +10,20 @@ run_block_open_issue_failure() {
   tmp_dir="$(mktemp -d)"
   trap 'rm -rf "$tmp_dir"' RETURN
 
-  mkdir -p "$tmp_dir/bin" "$tmp_dir/.git/beads-worktrees/beads-sync/.beads"
+  mkdir -p "$tmp_dir/bin"
   cp "$repo_root/dev/hooks/pre-push" "$tmp_dir/pre-push"
 
-  cat >"$tmp_dir/.git/beads-worktrees/beads-sync/.beads/issues.jsonl" <<'EOF'
-{"id":"beans-test","status":"in_progress"}
-EOF
-
-  cat >"$tmp_dir/bin/git" <<EOF
+  cat >"$tmp_dir/bin/git" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$tmp_dir"
-beads_sync_worktree="$tmp_dir/.git/beads-worktrees/beads-sync"
-
-case "\$1" in
-  rev-parse)
-    if [[ "\${2:-}" == "--path-format=absolute" && "\${3:-}" == "--git-common-dir" ]]; then
-      printf "%s\n" "\$repo_root/.git"
-      exit 0
-    fi
-    ;;
-  -C)
-    worktree_path="\$2"
-    shift 2
-    if [[ "\$worktree_path" == "\$beads_sync_worktree" && "\${1:-}" == "status" ]]; then
-      if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
-        printf "## beads-sync...origin/beads-sync\n"
-        exit 0
-      fi
-      if [[ "\${2:-}" == "--short" ]]; then
-        exit 0
-      fi
-    fi
-    ;;
+case "$1" in
   for-each-ref)
     printf "codex/beans-test\n"
     exit 0
     ;;
   merge-base)
-    if [[ "\${2:-}" == "--is-ancestor" && "\${3:-}" == "codex/beans-test" && "\${4:-}" == "main-local-sha" ]]; then
+    if [[ "${2:-}" == "--is-ancestor" && "${3:-}" == "codex/beans-test" && "${4:-}" == "main-local-sha" ]]; then
       exit 0
     fi
     exit 1
@@ -63,14 +37,9 @@ EOF
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ "${1:-}" == "--no-daemon" ]]; then
-  shift
-fi
-
-if [[ "${1:-}" == "show" && "${2:-}" == "beans-test" ]]; then
+if [[ "${1:-}" == "show" && "${2:-}" == "beans-test" && "${3:-}" == "--json" ]]; then
   cat <<'SHOW'
-beans-test: Example task
-Status: in_progress
+[{"id":"beans-test","status":"in_progress"}]
 SHOW
   exit 0
 fi
@@ -105,46 +74,20 @@ run_allow_closed_issue_success() {
   tmp_dir="$(mktemp -d)"
   trap 'rm -rf "$tmp_dir"' RETURN
 
-  mkdir -p "$tmp_dir/bin" "$tmp_dir/.git/beads-worktrees/beads-sync/.beads"
+  mkdir -p "$tmp_dir/bin"
   cp "$repo_root/dev/hooks/pre-push" "$tmp_dir/pre-push"
 
-  cat >"$tmp_dir/.git/beads-worktrees/beads-sync/.beads/issues.jsonl" <<'EOF'
-{"id":"beans-test","status":"closed"}
-EOF
-
-  cat >"$tmp_dir/bin/git" <<EOF
+  cat >"$tmp_dir/bin/git" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$tmp_dir"
-beads_sync_worktree="$tmp_dir/.git/beads-worktrees/beads-sync"
-
-case "\$1" in
-  rev-parse)
-    if [[ "\${2:-}" == "--path-format=absolute" && "\${3:-}" == "--git-common-dir" ]]; then
-      printf "%s\n" "\$repo_root/.git"
-      exit 0
-    fi
-    ;;
-  -C)
-    worktree_path="\$2"
-    shift 2
-    if [[ "\$worktree_path" == "\$beads_sync_worktree" && "\${1:-}" == "status" ]]; then
-      if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
-        printf "## beads-sync...origin/beads-sync\n"
-        exit 0
-      fi
-      if [[ "\${2:-}" == "--short" ]]; then
-        exit 0
-      fi
-    fi
-    ;;
+case "$1" in
   for-each-ref)
     printf "codex/beans-test\n"
     exit 0
     ;;
   merge-base)
-    if [[ "\${2:-}" == "--is-ancestor" && "\${3:-}" == "codex/beans-test" && "\${4:-}" == "main-local-sha" ]]; then
+    if [[ "${2:-}" == "--is-ancestor" && "${3:-}" == "codex/beans-test" && "${4:-}" == "main-local-sha" ]]; then
       exit 0
     fi
     exit 1
@@ -158,14 +101,9 @@ EOF
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ "${1:-}" == "--no-daemon" ]]; then
-  shift
-fi
-
-if [[ "${1:-}" == "show" && "${2:-}" == "beans-test" ]]; then
+if [[ "${1:-}" == "show" && "${2:-}" == "beans-test" && "${3:-}" == "--json" ]]; then
   cat <<'SHOW'
-beans-test: Example task
-Status: closed
+[{"id":"beans-test","status":"closed"}]
 SHOW
   exit 0
 fi

@@ -7,20 +7,14 @@ Usage: dev/beads-finish <issue-id> [notes]
 
 Wraps the common Beads finish sequence:
   1) Show issue details
-  2) Optionally append notes
-  3) Close the issue
-  4) Run sync integrity check
-  5) Show git status
-  6) Export the shared DB state into beads-sync JSONL
-  7) Report whether beads-sync now has uncommitted metadata changes
+  2) Optionally append notes while closing the issue
+  3) Push the Beads mutation through the Dolt remote
+  4) Show git status
 USAGE
 }
 
 issue_id="${1:-}"
 notes="${2:-}"
-git_common_dir="$(git rev-parse --git-common-dir)"
-beads_sync_path="$git_common_dir/beads-worktrees/beads-sync"
-beads_sync_jsonl="$beads_sync_path/.beads/issues.jsonl"
 
 if [[ -z "$issue_id" ]]; then
   usage
@@ -28,38 +22,36 @@ if [[ -z "$issue_id" ]]; then
 fi
 
 bd_cmd() {
-  bd --no-daemon "$@"
+  bd "$@"
+}
+
+push_beads_dolt() {
+  local dolt_password="${DOLT_REMOTE_PASSWORD:-}"
+
+  if [[ -z "$dolt_password" ]]; then
+    if ! command -v gh >/dev/null 2>&1; then
+      echo "Beads mutation needs a Dolt push, but gh is not available to mint a token." >&2
+      exit 1
+    fi
+
+    dolt_password="$(gh auth token)"
+  fi
+
+  DOLT_REMOTE_PASSWORD="$dolt_password" bd dolt push >/dev/null
 }
 
 bd_cmd show "$issue_id"
 
 if [[ -n "$notes" ]]; then
-  bd_cmd update "$issue_id" --notes "$notes" >/dev/null
-fi
-
-bd_cmd update "$issue_id" --status closed >/dev/null
-bd_cmd sync --check
-git status --short
-bd_cmd export -o "$beads_sync_jsonl"
-
-if [[ -f "$beads_sync_jsonl" ]]; then
-  if grep -Fq "\"id\":\"$issue_id\"" "$beads_sync_jsonl"; then
-    echo "Metadata durable: $issue_id is present in $beads_sync_jsonl"
-  else
-    echo "Metadata mismatch: $issue_id exists in the DB but is missing from $beads_sync_jsonl" >&2
-    exit 1
-  fi
+  bd_cmd update "$issue_id" --notes "$notes" --status closed >/dev/null
 else
-  echo "beads-sync JSONL not found at $beads_sync_jsonl" >&2
-  exit 1
+  bd_cmd update "$issue_id" --status closed >/dev/null
 fi
+
+push_beads_dolt
+git status --short
+bd_cmd show "$issue_id" --json
 
 echo "Issue: $issue_id"
 echo "Current branch: $(git rev-parse --abbrev-ref HEAD)"
-
-if [[ -d "$beads_sync_path" ]]; then
-  echo "beads-sync status:"
-  git -C "$beads_sync_path" status --short --branch
-else
-  echo "beads-sync worktree not found at $beads_sync_path"
-fi
+echo "Beads metadata pushed through Dolt."

@@ -37,7 +37,22 @@ repo_pre_push_hook="$repo_root/dev/hooks/pre-push"
 pre_push_hook_path="$hooks_dir/pre-push"
 
 bd_cmd() {
-  bd --no-daemon "$@"
+  bd "$@"
+}
+
+push_beads_dolt() {
+  local dolt_password="${DOLT_REMOTE_PASSWORD:-}"
+
+  if [[ -z "$dolt_password" ]]; then
+    if ! command -v gh >/dev/null 2>&1; then
+      echo "Beads mutation needs a Dolt push, but gh is not available to mint a token." >&2
+      exit 1
+    fi
+
+    dolt_password="$(gh auth token)"
+  fi
+
+  DOLT_REMOTE_PASSWORD="$dolt_password" bd dolt push >/dev/null
 }
 
 refresh_bd_hooks() {
@@ -103,18 +118,14 @@ warn_if_checkout_dirty() {
   fi
 }
 
-ensure_branch_exists() {
-  if git show-ref --verify --quiet "refs/heads/$branch"; then
+ensure_issue_is_claimed() {
+  if bd_cmd update "$issue_id" --claim >/dev/null 2>&1; then
+    push_beads_dolt
     return 0
   fi
 
-  git branch "$branch" HEAD >/dev/null
-}
-
-ensure_issue_is_claimed() {
-  if ! bd_cmd update "$issue_id" --claim >/dev/null 2>&1; then
-    bd_cmd update "$issue_id" --status in_progress >/dev/null
-  fi
+  bd_cmd update "$issue_id" --status in_progress >/dev/null
+  push_beads_dolt
 }
 
 bd_cmd prime >/dev/null || true
@@ -124,7 +135,6 @@ install_repo_pre_push_hook
 
 warn_if_checkout_dirty
 ensure_issue_is_claimed
-ensure_branch_exists
 
 if [[ -d "$worktree_path" ]]; then
   echo "Worktree exists: $worktree_path"

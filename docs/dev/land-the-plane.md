@@ -14,12 +14,10 @@ In Beans, the repo root checkout is the integration-only `main` worktree. Keep a
 
 ## What the helper does
 
-The helper is intentionally automation-friendly. Work is not considered landed until the issue is synced, local `main` is updated from `origin/main`, the task branch is merged into `main`, and `main` is pushed. The default path should still be easy for an agent to execute without waiting for a human to answer bookkeeping questions.
-
 1. Runs explicit `--check` commands when provided.
 2. Otherwise runs the repo default validation commands when configured. In Beans, the defaults are `npm run check:beads-start` and `npm run build`.
 3. If `--no-checks` is passed, skips validation for that one landing.
-4. Creates any requested follow-up Beads issues before closeout.
+4. Creates any requested follow-up Beads issues before closeout and pushes each one through Dolt.
 5. If the task worktree has tracked or untracked repo edits, auto-commits them with a checkpoint commit before closeout.
 6. Verifies that the checkpoint commit actually advanced `HEAD` and left the task worktree clean before closeout continues.
 7. If the task worktree is ambiguous because of unresolved merges, fails before closeout.
@@ -27,16 +25,14 @@ The helper is intentionally automation-friendly. Work is not considered landed u
 9. Verifies the root `main` checkout is clean before closeout starts. Dirty `worktrees/my/main` does not block landing.
 10. Updates root `main` from `origin/main` with `git pull --ff-only origin main`.
 11. Merges the current task branch into root `main`, and if that merge conflicts, fails with the unresolved file list.
-12. Restores the root checkout's local `.beads/issues.jsonl` mirror if `dev/beads-finish` dirtied it during closeout.
-13. Commits and pushes `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` on the `beads-sync` branch when closeout dirties that worktree.
-14. Pushes `main` to `origin` only after `beads-sync` is durably synced, so the repo's `main` push guard sees the closed/exported issue state.
-15. Prunes closed-task Beads worktrees with `dev/beads-prune-closed-worktrees`, including the task worktree that just landed, and fails if that worktree still exists afterward.
-16. Verifies the landed task commit is now reachable from root `main`.
-17. Verifies the task worktree has been pruned, root `main` plus `beads-sync` both end clean, and that root `main` plus `beads-sync` are synced with origin.
-18. Reports the landed SHAs for the task branch, root `main`, and `beads-sync`.
-19. Lists untracked files and stashes for cleanup review.
-20. Shows `bd --no-daemon ready`.
-21. Emits a next-session prompt built from the best ready issue, preferring ready task/bug work, then lower priority number, then current ready order.
+12. Pushes `main` to `origin`.
+13. Prunes closed-task Beads worktrees with `dev/beads-prune-closed-worktrees`, including the task worktree that just landed, and fails if that worktree still exists afterward.
+14. Verifies the landed task commit is now reachable from root `main`.
+15. Verifies the task worktree has been pruned and root `main` ends clean and synced with origin.
+16. Reports the landed SHAs for the task branch and root `main`.
+17. Lists untracked files and stashes for cleanup review.
+18. Shows `bd ready`.
+19. Emits a next-session prompt built from the best ready issue, preferring ready task/bug work, then lower priority number, then current ready order.
 
 ## Defaults and overrides
 
@@ -64,7 +60,7 @@ dev/land-the-plane beans-2wm "Documented the new workflow" \
 ```
 
 The helper will fail if the root `main` checkout is dirty. That is intentional: in this repo, landing should not silently merge into the integration checkout when the root already has unrelated local work.
-The repo's `pre-push` guard also blocks manual `git push origin main` when a merged `codex/beans-*` task branch still has an open Beads issue or unsynced `beads-sync` metadata. `dev/land-the-plane` satisfies that guard by pushing `beads-sync` before `main`.
+The repo's `pre-push` guard also blocks manual `git push origin main` when a merged `codex/beans-*` task branch still has an open Beads issue. `dev/land-the-plane` satisfies that guard by delegating issue closeout to `dev/beads-finish` before pushing `main`.
 
 ## Cleanup expectations
 
@@ -84,4 +80,4 @@ The helper does prune closed Beads task worktrees automatically after a successf
 
 ## Relationship to Beads
 
-`dev/land-the-plane` extends `dev/beads-finish`. `beads-finish` is still the lower-level close/sync helper; `land-the-plane` is the repo's full handoff ritual.
+`dev/land-the-plane` extends `dev/beads-finish`. `beads-finish` is still the lower-level close/push helper; `land-the-plane` is the repo's full handoff ritual.

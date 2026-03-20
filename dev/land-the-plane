@@ -36,7 +36,6 @@ current_worktree="$(git rev-parse --show-toplevel)"
 current_branch="$(git rev-parse --abbrev-ref HEAD)"
 git_common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
 repo_root="$(cd "$git_common_dir/.." && pwd)"
-beads_sync_worktree="$git_common_dir/beads-worktrees/beads-sync"
 
 if [[ -z "$issue_id" ]]; then
   usage
@@ -85,7 +84,22 @@ while [[ $# -gt 0 ]]; do
 done
 
 bd_cmd() {
-  bd --no-daemon "$@"
+  bd "$@"
+}
+
+push_beads_dolt() {
+  local dolt_password="${DOLT_REMOTE_PASSWORD:-}"
+
+  if [[ -z "$dolt_password" ]]; then
+    if ! command -v gh >/dev/null 2>&1; then
+      echo "Beads mutation needs a Dolt push, but gh is not available to mint a token." >&2
+      exit 1
+    fi
+
+    dolt_password="$(gh auth token)"
+  fi
+
+  DOLT_REMOTE_PASSWORD="$dolt_password" bd dolt push >/dev/null
 }
 
 print_section() {
@@ -225,6 +239,7 @@ create_follow_ups() {
   for title in "${follow_ups[@]}"; do
     require_value "--follow-up" "$title"
     bd_cmd create "$title"
+    push_beads_dolt
   done
 }
 
@@ -267,21 +282,6 @@ auto_commit_task_worktree_if_safe() {
   fi
 }
 
-cleanup_root_main_metadata_mirror() {
-  local metadata_path=".beads/issues.jsonl"
-  local metadata_status
-
-  metadata_status="$(git -C "$repo_root" status --short -- "$metadata_path")"
-
-  if [[ -z "$metadata_status" ]]; then
-    return
-  fi
-
-  print_section "Cleaning root main metadata mirror:"
-  printf "%s\n" "$metadata_status"
-  git -C "$repo_root" restore --staged --worktree -- "$metadata_path"
-}
-
 land_on_root_main() {
   local merge_conflicts
 
@@ -305,32 +305,6 @@ land_on_root_main() {
     exit 1
   fi
 
-}
-
-sync_beads_metadata_branch() {
-  local sync_status
-  local sync_branch_status
-
-  if [[ ! -d "$beads_sync_worktree" ]]; then
-    echo "Could not locate the beads-sync worktree at $beads_sync_worktree" >&2
-    exit 1
-  fi
-
-  sync_status="$(git -C "$beads_sync_worktree" status --short)"
-  sync_branch_status="$(git -C "$beads_sync_worktree" status --short --branch | head -n 1)"
-
-  if [[ -z "$sync_status" && "$sync_branch_status" != *"ahead "* ]]; then
-    return
-  fi
-
-  print_section "Syncing beads-sync:"
-  printf "%s\n" "$sync_branch_status"
-  if [[ -n "$sync_status" ]]; then
-    printf "%s\n" "$sync_status"
-    git -C "$beads_sync_worktree" add .beads/issues.jsonl
-    git -C "$beads_sync_worktree" commit -m "chore(beads): sync $issue_id metadata"
-  fi
-  git -C "$beads_sync_worktree" push origin beads-sync
 }
 
 prune_closed_task_worktrees() {
@@ -411,7 +385,6 @@ select_next_issue() {
 print_final_state() {
   local task_head="$1"
   local main_head
-  local beads_sync_head
 
   if [[ -e "$current_worktree" ]]; then
     echo "Closed task worktree should have been pruned during closeout: $current_worktree" >&2
@@ -420,24 +393,14 @@ print_final_state() {
 
   ensure_worktree_clean "$repo_root" "Root main"
   ensure_branch_is_synced "$repo_root" "Root main"
-
-  if [[ ! -d "$beads_sync_worktree" ]]; then
-    echo "Could not locate the beads-sync worktree at $beads_sync_worktree" >&2
-    exit 1
-  fi
-
-  ensure_worktree_clean "$beads_sync_worktree" "beads-sync"
-  ensure_branch_is_synced "$beads_sync_worktree" "beads-sync"
   assert_task_commit_landed "$task_head"
 
   main_head="$(git -C "$repo_root" rev-parse HEAD)"
-  beads_sync_head="$(git -C "$beads_sync_worktree" rev-parse HEAD)"
 
   print_section "Final landed state:"
   echo "Task branch: $current_branch @ $task_head"
   echo "Task worktree pruned: $current_worktree"
   echo "Root main: $main_head"
-  echo "beads-sync: $beads_sync_head"
 }
 
 ensure_not_running_from_main
@@ -448,9 +411,7 @@ create_follow_ups
 auto_commit_task_worktree_if_safe
 task_head="$(git rev-parse HEAD)"
 "$script_dir/beads-finish" "$issue_id" "$notes"
-cleanup_root_main_metadata_mirror
 land_on_root_main
-sync_beads_metadata_branch
 git -C "$repo_root" push origin main
 
 print_section "Task worktree review:"
@@ -480,6 +441,6 @@ if [[ -n "$next_issue" ]]; then
   print_section "Suggested next-session prompt:"
   echo "Heuristic: prefer ready task/bug work, then lower P-number, then existing ready order."
   cat <<EOF
-Start with dev/beads-start $next_issue, read the issue with bd --no-daemon show $next_issue, confirm the worktree is clean, implement the task, then run dev/land-the-plane $next_issue before handing off.
+Start with dev/beads-start $next_issue, read the issue with bd show $next_issue, confirm the worktree is clean, implement the task, then run dev/land-the-plane $next_issue before handing off.
 EOF
 fi

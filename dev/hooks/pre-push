@@ -18,49 +18,23 @@ if [[ "$pushes_main" != true ]]; then
   exit 0
 fi
 
-git_common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
-beads_sync_worktree="$git_common_dir/beads-worktrees/beads-sync"
-beads_sync_jsonl="$beads_sync_worktree/.beads/issues.jsonl"
-
-require_beads_sync_clean() {
-  local sync_status
-  local sync_branch_status
-
-  if [[ ! -d "$beads_sync_worktree" ]]; then
-    echo "Push to main blocked: missing beads-sync worktree at $beads_sync_worktree" >&2
-    echo "Run dev/land-the-plane for Beads-managed work so metadata is exported and pushed first." >&2
-    exit 1
-  fi
-
-  sync_status="$(git -C "$beads_sync_worktree" status --short)"
-  sync_branch_status="$(git -C "$beads_sync_worktree" status --short --branch | head -n 1)"
-
-  if [[ -n "$sync_status" || "$sync_branch_status" == *"ahead "* || "$sync_branch_status" == *"behind "* || "$sync_branch_status" == *"[gone]"* ]]; then
-    echo "Push to main blocked: beads-sync is not clean and synced with origin." >&2
-    printf "%s\n" "$sync_branch_status" >&2
-    if [[ -n "$sync_status" ]]; then
-      printf "%s\n" "$sync_status" >&2
-    fi
-    echo "Run dev/land-the-plane for Beads-managed work so metadata lands before code reaches main." >&2
-    exit 1
-  fi
-}
-
 issue_status() {
   local issue_id="$1"
+  local status
 
-  bd --no-daemon show "$issue_id" | awk -F': ' '/^Status:/ { print tolower($2); exit }'
+  status="$(
+    bd show "$issue_id" --json 2>/dev/null |
+      tr -d '\n' |
+      sed -nE 's/.*"status"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/p'
+  )"
+
+  if [[ -z "$status" ]]; then
+    echo "unknown"
+    return 1
+  fi
+
+  printf '%s\n' "$status"
 }
-
-export_has_closed_issue() {
-  local issue_id="$1"
-
-  [[ -f "$beads_sync_jsonl" ]] &&
-    grep -F "\"id\":\"$issue_id\"" "$beads_sync_jsonl" |
-    grep -F "\"status\":\"closed\"" >/dev/null
-}
-
-require_beads_sync_clean
 
 while IFS= read -r branch_name; do
   [[ -n "$branch_name" ]] || continue
@@ -70,17 +44,17 @@ while IFS= read -r branch_name; do
   fi
 
   issue_id="${branch_name#codex/}"
-  status="$(issue_status "$issue_id")"
+  status="$(issue_status "$issue_id" || true)"
+
+  if [[ -z "$status" || "$status" == "unknown" ]]; then
+    echo "Push to main blocked: could not determine Beads status for $issue_id." >&2
+    echo "Run bd show $issue_id --json and dev/beads-finish $issue_id before pushing main." >&2
+    exit 1
+  fi
 
   if [[ "$status" != "closed" ]]; then
     echo "Push to main blocked: $branch_name is merged into main, but Beads issue $issue_id is still $status." >&2
     echo "Close it with dev/beads-finish $issue_id or dev/land-the-plane $issue_id before pushing main." >&2
-    exit 1
-  fi
-
-  if ! export_has_closed_issue "$issue_id"; then
-    echo "Push to main blocked: beads-sync does not show a closed export record for $issue_id." >&2
-    echo "Run dev/beads-finish $issue_id and push beads-sync before pushing main." >&2
     exit 1
   fi
 done < <(git for-each-ref --format='%(refname:short)' refs/heads/codex/beans-*)

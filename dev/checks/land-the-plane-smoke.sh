@@ -14,7 +14,7 @@ run_success_scenario() {
   my_main_worktree="$tmp_dir/worktrees/my/main"
   trap 'rm -rf "$tmp_dir"' RETURN
 
-  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$task_worktree" "$my_main_worktree" "$tmp_dir/.git/beads-worktrees/beads-sync"
+  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$tmp_dir/.git" "$task_worktree" "$my_main_worktree"
   cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
   cp "$repo_root/dev/beads-prune-closed-worktrees" "$tmp_dir/dev/beads-prune-closed-worktrees"
 
@@ -43,9 +43,7 @@ echo "\$*" >>"$tmp_dir/git.log"
 repo_root="$tmp_dir"
 task_worktree="$task_worktree"
 my_main_worktree="$my_main_worktree"
-beads_sync_worktree="$tmp_dir/.git/beads-worktrees/beads-sync"
 task_dirty_flag="$tmp_dir/task-dirty"
-beads_sync_dirty_flag="$tmp_dir/beads-sync-dirty"
 
 case "\$1" in
   rev-parse)
@@ -95,16 +93,9 @@ case "\$1" in
     exit 0
     ;;
   add)
-    if [[ "\$PWD" == "\$beads_sync_worktree" || "\${GIT_DIR:-}" == "\$beads_sync_worktree/.git" ]]; then
-      exit 0
-    fi
     exit 0
     ;;
   commit)
-    if [[ "\$PWD" == "\$beads_sync_worktree" || "\${GIT_DIR:-}" == "\$beads_sync_worktree/.git" ]]; then
-      rm -f "\$beads_sync_dirty_flag"
-      exit 0
-    fi
     : >"\$repo_root/task-commit-created"
     rm -f "\$task_dirty_flag"
     exit 0
@@ -154,40 +145,14 @@ LIST
           exit 0
         fi
 
-        if [[ "\${2:-}" == "HEAD" ]]; then
-          case "\$worktree_path" in
-            "\$repo_root")
-              printf "main-head-sha\n"
-              ;;
-            "\$beads_sync_worktree")
-              printf "beads-sync-sha\n"
-              ;;
-          esac
+        if [[ "\$worktree_path" == "\$repo_root" && "\${2:-}" == "HEAD" ]]; then
+          printf "main-head-sha\n"
           exit 0
         fi
         ;;
       status)
-        if [[ "\$worktree_path" == "\$repo_root" ]]; then
-          if [[ "\${2:-}" == "--short" && "\${3:-}" == "--" && "\${4:-}" == ".beads/issues.jsonl" ]]; then
-            if [[ -f "\$repo_root/root-metadata-dirty" ]]; then
-              printf " M .beads/issues.jsonl\n"
-            fi
-            exit 0
-          fi
-          if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
-            printf "## main...origin/main\n"
-          fi
-          exit 0
-        fi
-
-        if [[ "\$worktree_path" == "\$beads_sync_worktree" ]]; then
-          if [[ "\${2:-}" == "--short" && -f "\$beads_sync_dirty_flag" ]]; then
-            printf " M .beads/issues.jsonl\n"
-            exit 0
-          fi
-          if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
-            printf "## beads-sync...origin/beads-sync\n"
-          fi
+        if [[ "\$worktree_path" == "\$repo_root" && "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
+          printf "## main...origin/main\n"
           exit 0
         fi
 
@@ -198,25 +163,7 @@ LIST
 
         exit 0
         ;;
-      add)
-        exit 0
-        ;;
-      restore)
-        if [[ "\$worktree_path" == "\$repo_root" ]]; then
-          rm -f "\$repo_root/root-metadata-dirty"
-        fi
-        exit 0
-        ;;
-      commit)
-        if [[ "\$worktree_path" == "\$beads_sync_worktree" ]]; then
-          rm -f "\$beads_sync_dirty_flag"
-        fi
-        exit 0
-        ;;
       fetch|pull|merge|push)
-        if [[ "\$worktree_path" == "\$beads_sync_worktree" && "\${1:-}" == "push" ]]; then
-          rm -f "\$beads_sync_dirty_flag"
-        fi
         exit 0
         ;;
       merge-base)
@@ -255,26 +202,15 @@ fi
 exit 0
 EOF
 
-  cat >"$tmp_dir/bin/bd" <<EOF
+  cat >"$tmp_dir/bin/bd" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "\$*" >>"$tmp_dir/bd.log"
-
-while [[ "\${1:-}" == --* ]]; do
-  if [[ "\$1" == "--no-daemon" ]]; then
-    shift
-    continue
-  fi
-
-  break
-done
-
-case "\${1:-}" in
+case "${1:-}" in
   list)
-    if [[ "\${2:-}" == "--status" && "\${3:-}" == "closed" ]]; then
+    if [[ "${2:-}" == "--status" && "${3:-}" == "closed" ]]; then
       cat <<'CLOSED'
-beans-test [closed]
+✓ beans-test [P2] [task] - Closed issue
 CLOSED
       exit 0
     fi
@@ -290,7 +226,7 @@ READY
     exit 0
     ;;
   show)
-    case "\${2:-}" in
+    case "${2:-}" in
       beans-nep)
         cat <<'SHOW'
 ○ beans-nep · Bigger theme   [● P1 · OPEN]
@@ -306,16 +242,13 @@ SHOW
     esac
     exit 0
     ;;
-  *)
-    exit 0
-    ;;
 esac
+
+exit 0
 EOF
 
   chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-prune-closed-worktrees" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd" "$tmp_dir/bin/npm"
   : >"$tmp_dir/task-dirty"
-  : >"$tmp_dir/beads-sync-dirty"
-  : >"$tmp_dir/root-metadata-dirty"
 
   output="$(
     cd "$task_worktree"
@@ -362,34 +295,6 @@ EOF
     exit 1
   fi
 
-  if ! grep -Fq -- "-C $tmp_dir/.git/beads-worktrees/beads-sync status --short --branch" "$tmp_dir/git.log"; then
-    echo "land-the-plane did not verify beads-sync final state" >&2
-    exit 1
-  fi
-
-  if ! grep -Fq -- "-C $tmp_dir restore --staged --worktree -- .beads/issues.jsonl" "$tmp_dir/git.log"; then
-    echo "land-the-plane did not clean the root main metadata mirror after beads-finish" >&2
-    exit 1
-  fi
-
-  if ! grep -Fq -- "-C $tmp_dir/.git/beads-worktrees/beads-sync commit -m chore(beads): sync beans-test metadata" "$tmp_dir/git.log"; then
-    echo "land-the-plane did not commit beads-sync metadata during closeout" >&2
-    exit 1
-  fi
-
-  if ! grep -Fq -- "-C $tmp_dir/.git/beads-worktrees/beads-sync push origin beads-sync" "$tmp_dir/git.log"; then
-    echo "land-the-plane did not push beads-sync during closeout" >&2
-    exit 1
-  fi
-
-  beads_sync_push_line="$(grep -n -F -- "-C $tmp_dir/.git/beads-worktrees/beads-sync push origin beads-sync" "$tmp_dir/git.log" | head -n 1 | cut -d: -f1)"
-  main_push_line="$(grep -n -F -- "-C $tmp_dir push origin main" "$tmp_dir/git.log" | head -n 1 | cut -d: -f1)"
-
-  if [[ -z "$beads_sync_push_line" || -z "$main_push_line" || "$beads_sync_push_line" -ge "$main_push_line" ]]; then
-    echo "land-the-plane should push beads-sync before pushing main" >&2
-    exit 1
-  fi
-
   if ! grep -Fq "worktree remove $task_worktree" "$tmp_dir/git.log"; then
     echo "land-the-plane did not prune the just-closed task worktree" >&2
     exit 1
@@ -420,8 +325,8 @@ EOF
     exit 1
   fi
 
-  if [[ "$output" != *"dev/beads-start beans-ntk"* ]]; then
-    echo "land-the-plane did not prefer the best next ready task" >&2
+  if [[ "$output" != *"dev/beads-start beans-ntk"* || "$output" != *"bd show beans-ntk"* ]]; then
+    echo "land-the-plane did not print the modern next-session prompt" >&2
     exit 1
   fi
 }
@@ -435,7 +340,7 @@ run_dirty_root_failure() {
   task_worktree="$tmp_dir/worktrees/beans-test"
   trap 'rm -rf "$tmp_dir"' RETURN
 
-  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$task_worktree" "$tmp_dir/.git/beads-worktrees/beads-sync"
+  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$tmp_dir/.git" "$task_worktree"
   cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
 
   cat >"$tmp_dir/dev/beads-finish" <<'EOF'
@@ -495,19 +400,9 @@ case "\$1" in
 esac
 EOF
 
-cat >"$tmp_dir/bin/bd" <<'EOF'
+  cat >"$tmp_dir/bin/bd" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-
-if [[ "${1:-}" == "--no-daemon" ]]; then
-  shift
-fi
-
-if [[ "${1:-}" == "list" && "${2:-}" == "--status" && "${3:-}" == "closed" ]]; then
-  printf "beans-test [closed]\n"
-  exit 0
-fi
-
 exit 0
 EOF
 
@@ -541,7 +436,7 @@ run_checkpoint_still_dirty_failure() {
   task_worktree="$tmp_dir/worktrees/beans-test"
   trap 'rm -rf "$tmp_dir"' RETURN
 
-  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$task_worktree" "$tmp_dir/.git/beads-worktrees/beads-sync"
+  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$tmp_dir/.git" "$task_worktree"
   cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
 
   cat >"$tmp_dir/dev/beads-finish" <<'EOF'
@@ -652,7 +547,7 @@ run_root_merge_conflict_failure() {
   task_worktree="$tmp_dir/worktrees/beans-test"
   trap 'rm -rf "$tmp_dir"' RETURN
 
-  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$task_worktree" "$tmp_dir/.git/beads-worktrees/beads-sync"
+  mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$tmp_dir/.git" "$task_worktree"
   cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
 
   cat >"$tmp_dir/dev/beads-finish" <<'EOF'

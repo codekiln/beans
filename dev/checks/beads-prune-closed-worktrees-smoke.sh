@@ -59,10 +59,6 @@ cat >"$tmp_dir/bin/bd" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ "$1" == "--no-daemon" ]]; then
-  shift
-fi
-
 case "${1:-}" in
   list)
     cat <<'LIST'

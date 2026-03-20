@@ -61,7 +61,14 @@ case "\$1" in
 esac
 EOF
 
-chmod +x "$tmp_dir/bin/git" "$tmp_dir/bin/bd" "$tmp_dir/beads-start"
+cat >"$tmp_dir/bin/gh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+printf "fake-gh-token\n"
+EOF
+
+chmod +x "$tmp_dir/bin/git" "$tmp_dir/bin/bd" "$tmp_dir/bin/gh" "$tmp_dir/beads-start"
 
 cat >"$tmp_dir/.gitignore" <<'EOF'
 # bd worktrees
@@ -90,18 +97,13 @@ if ! grep -Fqx "# bd worktrees" "$tmp_dir/.gitignore"; then
   exit 1
 fi
 
-if ! grep -Fq "branch codex/beans-test HEAD" "$tmp_dir/git.log"; then
-  echo "beads-start did not create the expected branch when absent" >&2
+if ! grep -Fq -- "prime" "$tmp_dir/bd.log"; then
+  echo "beads-start did not prime bd before starting work" >&2
   exit 1
 fi
 
-if ! grep -Fq -- "--no-daemon prime" "$tmp_dir/bd.log"; then
-  echo "beads-start did not use --no-daemon for bd prime" >&2
-  exit 1
-fi
-
-if ! grep -Fq -- "--no-daemon show beans-test" "$tmp_dir/bd.log"; then
-  echo "beads-start did not use --no-daemon for bd show" >&2
+if ! grep -Fq -- "show beans-test" "$tmp_dir/bd.log"; then
+  echo "beads-start did not show the target issue before startup" >&2
   exit 1
 fi
 
@@ -120,8 +122,13 @@ if ! grep -Fq "dev/hooks/pre-push" "$tmp_dir/.git/hooks/pre-push"; then
   exit 1
 fi
 
-if ! grep -Fq -- "--no-daemon update beans-test --claim" "$tmp_dir/bd.log"; then
-  echo "beads-start did not use --no-daemon when claiming the issue" >&2
+if ! grep -Fq -- "update beans-test --claim" "$tmp_dir/bd.log"; then
+  echo "beads-start did not claim the issue" >&2
+  exit 1
+fi
+
+if ! grep -Fq -- "dolt push" "$tmp_dir/bd.log"; then
+  echo "beads-start did not push the Beads mutation through Dolt" >&2
   exit 1
 fi
 

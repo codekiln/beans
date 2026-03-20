@@ -44,7 +44,7 @@ worktree_root="$repo_root/worktrees"
 closed_ids_file="$(mktemp)"
 trap 'rm -f "$closed_ids_file"' EXIT
 
-bd --no-daemon list --status closed | grep -oE 'beans-[a-z0-9.]+' | sort -u >"$closed_ids_file" || true
+bd list --status closed | grep -oE 'beans-[a-z0-9.]+' | sort -u >"$closed_ids_file" || true
 
 if [[ ! -s "$closed_ids_file" ]]; then
   echo "No closed Beads issues found."

@@ -26,7 +26,7 @@
   - `dev/beads-start <issue-id>`
   - `dev/beads-finish <issue-id> "optional notes"`
   - `dev/land-the-plane <issue-id> "optional notes"`
-- In this repo, prefer direct Beads mode. The helpers force `bd --no-daemon`, and durability should be checked against `.git/beads-worktrees/beads-sync/.beads/issues.jsonl` rather than the current checkout's `.beads/issues.jsonl`.
+- In this repo, use the modern `bd` CLI shape directly. The helpers push their own Beads mutations with `bd dolt push`, and manual mutations should do the same with `DOLT_REMOTE_PASSWORD="$(gh auth token)" bd dolt push`.
 - Each worktree needs its own `npm install` before running the dev server.
 
 ## Devcontainer expectations for worktrees
