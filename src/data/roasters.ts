@@ -1,14 +1,13 @@
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
-type RoasterEntry = CollectionEntry<"roasters">;
-export type Roaster = RoasterEntry & RoasterEntry["data"] & { slug: string };
+type RoasterCollectionEntry = CollectionEntry<"roasters">;
+export type Roaster = RoasterCollectionEntry & RoasterCollectionEntry["data"] & { slug: string };
 
-const isRoasterEntry = (entry: RoasterEntry) =>
-  /(^|\/)roaster(\.md)?$/.test(entry.id) || /(^|\/)roaster$/.test(entry.slug);
+const isRoasterEntry = (entry: RoasterCollectionEntry) => /(^|\/)roaster$/.test(entry.id);
 
-const getRoasterSlug = (entry: RoasterEntry) => {
-  const base = (entry.id.includes("/") ? entry.id : entry.slug).replace(/\/roaster(\.md)?$/, "");
+const getRoasterSlug = (entry: RoasterCollectionEntry) => {
+  const base = entry.id.replace(/\/roaster$/, "");
   const segments = base.split("/").filter(Boolean);
   return segments[segments.length - 1] ?? "";
 };

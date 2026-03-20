@@ -1,7 +1,8 @@
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
-export type BeanEntry = CollectionEntry<"beans">;
+type BeanCollectionEntry = CollectionEntry<"beans">;
+export type BeanEntry = BeanCollectionEntry & { slug: string };
 export type BeanRouteInfo = {
   aliases: string[];
   commandText: string;
@@ -36,7 +37,7 @@ const getTimeToken = (time: string | undefined) =>
 
 export const getBeans = async () => {
   const entries = await getCollection("beans");
-  return entries.sort(compareBeansByDate);
+  return entries.map((entry) => ({ ...entry, slug: entry.id })).sort(compareBeansByDate);
 };
 
 export const getBeanRouteInfoMap = (beans: BeanEntry[]) => {

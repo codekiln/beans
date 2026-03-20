@@ -1,8 +1,8 @@
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
-type RecipeEntry = CollectionEntry<"recipes">;
-export type Recipe = RecipeEntry["data"] & { slug: string; steps: string[] };
+type RecipeCollectionEntry = CollectionEntry<"recipes">;
+export type Recipe = RecipeCollectionEntry & RecipeCollectionEntry["data"] & { slug: string; steps: string[] };
 
 const parseRecipeBody = (body: string) => {
   const steps: string[] = [];
@@ -31,6 +31,6 @@ const parseRecipeBody = (body: string) => {
 export const getRecipes = async () => {
   const entries = await getCollection("recipes");
   return entries
-    .map((entry) => ({ ...entry.data, steps: parseRecipeBody(entry.body ?? ""), slug: entry.slug }))
+    .map((entry) => ({ ...entry, ...entry.data, steps: parseRecipeBody(entry.body ?? ""), slug: entry.id }))
     .sort((a, b) => a.order - b.order);
 };

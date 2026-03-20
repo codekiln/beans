@@ -1,4 +1,5 @@
 ---
+import { render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getBeanRouteInfoMap, getBeans, getBeansForCompanion } from "../../data/beans";
 import {
@@ -16,7 +17,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const companion = slug ? await getCompanionBySlug(slug) : null;
-const renderResult = companion ? await companion.render() : null;
+const renderResult = companion ? await render(companion) : null;
 const NotesContent = renderResult?.Content;
 const allBeans = await getBeans();
 const beanRouteInfo = getBeanRouteInfoMap(allBeans);

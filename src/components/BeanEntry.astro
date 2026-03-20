@@ -1,4 +1,5 @@
 ---
+import { render } from "astro:content";
 import TagRow from "./TagRow.astro";
 import CoffeeBuddyQuote from "./CoffeeBuddyQuote.astro";
 import { getCompanionBySlug } from "../data/companions";
@@ -6,7 +7,7 @@ import { getBeanRouteInfo, getBeans } from "../data/beans";
 import { withBase } from "../utils/paths";
 
 const { bean, routeInfo = null, showBuddyComment = false, showClosingMark = false } = Astro.props;
-const { Content } = await bean.render();
+const { Content } = await render(bean);
 const beanRouteInfo = routeInfo ?? getBeanRouteInfo(bean, await getBeans());
 const companion = bean.data.personaComment
   ? await getCompanionBySlug(bean.data.personaComment.companion)

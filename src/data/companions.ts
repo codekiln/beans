@@ -1,7 +1,8 @@
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
-export type CompanionEntry = CollectionEntry<"companions">;
+type CompanionCollectionEntry = CollectionEntry<"companions">;
+export type CompanionEntry = CompanionCollectionEntry & { slug: string };
 export type CompanionPortrait = {
   src: string;
   darkSrc?: string;
@@ -15,11 +16,13 @@ const DEFAULT_COMPANION_PORTRAIT = {
 
 export const getCompanions = async () => {
   const entries = await getCollection("companions");
-  return entries.sort((a, b) => {
-    const orderCompare = a.data.order - b.data.order;
-    if (orderCompare !== 0) return orderCompare;
-    return a.data.name.localeCompare(b.data.name);
-  });
+  return entries
+    .map((entry) => ({ ...entry, slug: entry.id }))
+    .sort((a, b) => {
+      const orderCompare = a.data.order - b.data.order;
+      if (orderCompare !== 0) return orderCompare;
+      return a.data.name.localeCompare(b.data.name);
+    });
 };
 
 export const getCompanionPath = (slug: string) => `/companion/${slug}/`;

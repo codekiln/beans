@@ -1,7 +1,11 @@
-import { defineCollection, z } from "astro:content";
+import { defineCollection } from "astro:content";
+import { glob } from "astro/loaders";
+import { z } from "astro/zod";
+
+const markdownPattern = "**/[^_]*.{md,mdx}";
 
 const beans = defineCollection({
-  type: "content",
+  loader: glob({ pattern: markdownPattern, base: "./src/content/beans" }),
   schema: z.object({
     id: z.string(),
     beanKey: z.string(),
@@ -82,7 +86,7 @@ const beans = defineCollection({
 });
 
 const companions = defineCollection({
-  type: "content",
+  loader: glob({ pattern: markdownPattern, base: "./src/content/companions" }),
   schema: z.object({
     name: z.string(),
     title: z.string(),
@@ -99,7 +103,7 @@ const companions = defineCollection({
 });
 
 const recipes = defineCollection({
-  type: "content",
+  loader: glob({ pattern: markdownPattern, base: "./src/content/recipes" }),
   schema: z.object({
     name: z.string(),
     summary: z.string(),
@@ -123,7 +127,7 @@ const recipes = defineCollection({
 });
 
 const equipment = defineCollection({
-  type: "content",
+  loader: glob({ pattern: markdownPattern, base: "./src/content/equipment" }),
   schema: z.object({
     name: z.string(),
     type: z.string(),
@@ -156,9 +160,8 @@ const equipment = defineCollection({
   })
 });
 
-
 const terms = defineCollection({
-  type: "content",
+  loader: glob({ pattern: markdownPattern, base: "./src/content/terms" }),
   schema: z.object({
     name: z.string(),
     aliases: z.array(z.string()).optional(),
@@ -167,7 +170,7 @@ const terms = defineCollection({
 });
 
 const questions = defineCollection({
-  type: "content",
+  loader: glob({ pattern: markdownPattern, base: "./src/content/questions" }),
   schema: z.object({
     title: z.string(),
     summary: z.string(),
@@ -176,7 +179,7 @@ const questions = defineCollection({
 });
 
 const roasters = defineCollection({
-  type: "content",
+  loader: glob({ pattern: markdownPattern, base: "./src/content/roasters" }),
   schema: z.union([
     z.object({
       name: z.string(),

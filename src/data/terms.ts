@@ -4,11 +4,12 @@ import { stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-type TermEntry = CollectionEntry<"terms">;
-export type Term = TermEntry &
-  TermEntry["data"] & {
+type TermCollectionEntry = CollectionEntry<"terms">;
+export type Term = TermCollectionEntry &
+  TermCollectionEntry["data"] & {
     dateCreated: string;
     dateUpdated: string;
+    slug: string;
   };
 
 const TERMS_DIR = fileURLToPath(new URL("../content/terms", import.meta.url));
@@ -47,7 +48,7 @@ export const getTerms = async () => {
   const hydrated = await Promise.all(
     entries.map(async (entry) => {
       const dates = await getTermFileDates(entry.id);
-      return { ...entry, ...entry.data, ...dates };
+      return { ...entry, ...entry.data, ...dates, slug: entry.id };
     })
   );
 

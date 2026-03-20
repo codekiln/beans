@@ -1,4 +1,5 @@
 ---
+import { render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getTerms } from "../../data/terms";
 import { withBase } from "../../utils/paths";
@@ -11,7 +12,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const terms = await getTerms();
 const term = terms.find((entry) => entry.slug === slug);
-const renderResult = term ? await term.render() : null;
+const renderResult = term ? await render(term) : null;
 const DefinitionContent = renderResult?.Content;
 const hasDefinition = Boolean(term?.body?.trim());
 ---

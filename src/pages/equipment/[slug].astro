@@ -1,4 +1,5 @@
 ---
+import { render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getEquipment } from "../../data/equipment";
 import { getBeanRouteInfoMap, getBeans } from "../../data/beans";
@@ -24,9 +25,9 @@ const item =
   equipment.find((entry) => entry.slug === slug) ??
   equipment.find((entry) => entry.aliases?.some((alias) => alias.slug === slug));
 const alias = item?.aliases?.find((entry) => entry.slug === slug);
-const related = equipment.filter((entry) => item?.related.includes(entry.slug));
+const related = equipment.filter((entry) => item?.related.includes(entry.slug) ?? false);
 const gearSlugs = new Set([item?.slug, ...(item?.aliases?.map((entry) => entry.slug) ?? [])]);
-const renderResult = item ? await item.render() : null;
+const renderResult = item ? await render(item) : null;
 const NotesContent = renderResult?.Content;
 const hasNotes = Boolean(item?.body?.trim());
 const relatedBeans = beans
