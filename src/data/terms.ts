@@ -48,7 +48,7 @@ export const getTerms = async () => {
   const hydrated = await Promise.all(
     entries.map(async (entry) => {
       const dates = await getTermFileDates(entry.id);
-      return { ...entry, ...entry.data, ...dates, slug: entry.id };
+      return { ...entry, ...entry.data, ...dates, slug: entry.slug };
     })
   );
 

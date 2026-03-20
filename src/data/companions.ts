@@ -17,7 +17,7 @@ const DEFAULT_COMPANION_PORTRAIT = {
 export const getCompanions = async () => {
   const entries = await getCollection("companions");
   return entries
-    .map((entry) => ({ ...entry, slug: entry.id }))
+    .map((entry) => ({ ...entry, slug: entry.slug }))
     .sort((a, b) => {
       const orderCompare = a.data.order - b.data.order;
       if (orderCompare !== 0) return orderCompare;

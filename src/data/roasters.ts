@@ -4,10 +4,10 @@ import type { CollectionEntry } from "astro:content";
 type RoasterCollectionEntry = CollectionEntry<"roasters">;
 export type Roaster = RoasterCollectionEntry & RoasterCollectionEntry["data"] & { slug: string };
 
-const isRoasterEntry = (entry: RoasterCollectionEntry) => /(^|\/)roaster$/.test(entry.id);
+const isRoasterEntry = (entry: RoasterCollectionEntry) => /(^|\/)roaster$/.test(entry.slug);
 
 const getRoasterSlug = (entry: RoasterCollectionEntry) => {
-  const base = entry.id.replace(/\/roaster$/, "");
+  const base = entry.slug.replace(/\/roaster$/, "");
   const segments = base.split("/").filter(Boolean);
   return segments[segments.length - 1] ?? "";
 };

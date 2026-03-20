@@ -7,7 +7,7 @@ export type EquipmentItem = EquipmentCollectionEntry & EquipmentCollectionEntry[
 export const getEquipment = async () => {
   const entries = await getCollection("equipment");
   return entries
-    .map((entry) => ({ ...entry, ...entry.data, slug: entry.id }))
+    .map((entry) => ({ ...entry, ...entry.data, slug: entry.slug }))
     .sort((a, b) => a.order - b.order);
 };
 

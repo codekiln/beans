@@ -5,16 +5,16 @@ type RoasterCollectionEntry = CollectionEntry<"roasters">;
 type CoffeeEntry = RoasterCollectionEntry & RoasterCollectionEntry["data"];
 export type Coffee = CoffeeEntry & { roaster: string; slug: string };
 
-const isRoasterEntry = (entry: RoasterCollectionEntry) => /(^|\/)roaster$/.test(entry.id);
+const isRoasterEntry = (entry: RoasterCollectionEntry) => /(^|\/)roaster$/.test(entry.slug);
 
-const getPathSegments = (entry: RoasterCollectionEntry) => entry.id.split("/").filter(Boolean);
+const getPathSegments = (entry: RoasterCollectionEntry) => entry.slug.split("/").filter(Boolean);
 
 const getRoasterSlug = (entry: RoasterCollectionEntry) => {
   const segments = getPathSegments(entry);
   return segments.length >= 2 ? segments[segments.length - 2] : segments[0] ?? "";
 };
 
-const getCoffeeSlug = (entry: RoasterCollectionEntry) => entry.id;
+const getCoffeeSlug = (entry: RoasterCollectionEntry) => entry.slug;
 
 export const getCoffees = async () => {
   const entries = await getCollection("roasters");

@@ -31,6 +31,6 @@ const parseRecipeBody = (body: string) => {
 export const getRecipes = async () => {
   const entries = await getCollection("recipes");
   return entries
-    .map((entry) => ({ ...entry, ...entry.data, steps: parseRecipeBody(entry.body ?? ""), slug: entry.id }))
+    .map((entry) => ({ ...entry, ...entry.data, steps: parseRecipeBody(entry.body ?? ""), slug: entry.slug }))
     .sort((a, b) => a.order - b.order);
 };

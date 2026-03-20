@@ -37,7 +37,7 @@ const getTimeToken = (time: string | undefined) =>
 
 export const getBeans = async () => {
   const entries = await getCollection("beans");
-  return entries.map((entry) => ({ ...entry, slug: entry.id })).sort(compareBeansByDate);
+  return entries.map((entry) => ({ ...entry, slug: entry.slug })).sort(compareBeansByDate);
 };
 
 export const getBeanRouteInfoMap = (beans: BeanEntry[]) => {
