@@ -3,6 +3,7 @@ import type { CollectionEntry } from "astro:content";
 import { stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { getContentSlug } from "./content-ids";
 
 type TermCollectionEntry = CollectionEntry<"terms">;
 export type Term = TermCollectionEntry &
@@ -48,7 +49,7 @@ export const getTerms = async () => {
   const hydrated = await Promise.all(
     entries.map(async (entry) => {
       const dates = await getTermFileDates(entry.id);
-      return { ...entry, ...entry.data, ...dates, slug: entry.slug };
+      return { ...entry, ...entry.data, ...dates, slug: getContentSlug(entry.id) };
     })
   );
 

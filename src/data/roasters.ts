@@ -1,14 +1,17 @@
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
+import { getContentPathSegments } from "./content-ids";
 
 type RoasterCollectionEntry = CollectionEntry<"roasters">;
 export type Roaster = RoasterCollectionEntry & RoasterCollectionEntry["data"] & { slug: string };
 
-const isRoasterEntry = (entry: RoasterCollectionEntry) => /(^|\/)roaster$/.test(entry.slug);
+const isRoasterEntry = (entry: RoasterCollectionEntry) => {
+  const segments = getContentPathSegments(entry.id);
+  return segments[segments.length - 1] === "roaster";
+};
 
 const getRoasterSlug = (entry: RoasterCollectionEntry) => {
-  const base = entry.slug.replace(/\/roaster$/, "");
-  const segments = base.split("/").filter(Boolean);
+  const segments = getContentPathSegments(entry.id).filter((segment) => segment !== "roaster");
   return segments[segments.length - 1] ?? "";
 };
 

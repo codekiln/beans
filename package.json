@@ -8,6 +8,7 @@
     "dev-local": "astro dev --host 0.0.0.0 --port 4322",
     "dev-worktree": "astro dev --host 127.0.0.1",
     "check:bean-rendering": "node dev/checks/bean-rendering.mjs",
+    "check:content-routes": "node dev/checks/content-routes.mjs",
     "check:beads-start": "bash dev/checks/beads-start-smoke.sh",
     "check:beads-finish": "bash dev/checks/beads-finish-smoke.sh",
     "check:beads-pre-push": "bash dev/checks/beads-pre-push-smoke.sh",

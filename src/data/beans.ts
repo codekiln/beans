@@ -1,5 +1,6 @@
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
+import { getContentSlug } from "./content-ids";
 
 type BeanCollectionEntry = CollectionEntry<"beans">;
 export type BeanEntry = BeanCollectionEntry & { slug: string };
@@ -37,7 +38,7 @@ const getTimeToken = (time: string | undefined) =>
 
 export const getBeans = async () => {
   const entries = await getCollection("beans");
-  return entries.map((entry) => ({ ...entry, slug: entry.slug })).sort(compareBeansByDate);
+  return entries.map((entry) => ({ ...entry, slug: getContentSlug(entry.id) })).sort(compareBeansByDate);
 };
 
 export const getBeanRouteInfoMap = (beans: BeanEntry[]) => {
