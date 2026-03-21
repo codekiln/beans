@@ -74,11 +74,8 @@ gear:
     slug: "<slug>"
 ---
 
-### Observations
-- <note>
+<note>
 
-### Brew log
-- <note>
 ```
 
 ## Notes
@@ -86,4 +83,5 @@ gear:
 - Omit optional fields or entire objects when unknown.
 - Keep the primary descriptive content in the markdown body.
 - Images in the markdown body must use the `/beans/images/` path.
-- Do not include an inline body preamble like `` `$ bean log YYYY-MM-DD` `` or `` `$ bean log YYYY-MM-DD HHMM` ``; the entry header already renders the command prompt.
+- Do not include an inline body preamble like `$ bean log YYYY-MM-DD` or `$ bean log YYYY-MM-DD HHMM`; 
+  the entry header already renders the command prompt.
