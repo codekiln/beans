@@ -15,7 +15,7 @@ In Beans, the repo root checkout is the integration-only `main` worktree. Keep a
 ## What the helper does
 
 1. Runs explicit `--check` commands when provided.
-2. Otherwise runs the repo default validation commands when configured. In Beans, the defaults are `npm run check:beads-start` and `npm run build`.
+2. Otherwise runs the repo default validation commands when configured. In Beans, the defaults are `npm run check:beads-start`, `npm run check:markdown-a11y`, and `npm run build`.
 3. If `--no-checks` is passed, skips validation for that one landing.
 4. Creates any requested follow-up Beads issues before closeout and pushes each one through Dolt.
 5. If the task worktree has tracked or untracked repo edits, auto-commits them with a checkpoint commit before closeout.

@@ -43,6 +43,7 @@ Before landing:
 
 ```bash
 git status --short
+npm run check:markdown-a11y
 npm run build
 dev/beads-finish <issue-id> "optional notes"
 git push origin main

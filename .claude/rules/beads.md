@@ -94,7 +94,7 @@ bd show <issue-id> --json
 
 It:
 
-1. Runs default validation (`npm run check:beads-start` and `npm run build`) unless overridden.
+1. Runs default validation (`npm run check:beads-start`, `npm run check:markdown-a11y`, and `npm run build`) unless overridden.
 2. Creates requested follow-up Beads issues and pushes each one through Dolt.
 3. Auto-commits tracked or untracked task-worktree changes when safe.
 4. Delegates closeout to `dev/beads-finish`.

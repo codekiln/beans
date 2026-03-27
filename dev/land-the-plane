@@ -189,6 +189,10 @@ run_checks() {
       default_checks+=("npm run check:beads-start")
     fi
 
+    if [[ -f package.json ]] && grep -q '"check:markdown-a11y"' package.json; then
+      default_checks+=("npm run check:markdown-a11y")
+    fi
+
     if [[ -f package.json ]] && grep -q '"build"' package.json; then
       default_checks+=("npm run build")
     fi

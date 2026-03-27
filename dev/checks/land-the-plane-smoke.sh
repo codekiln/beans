@@ -22,6 +22,7 @@ run_success_scenario() {
 {
   "scripts": {
     "check:beads-start": "echo beads-start",
+    "check:markdown-a11y": "echo markdown-a11y",
     "build": "echo build"
   }
 }
@@ -194,6 +195,11 @@ if [[ "\$1" == "run" && "\$2" == "check:beads-start" ]]; then
   exit 0
 fi
 
+if [[ "\$1" == "run" && "\$2" == "check:markdown-a11y" ]]; then
+  echo "markdown-a11y ok"
+  exit 0
+fi
+
 if [[ "\$1" == "run" && "\$2" == "build" ]]; then
   echo "build ok"
   exit 0
@@ -272,6 +278,11 @@ EOF
 
   if ! grep -Fq "run check:beads-start" "$tmp_dir/npm.log"; then
     echo "land-the-plane did not run the default Beads startup smoke check" >&2
+    exit 1
+  fi
+
+  if ! grep -Fq "run check:markdown-a11y" "$tmp_dir/npm.log"; then
+    echo "land-the-plane did not run the default markdown accessibility check" >&2
     exit 1
   fi
 
