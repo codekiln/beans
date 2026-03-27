@@ -7,16 +7,16 @@ blend: "single-origin"
 
 ## [Finca Los Angeles | El Salvador | Parable Coffee Co.](https://www.parablecoffeeco.com/product-page/colombia-los-naranjos-san-agustin) 
 
-### facts
+## facts
 
 - Process: Black Honey
 - Variety: Pacamara
 
 
-#### location: El Salvador
+## location: El Salvador
 - Region: Cantón Taltapanca, Apaneca
 
-#### elevation - 1380 MASL/≈4,528 feet
+## elevation - 1380 MASL/≈4,528 feet
 MASL = Meters Above Sea Level
 
 For reference, 
@@ -24,7 +24,7 @@ For reference,
 - Denver, CO is at ~5,280 ft (1,609 m) (aka "Mile High City")
 - Boulder, CO is at ~5,430 ft (1,655 m)
 
-#### farm
+## farm
 
 > Finca Los Angeles is a 16-hectare farm founded in 2017 by Los Naranjos Coffee. Several years ago there was a natural disaster that destroyed a large part of the community in the cantón. This farm has been part of the development of the area since and is aiming to be one of the best. In 2020 it competed in its first Cup of Excellence and placed 5th. Something notable about this farm is its topography. It is a practically flat farm with very young nearly 100% Pacamara trees. It has stood out for many of its coffees in places such as Holland, France, and the United Kingdom.
 

@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check markdown accessibility
+        run: npm run check:markdown-a11y
+
       - name: Build
         run: npm run build
 

@@ -8,7 +8,7 @@ profile: "balanced · sweet dark fruit · earthy chocolate"
 blend: "Ethiopia · Sumatra · Guatemala"
 ---
 
-### Label
+## Label
 
 > Balanced and sweet with dark fruit and earthy chocolate notes.
 

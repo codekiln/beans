@@ -7,7 +7,7 @@ blend: "single-origin"
 
 ## [Guatemala ACODIHUE Heuheutenango Organic | Parable Coffee Co.](https://www.parablecoffeeco.com/product-page/guatemala-organic)
 
-### facts
+## facts
 
 - Variety: Bourbon, Catimor, Caturra, Maragogype, Pache
 - Altitude: 1400-2200 [masl](/beans/terms/masl/)
@@ -16,7 +16,7 @@ blend: "single-origin"
 - Certifications: Organic and Fair Trade
 
 
-#### about the producer  
+## about the producer  
 
 Asociación de Cooperación al Desarrollo Integral de Huehuetenango (ACODIHUE) 
 
@@ -40,6 +40,6 @@ Parable's product notes for this coffee highlight ACODIHUE's
 poverty reduction, food security, and
 environmental stewardship."
 
-#### other
+## other
 
 
