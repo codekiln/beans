@@ -16,9 +16,19 @@ const { groups } = Astro.props;
         <h3>{group.label}</h3>
         <ul class="table-list">
           {group.links.map((link) => (
-            <li>
-              <a href={withBase(link.href)}>[{link.label}]</a>
-              {link.meta ? ` · ${link.meta}` : ""}
+            <li class:list={["entity-backlink-item", link.command && "entity-backlink-item-bean"]}>
+              <a class="entity-backlink-link" href={withBase(link.href)}>
+                <span aria-hidden="true">[</span>
+                {link.command ? (
+                  <>
+                    <span class="entity-backlink-command">{link.command}</span>
+                    <span class="entity-backlink-separator" aria-hidden="true"> - </span>
+                  </>
+                ) : null}
+                <span class="entity-backlink-label">{link.label}</span>
+                <span aria-hidden="true">]</span>
+              </a>
+              {link.meta ? <span class="entity-backlink-meta"> · {link.meta}</span> : null}
             </li>
           ))}
         </ul>

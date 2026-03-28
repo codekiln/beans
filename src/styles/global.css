@@ -679,6 +679,31 @@ button:focus-visible {
   gap: 0.75rem;
 }
 
+.entity-backlink-item {
+  line-height: 1.45;
+}
+
+.entity-backlink-link {
+  text-decoration: none;
+}
+
+.entity-backlink-link:hover,
+.entity-backlink-link:focus-visible {
+  text-decoration: underline;
+}
+
+.entity-backlink-command {
+  font-weight: 600;
+}
+
+.entity-backlink-item-bean .entity-backlink-label {
+  color: var(--muted);
+}
+
+.entity-backlink-meta {
+  color: var(--muted);
+}
+
 .stream-list {
   gap: 1rem;
 }

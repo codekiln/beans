@@ -27,6 +27,7 @@ export type BacklinkSourceKind =
   | "terms";
 
 export type EntityBacklink = {
+  command?: string;
   href: string;
   label: string;
   meta?: string;
@@ -45,6 +46,7 @@ type TargetEntity = {
 
 type SourceDescriptor = {
   body: string;
+  command?: string;
   href: string;
   kind: BacklinkSourceKind;
   label: string;
@@ -109,6 +111,7 @@ const addBacklink = (
 
   if (!group.has(source.href)) {
     group.set(source.href, {
+      command: source.command,
       href: source.href,
       label: source.label,
       meta: source.meta
@@ -150,13 +153,17 @@ export const getEntityBacklinks = async (target: TargetEntity): Promise<EntityBa
   const beanSources: SourceDescriptor[] = beans.map((bean) => {
     const routeInfo = beanRouteInfo.get(bean.slug);
     const displayLabel = routeInfo?.displayLabel ?? bean.data.date;
+    const commandLabel = routeInfo?.commandText
+      ? `bean ${routeInfo.commandText}`
+      : `bean log ${displayLabel}`;
 
     return {
       body: bean.body,
+      command: commandLabel,
       href: routeInfo?.path ?? `/log/${bean.slug}/`,
       kind: "beans",
-      label: displayLabel,
-      meta: `bean log ${displayLabel}`,
+      label: bean.data.title,
+      meta: undefined,
       slug: bean.slug
     };
   });
