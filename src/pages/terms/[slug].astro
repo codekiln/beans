@@ -1,7 +1,9 @@
 ---
 import { render } from "astro:content";
+import EntityBacklinks from "../../components/EntityBacklinks.astro";
+import { getEntityBacklinks } from "../../data/entity-backlinks";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getTermReferences, getTerms } from "../../data/terms";
+import { getTerms } from "../../data/terms";
 import { withBase } from "../../utils/paths";
 
 export async function getStaticPaths() {
@@ -12,7 +14,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const terms = await getTerms();
 const term = terms.find((entry) => entry.slug === slug);
-const references = term ? await getTermReferences(term.slug) : [];
+const backlinks = term ? await getEntityBacklinks({ kind: "term", slug: term.slug }) : [];
 const renderResult = term ? await render(term) : null;
 const DefinitionContent = renderResult?.Content;
 const hasDefinition = Boolean(term?.body?.trim());
@@ -63,16 +65,5 @@ const hasDefinition = Boolean(term?.body?.trim());
       </ul>
     </section>
   ) : null}
-  {references.length ? (
-    <section class="window">
-      <h2 class="section-title">Referenced In</h2>
-      <ul class="table-list">
-        {references.map((reference) => (
-          <li>
-            <a href={withBase(reference.href)}>[{reference.label}]</a> · {reference.meta}
-          </li>
-        ))}
-      </ul>
-    </section>
-  ) : null}
+  <EntityBacklinks groups={backlinks} />
 </BaseLayout>

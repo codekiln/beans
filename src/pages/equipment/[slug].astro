@@ -1,8 +1,9 @@
 ---
 import { render } from "astro:content";
+import EntityBacklinks from "../../components/EntityBacklinks.astro";
+import { getEntityBacklinks } from "../../data/entity-backlinks";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getEquipment } from "../../data/equipment";
-import { getBeanRouteInfoMap, getBeans } from "../../data/beans";
 import { withBase } from "../../utils/paths";
 
 export async function getStaticPaths() {
@@ -15,8 +16,6 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const equipment = await getEquipment();
-const beans = await getBeans();
-const beanRouteInfo = getBeanRouteInfoMap(beans);
 const currency = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD"
@@ -26,26 +25,10 @@ const item =
   equipment.find((entry) => entry.aliases?.some((alias) => alias.slug === slug));
 const alias = item?.aliases?.find((entry) => entry.slug === slug);
 const related = equipment.filter((entry) => item?.related.includes(entry.slug) ?? false);
-const gearSlugs = new Set([item?.slug, ...(item?.aliases?.map((entry) => entry.slug) ?? [])]);
+const backlinks = item ? await getEntityBacklinks({ kind: "equipment", slug: item.slug }) : [];
 const renderResult = item ? await render(item) : null;
 const NotesContent = renderResult?.Content;
 const hasNotes = Boolean(item?.body?.trim());
-const relatedBeans = beans
-  .filter((bean) => {
-    const brewerSlug = bean.data.brew?.brewer?.slug;
-    const grinderSlug = bean.data.brewDetails?.grinder?.slug;
-    const extraGear = bean.data.gear?.map((entry) => entry.slug) ?? [];
-    return (
-      (brewerSlug && gearSlugs.has(brewerSlug)) ||
-      (grinderSlug && gearSlugs.has(grinderSlug)) ||
-      extraGear.some((entry) => entry && gearSlugs.has(entry))
-    );
-  })
-  .sort((a, b) => {
-    const left = new Date(`${a.data.date}T${a.data.time ?? "00:00"}:00`);
-    const right = new Date(`${b.data.date}T${b.data.time ?? "00:00"}:00`);
-    return right.getTime() - left.getTime();
-  });
 ---
 <BaseLayout
   title={`${item?.name ?? "Equipment"} · Beans`}
@@ -90,22 +73,7 @@ const relatedBeans = beans
       </ul>
     </section>
   )}
-  <section class="window">
-    <h2 class="section-title">Recent beans</h2>
-    {relatedBeans.length > 0 ? (
-      <ul>
-        {relatedBeans.map((bean) => (
-          <li>
-            <a href={withBase(beanRouteInfo.get(bean.slug)?.path ?? `/log/${bean.slug}/`)}>
-              {beanRouteInfo.get(bean.slug)?.displayLabel ?? bean.data.date} · {bean.data.title}
-            </a>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p>No beans logged with this gear yet.</p>
-    )}
-  </section>
+  <EntityBacklinks groups={backlinks} />
   {item?.references?.length > 0 && (
     <section class="window">
       <h2 class="section-title">References</h2>

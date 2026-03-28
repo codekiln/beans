@@ -1,4 +1,6 @@
 ---
+import EntityBacklinks from "../../components/EntityBacklinks.astro";
+import { getEntityBacklinks } from "../../data/entity-backlinks";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getRecipes } from "../../data/recipes";
 import { withBase } from "../../utils/paths";
@@ -11,6 +13,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const recipes = await getRecipes();
 const recipe = recipes.find((entry) => entry.slug === slug);
+const backlinks = recipe ? await getEntityBacklinks({ kind: "recipe", slug: recipe.slug }) : [];
 ---
 <BaseLayout
   title={`${recipe?.name ?? "Recipe"} · Beans`}
@@ -55,4 +58,5 @@ const recipe = recipes.find((entry) => entry.slug === slug);
       ))}
     </ol>
   </section>
+  <EntityBacklinks groups={backlinks} />
 </BaseLayout>

@@ -1,8 +1,9 @@
 ---
 import { render } from "astro:content";
+import EntityBacklinks from "../../components/EntityBacklinks.astro";
+import { getEntityBacklinks } from "../../data/entity-backlinks";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getRoasters } from "../../data/roasters";
-import { getCoffees } from "../../data/coffees";
 import { withBase } from "../../utils/paths";
 
 export async function getStaticPaths() {
@@ -13,8 +14,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const roasters = await getRoasters();
 const roaster = roasters.find((entry) => entry.slug === slug);
-const coffees = await getCoffees();
-const roasterCoffees = coffees.filter((coffee) => coffee.roaster === slug);
+const backlinks = roaster ? await getEntityBacklinks({ kind: "roaster", slug: roaster.slug }) : [];
 const renderResult = roaster ? await render(roaster) : null;
 const NotesContent = renderResult?.Content;
 const hasNotes = Boolean(roaster?.body?.trim());
@@ -46,18 +46,5 @@ const hasNotes = Boolean(roaster?.body?.trim());
       </div>
     </section>
   ) : null}
-  <section class="window">
-    <h2 class="section-title">Roasts</h2>
-    {roasterCoffees.length ? (
-      <ul class="table-list">
-        {roasterCoffees.map((coffee) => (
-          <li>
-            <a href={withBase(`/coffees/${coffee.slug}/`)}>[{coffee.name}]</a>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p>No roasts logged yet.</p>
-    )}
-  </section>
+  <EntityBacklinks groups={backlinks} />
 </BaseLayout>

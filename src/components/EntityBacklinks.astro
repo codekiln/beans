@@ -1,0 +1,28 @@
+---
+import { withBase } from "../utils/paths";
+import type { EntityBacklinkGroup } from "../data/entity-backlinks";
+
+type Props = {
+  groups: EntityBacklinkGroup[];
+};
+
+const { groups } = Astro.props;
+---
+{groups.length > 0 && (
+  <section class="window">
+    <h2 class="section-title">Referenced In</h2>
+    {groups.map((group) => (
+      <>
+        <h3>{group.label}</h3>
+        <ul class="table-list">
+          {group.links.map((link) => (
+            <li>
+              <a href={withBase(link.href)}>[{link.label}]</a>
+              {link.meta ? ` · ${link.meta}` : ""}
+            </li>
+          ))}
+        </ul>
+      </>
+    ))}
+  </section>
+)}

@@ -1,7 +1,8 @@
 ---
 import { render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getBeanRouteInfoMap, getBeans, getBeansForCompanion } from "../../data/beans";
+import EntityBacklinks from "../../components/EntityBacklinks.astro";
+import { getEntityBacklinks } from "../../data/entity-backlinks";
 import {
   getCompanionBySlug,
   getCompanionPath,
@@ -19,11 +20,7 @@ const { slug } = Astro.params;
 const companion = slug ? await getCompanionBySlug(slug) : null;
 const renderResult = companion ? await render(companion) : null;
 const NotesContent = renderResult?.Content;
-const allBeans = await getBeans();
-const beanRouteInfo = getBeanRouteInfoMap(allBeans);
-const companionBeans = companion
-  ? getBeansForCompanion(allBeans, companion.slug)
-  : [];
+const backlinks = companion ? await getEntityBacklinks({ kind: "companion", slug: companion.slug }) : [];
 const portrait = companion ? getCompanionPortrait(companion.data) : null;
 const initialCommand = `companion ${companion?.slug ?? ""}`.trim();
 const initialLinkHref = withBase(getCompanionPath(companion?.slug ?? ""));
@@ -66,23 +63,7 @@ const initialLinkHref = withBase(getCompanionPath(companion?.slug ?? ""));
       </div>
     ) : null}
 
-    <div class="window companion-logbook">
-      <h2>Commented Cups</h2>
-      {companionBeans.length > 0 ? (
-        <ul class="companion-links">
-          {companionBeans.map((bean) => (
-            <li>
-              <a href={withBase(beanRouteInfo.get(bean.slug)?.path ?? `/log/${bean.slug}/`)}>
-                {beanRouteInfo.get(bean.slug)?.displayLabel ?? bean.data.date}
-              </a>
-              <span>{bean.data.title}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No buddy comments logged yet.</p>
-      )}
-    </div>
+    <EntityBacklinks groups={backlinks} />
 
     <p class="companion-back">
       <a href={withBase("/companion/")}>Back to companions</a>
@@ -121,8 +102,7 @@ const initialLinkHref = withBase(getCompanionPath(companion?.slug ?? ""));
   }
 
   .companion-hero,
-  .companion-notes,
-  .companion-logbook {
+  .companion-notes {
     padding: 1rem 1.1rem;
   }
 
@@ -149,8 +129,7 @@ const initialLinkHref = withBase(getCompanionPath(companion?.slug ?? ""));
   }
 
   .companion-hero h1,
-  .companion-notes h2,
-  .companion-logbook h2 {
+  .companion-notes h2 {
     margin-top: 0;
   }
 
@@ -159,20 +138,6 @@ const initialLinkHref = withBase(getCompanionPath(companion?.slug ?? ""));
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--accent);
-  }
-
-  .companion-links {
-    margin: 0;
-    padding-left: 1.15rem;
-  }
-
-  .companion-links li + li {
-    margin-top: 0.45rem;
-  }
-
-  .companion-links span {
-    display: block;
-    color: var(--muted);
   }
 
   .companion-back {
