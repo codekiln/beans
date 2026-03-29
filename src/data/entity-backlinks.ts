@@ -5,6 +5,7 @@ import { getEquipment } from "./equipment";
 import { getQuestions } from "./questions";
 import { getRecipes } from "./recipes";
 import { getRoasters } from "./roasters";
+import { getSpans } from "./spans";
 import { getTerms } from "./terms";
 
 export type EntityKind =
@@ -14,7 +15,8 @@ export type EntityKind =
   | "companion"
   | "equipment"
   | "recipe"
-  | "question";
+  | "question"
+  | "span";
 
 export type BacklinkSourceKind =
   | "beans"
@@ -22,6 +24,7 @@ export type BacklinkSourceKind =
   | "roasters"
   | "companions"
   | "equipment"
+  | "spans"
   | "recipes"
   | "questions"
   | "terms";
@@ -61,6 +64,7 @@ const SOURCE_ORDER: BacklinkSourceKind[] = [
   "roasters",
   "companions",
   "equipment",
+  "spans",
   "recipes",
   "questions",
   "terms"
@@ -72,6 +76,7 @@ const SOURCE_LABELS: Record<BacklinkSourceKind, string> = {
   roasters: "Roasters",
   companions: "Companions",
   equipment: "Equipment",
+  spans: "Spans",
   recipes: "Recipes",
   questions: "Questions",
   terms: "Terms"
@@ -84,7 +89,8 @@ const TARGET_PATH_SEGMENTS: Record<EntityKind, string> = {
   companion: "companion",
   equipment: "equipment",
   recipe: "recipes",
-  question: "questions"
+  question: "questions",
+  span: "spans"
 };
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -136,7 +142,7 @@ const addBodyLinkBacklinks = (
 };
 
 export const getEntityBacklinks = async (target: TargetEntity): Promise<EntityBacklinkGroup[]> => {
-  const [beans, coffees, companions, equipment, questions, recipes, roasters, terms] = await Promise.all([
+  const [beans, coffees, companions, equipment, questions, recipes, roasters, spans, terms] = await Promise.all([
     getBeans(),
     getCoffees(),
     getCompanions(),
@@ -144,6 +150,7 @@ export const getEntityBacklinks = async (target: TargetEntity): Promise<EntityBa
     getQuestions(),
     getRecipes(),
     getRoasters(),
+    getSpans(),
     getTerms()
   ]);
 
@@ -277,6 +284,24 @@ export const getEntityBacklinks = async (target: TargetEntity): Promise<EntityBa
     }
   });
 
+  const spanSources: SourceDescriptor[] = spans.map((span) => ({
+    body: span.body,
+    href: `/spans/${span.slug}/`,
+    kind: "spans",
+    label: span.data.name,
+    meta: span.data.category,
+    slug: span.slug,
+    targetKind: "span"
+  }));
+
+  spanSources.forEach((source, index) => {
+    const subject = spans[index].data.subject;
+
+    if (subject && subject.kind === target.kind && subject.slug === target.slug) {
+      addBacklink(groups, source, target);
+    }
+  });
+
   const questionSources: SourceDescriptor[] = questions.map((question) => ({
     body: question.body,
     href: `/questions/${question.slug}/`,
@@ -301,6 +326,7 @@ export const getEntityBacklinks = async (target: TargetEntity): Promise<EntityBa
     roasterSources,
     companionSources,
     equipmentSources,
+    spanSources,
     recipeSources,
     questionSources,
     termSources

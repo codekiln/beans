@@ -160,6 +160,32 @@ const equipment = defineCollection({
   })
 });
 
+const spans = defineCollection({
+  loader: glob({ pattern: markdownPattern, base: "./src/content/spans" }),
+  schema: z.object({
+    name: z.string(),
+    category: z.string(),
+    consumable: z.string(),
+    quantity: z.string().optional(),
+    roastDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
+    startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    endDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
+    subject: z
+      .object({
+        kind: z.enum(["coffee", "equipment", "roaster"]),
+        name: z.string(),
+        slug: z.string()
+      })
+      .optional()
+  })
+});
+
 const terms = defineCollection({
   loader: glob({ pattern: markdownPattern, base: "./src/content/terms" }),
   schema: z.object({
@@ -206,4 +232,4 @@ const roasters = defineCollection({
   ])
 });
 
-export const collections = { beans, companions, recipes, equipment, roasters, terms, questions };
+export const collections = { beans, companions, recipes, equipment, spans, roasters, terms, questions };

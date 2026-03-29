@@ -1,0 +1,58 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  formatSpanDate,
+  getSpanDayCount,
+  getSpanPath,
+  getSpanRangeLabel,
+  getSpanRoastDateLabel,
+  getSpans,
+  getSpanStatusLabel
+} from "../../data/spans";
+import { withBase } from "../../utils/paths";
+
+const spans = await getSpans();
+const openSpans = spans.filter((span) => !span.data.endDate);
+const closedSpans = spans.filter((span) => Boolean(span.data.endDate));
+---
+<BaseLayout title="Spans · Beans" description="Consumable span tracking." initialCommand="$ bean spans">
+  <section class="hero">
+    <h1>Consumable spans</h1>
+    <p>Start and end windows for bags, fills, and jugs.</p>
+    <p>{openSpans.length} open · {closedSpans.length} closed</p>
+  </section>
+  <section class="window" aria-labelledby="spans-open">
+    <h2 id="spans-open" class="section-title">Open</h2>
+    <ul class="table-list">
+      {openSpans.map((span) => (
+        <li>
+          <a href={withBase(getSpanPath(span.slug))}>[{span.data.name}]</a>
+          {" "}· {span.data.category}
+          {getSpanRoastDateLabel(span) ? ` · ${getSpanRoastDateLabel(span)}` : ""}
+          {" "}· {getSpanRangeLabel(span)}
+        </li>
+      ))}
+      {openSpans.length === 0 && <li>none right now</li>}
+    </ul>
+  </section>
+  <section class="window" aria-labelledby="spans-closed">
+    <h2 id="spans-closed" class="section-title">Closed</h2>
+    <ul class="table-list">
+      {closedSpans.map((span) => {
+        const dayCount = getSpanDayCount(span);
+        const durationLabel = dayCount === 1 ? "1 day" : `${dayCount} days`;
+
+        return (
+          <li>
+            <a href={withBase(getSpanPath(span.slug))}>[{span.data.name}]</a>
+            {" "}· {span.data.category}
+            {getSpanRoastDateLabel(span) ? ` · ${getSpanRoastDateLabel(span)}` : ""}
+            {" "}· {getSpanRangeLabel(span)}
+            {" "}· {getSpanStatusLabel(span)} after {durationLabel}
+          </li>
+        );
+      })}
+      {closedSpans.length === 0 && <li>none yet</li>}
+    </ul>
+  </section>
+</BaseLayout>

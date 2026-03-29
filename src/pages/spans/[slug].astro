@@ -1,0 +1,67 @@
+---
+import { render } from "astro:content";
+import EntityBacklinks from "../../components/EntityBacklinks.astro";
+import { getEntityBacklinks } from "../../data/entity-backlinks";
+import {
+  getSpanDayCount,
+  getSpanPath,
+  getSpanRangeLabel,
+  getSpanRoastDateLabel,
+  getSpans,
+  getSpanStatusLabel,
+  getSpanSubjectPath
+} from "../../data/spans";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { withBase } from "../../utils/paths";
+
+export async function getStaticPaths() {
+  const spans = await getSpans();
+  return spans.map((span) => ({ params: { slug: span.slug } }));
+}
+
+const { slug } = Astro.params;
+const spans = await getSpans();
+const span = spans.find((entry) => entry.slug === slug);
+const renderResult = span ? await render(span) : null;
+const NotesContent = renderResult?.Content;
+const hasNotes = Boolean(span?.body?.trim());
+const backlinks = span ? await getEntityBacklinks({ kind: "span", slug: span.slug }) : [];
+const subjectHref = span ? getSpanSubjectPath(span) : null;
+const dayCount = span ? getSpanDayCount(span) : null;
+---
+<BaseLayout
+  title={`${span?.data.name ?? "Span"} · Beans`}
+  description={`Consumable span for ${span?.data.name ?? "tracking"}.`}
+  initialCommand={`$ bean span ${span?.slug ?? ""}`.trim()}
+>
+  <section class="hero">
+    <h1>{span?.data.name}</h1>
+    <p>{span?.data.category}</p>
+    <p>{span ? getSpanRangeLabel(span) : null}</p>
+    {span?.data.quantity && <p>Quantity: {span.data.quantity}</p>}
+    {span && getSpanRoastDateLabel(span) && <p>{getSpanRoastDateLabel(span)}</p>}
+    {subjectHref && span?.data.subject && (
+      <p>
+        Subject: <a href={withBase(subjectHref)}>{span.data.subject.name}</a>
+      </p>
+    )}
+    <p>Status: {span ? getSpanStatusLabel(span) : "unknown"}</p>
+    {dayCount && <p>Measured duration: {dayCount === 1 ? "1 day" : `${dayCount} days`}</p>}
+    <p>
+      <a href={withBase("/spans/")}>[back to spans]</a>
+    </p>
+  </section>
+  <section class="window">
+    <h2 class="section-title">Consumable</h2>
+    <p>{span?.data.consumable}</p>
+  </section>
+  {NotesContent && hasNotes && (
+    <section class="window">
+      <h2 class="section-title">Notes</h2>
+      <div class="markdown">
+        <NotesContent />
+      </div>
+    </section>
+  )}
+  <EntityBacklinks groups={backlinks} />
+</BaseLayout>

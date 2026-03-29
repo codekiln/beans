@@ -8,6 +8,7 @@ export type SiteNavigationItem = {
 export const siteNavigation: SiteNavigationItem[] = [
   { command: "bean about", href: "/about/", label: "about" },
   { command: "bean equipment", href: "/equipment/", label: "equipment", matchPrefix: "/equipment/" },
+  { command: "bean spans", href: "/spans/", label: "spans", matchPrefix: "/spans/" },
   { command: "bean recipes", href: "/recipes/", label: "recipes", matchPrefix: "/recipes/" },
   { command: "bean roasters", href: "/roasters/", label: "roasters", matchPrefix: "/roasters/" },
   { command: "bean coffees", href: "/coffees/", label: "coffees", matchPrefix: "/coffees/" },
