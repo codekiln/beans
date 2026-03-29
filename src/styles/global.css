@@ -515,6 +515,7 @@ button:focus-visible {
 
 .markdown :not(pre) > code {
   display: inline-block;
+  white-space: break-spaces;
   padding: 0.08rem 0.42rem;
   border: 1px solid color-mix(in srgb, #5d3b22 70%, var(--border));
   border-radius: 0.45rem;
