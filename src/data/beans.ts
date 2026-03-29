@@ -109,17 +109,27 @@ export type InlineCompanionComment = {
   body: string;
 };
 
+const companionCommentPattern = /<CompanionComment\b([^>]*)>([\s\S]*?)<\/CompanionComment>/g;
+const getCompanionCommentAttr = (attributes: string, name: string) => {
+  const match = attributes.match(new RegExp(`\\b${name}=["']([^"']+)["']`));
+  return match?.[1] ?? null;
+};
+
 /**
  * Extract inline companion comments from bean content.
  * Matches <CompanionComment from="slug">body</CompanionComment> tags.
  */
 export const extractInlineCompanionComments = (body: string): InlineCompanionComment[] => {
-  const pattern = /<CompanionComment\s+from=["']([^"']+)["']\s*>([\s\S]*?)<\/CompanionComment>/g;
   const comments: InlineCompanionComment[] = [];
   let match;
-  while ((match = pattern.exec(body)) !== null) {
+  while ((match = companionCommentPattern.exec(body)) !== null) {
+    const companion = getCompanionCommentAttr(match[1], "from");
+    if (!companion) {
+      continue;
+    }
+
     comments.push({
-      companion: match[1],
+      companion,
       body: match[2].trim()
     });
   }

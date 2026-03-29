@@ -40,6 +40,8 @@ const inlineCommentStyle = [
   "background:#faf6ed",
   "color:#2b2118"
 ].join(";");
+const stripMdxFrontmatterImports = (body: string) =>
+  body.replace(/^(?:import|export)\s.+$/gm, "").replace(/\n{3,}/g, "\n\n").trim();
 const renderBuddyComment = async (entry: BeanEntry, site: URL) => {
   if (!entry.data.personaComment) {
     return "";
@@ -89,16 +91,20 @@ const renderInlineCompanionComment = async (
 };
 
 const transformInlineComments = async (body: string, site: URL) => {
-  const comments = extractInlineCompanionComments(body);
-  let result = body;
+  const bodyWithoutImports = stripMdxFrontmatterImports(body);
+  const comments = extractInlineCompanionComments(bodyWithoutImports);
+  let result = bodyWithoutImports;
+
   for (const comment of comments) {
     const rendered = await renderInlineCompanionComment(comment.companion, comment.body, site);
+    const escapedBody = comment.body.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\n/g, "\\s*");
     const pattern = new RegExp(
-      `<CompanionComment\\s+from=["']${comment.companion}["']\\s*>${comment.body.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}</CompanionComment>`,
+      `<CompanionComment\\b[^>]*\\bfrom=["']${comment.companion}["'][^>]*>\\s*${escapedBody}\\s*</CompanionComment>`,
       "g"
     );
     result = result.replace(pattern, rendered);
   }
+
   return result;
 };
 

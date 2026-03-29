@@ -9,6 +9,7 @@
     "dev-worktree": "astro dev --host 127.0.0.1",
     "check:markdown-a11y": "node dev/checks/markdown-a11y.mjs",
     "check:bean-rendering": "node dev/checks/bean-rendering.mjs",
+    "check:rss-rendering": "node dev/checks/rss-rendering.mjs",
     "check:content-routes": "node dev/checks/content-routes.mjs",
     "check:beads-start": "bash dev/checks/beads-start-smoke.sh",
     "check:beads-finish": "bash dev/checks/beads-finish-smoke.sh",

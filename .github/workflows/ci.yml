@@ -37,3 +37,6 @@ jobs:
 
       - name: Check bean rendering
         run: npm run check:bean-rendering
+
+      - name: Check RSS rendering
+        run: npm run check:rss-rendering
