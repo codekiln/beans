@@ -1,0 +1,213 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import harness from "../../data/rss-reader-harness.json";
+
+const stripEmbeds = (html) =>
+  html.replace(/<iframe[\s\S]*?<\/iframe>/gi, "<p><em>[embedded media removed for harness preview]</em></p>");
+
+const fixtures = (harness.fixtures ?? []).map((fixture) => ({
+  ...fixture,
+  browserHtml: stripEmbeds(fixture.rss.html)
+}));
+---
+<BaseLayout
+  title="RSS Reader Harness · Beans"
+  description="Fixture-driven RSS compatibility view for browser and terminal reader workflows."
+  initialCommand="$ bean dev rss-reader-harness"
+>
+  <section class="window harness-hero">
+    <p class="eyebrow">RSS reader compatibility harness</p>
+    <h1>Browser + terminal reader snapshots for real feed items</h1>
+    <p>
+      This page renders the latest committed harness snapshot from <code>src/data/rss-reader-harness.json</code>.
+      Refresh it with <code>npm run update:rss-reader-harness</code>, then inspect the page in a browser or
+      via Playwright at <code>/beans/dev/rss-reader-harness/</code>.
+    </p>
+    <div class="harness-meta">
+      <p><strong>Fixtures:</strong> {harness.fixtureCount}</p>
+      <p><strong>Terminal workflow:</strong> {harness.terminalWorkflow?.mode}</p>
+      <p><strong>Browser workflow:</strong> {harness.browserWorkflow?.mode}</p>
+    </div>
+  </section>
+
+  {fixtures.length ? (
+    <div class="harness-grid">
+      {fixtures.map((fixture) => (
+        <section class="window fixture-card">
+          <header class="fixture-header">
+            <div>
+              <p class="fixture-kicker">{fixture.coverage.join(" · ")}</p>
+              <h2>{fixture.title}</h2>
+            </div>
+            <a href={fixture.url}>Open live post</a>
+          </header>
+
+          {fixture.manualObservations?.length ? (
+            <div class="fixture-callout">
+              {fixture.manualObservations.map((observation) => (
+                <p>
+                  <strong>{observation.reader}</strong> ({observation.observedOn}): {observation.note}
+                </p>
+              ))}
+            </div>
+          ) : null}
+
+          <div class="fixture-badges">
+            {fixture.expected.inlineComment && <span>inline companion</span>}
+            {fixture.expected.buddyComment && <span>buddy note</span>}
+            {fixture.expected.anyImage && <span>image post</span>}
+            {fixture.expected.noImage && <span>no image</span>}
+            {fixture.compatibility.summaryDropsInlineComment && <span class="is-warning">summary drops inline comment</span>}
+            {fixture.compatibility.summaryDropsBuddyComment && <span class="is-warning">summary drops buddy note</span>}
+            {fixture.compatibility.summaryDropsSectionHeading && <span class="is-warning">summary drops heading</span>}
+          </div>
+
+          <div class="fixture-panels">
+            <article class="reader-card">
+              <p class="panel-label">Browser card preview</p>
+              {fixture.rss.image ? (
+                <img
+                  class="reader-card-image"
+                  src={fixture.rss.image.src}
+                  alt={fixture.rss.image.alt}
+                  loading="lazy"
+                />
+              ) : null}
+              <h3>{fixture.title}</h3>
+              <p>{fixture.eilmeldung.summary}</p>
+            </article>
+
+            <article class="reader-article">
+              <p class="panel-label">Raw RSS article HTML</p>
+              <div class="markdown" set:html={fixture.browserHtml} />
+            </article>
+
+            <article class="reader-terminal">
+              <p class="panel-label">Terminal reader text</p>
+              <pre>{fixture.eilmeldung.plainText}</pre>
+            </article>
+          </div>
+        </section>
+      ))}
+    </div>
+  ) : (
+    <section class="window fixture-card">
+      <p>No harness snapshot has been generated yet. Run <code>npm run update:rss-reader-harness</code>.</p>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .harness-hero,
+  .fixture-card {
+    margin-bottom: 1.5rem;
+  }
+
+  .eyebrow,
+  .fixture-kicker,
+  .panel-label {
+    margin: 0 0 0.5rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent, #8c6b3c);
+  }
+
+  .harness-meta {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 1rem;
+  }
+
+  .harness-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .fixture-header {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .fixture-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+
+  .fixture-callout {
+    margin-bottom: 1rem;
+    padding: 0.9rem 1rem;
+    border-left: 3px solid #b55e44;
+    background: rgba(181, 94, 68, 0.08);
+  }
+
+  .fixture-callout p {
+    margin: 0;
+  }
+
+  .fixture-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .fixture-badges span {
+    display: inline-flex;
+    padding: 0.3rem 0.55rem;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.78rem;
+  }
+
+  .fixture-badges .is-warning {
+    color: #b55e44;
+  }
+
+  .fixture-panels {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .reader-card,
+  .reader-article,
+  .reader-terminal {
+    min-width: 0;
+    padding: 1rem;
+    border: 1px solid rgba(140, 107, 60, 0.4);
+    background: rgba(248, 241, 227, 0.45);
+  }
+
+  .reader-card h3 {
+    margin-top: 0;
+  }
+
+  .reader-card-image {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(140, 107, 60, 0.3);
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .reader-terminal pre {
+    margin: 0;
+    white-space: pre-wrap;
+    font: inherit;
+  }
+
+  @media (max-width: 960px) {
+    .fixture-panels {
+      grid-template-columns: 1fr;
+    }
+
+    .fixture-header {
+      flex-direction: column;
+    }
+  }
+</style>
