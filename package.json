@@ -20,9 +20,9 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/mdx": "^5.0.2",
-    "@astrojs/rss": "^4.0.17",
-    "astro": "^6.0.8"
+    "@astrojs/mdx": "^5.0.3",
+    "@astrojs/rss": "^4.0.18",
+    "astro": "^6.1.1"
   },
   "devDependencies": {
     "playwright": "^1.58.2",
