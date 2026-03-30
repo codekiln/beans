@@ -1,0 +1,300 @@
+{
+  "harnessVersion": 1,
+  "rssPath": "/Users/Myer/Documents/GitHub/codekiln/beans/worktrees/beans-ebt/dist/rss.xml",
+  "fixtureCount": 5,
+  "terminalWorkflow": {
+    "reader": "eilmeldung",
+    "mode": "local_rss OPML import + sync against locally served dist/rss.xml"
+  },
+  "browserWorkflow": {
+    "mode": "Playwright/browser inspection of /beans/dev/rss-reader-harness/"
+  },
+  "notes": [
+    "The browser page renders fixture cards from this JSON snapshot.",
+    "March 29 includes a manual Readwise Reader observation sourced from the task description."
+  ],
+  "fixtures": [
+    {
+      "id": "inline-comment-march-29",
+      "url": "https://codekiln.github.io/beans/log/2026-03-29/",
+      "title": "earthy sweetness, beets. red. root-like and sweet.",
+      "sourcePath": "src/content/beans/2026-03-29-bean1.mdx",
+      "coverage": [
+        "inline companion comments",
+        "body images",
+        "content-order loss"
+      ],
+      "expected": {
+        "inlineComment": true,
+        "buddyComment": false,
+        "anyImage": true,
+        "noImage": false
+      },
+      "manualObservations": [
+        {
+          "reader": "Readwise Reader",
+          "observedOn": "2026-03-30",
+          "source": "task description",
+          "note": "Drops the March 29 grounds sniff companion block from the rendered item."
+        }
+      ],
+      "rss": {
+        "html": "<p><img src=\"/beans/images/2026-03-29-sun-0520.jpg\" alt=\"bean log 2026-03-29 sun 0520: handwritten grind notes, unicorn grounds sniff, let it go poem, Rosenau and Sanborn listening note, and guatemala acodihue huehuetenango stamp\"></p>\n<h2 id=\"grind\">grind</h2>\n<p>it’s the last few beans of this delicious,<br>\njuicy bag of guatemala beans from<br>\nparable coffee co, roasted on 2026-02-16,</p>\n<p>so it’s going to be a bit of a stronger cup;<br>\nmeasured 16.8 g beans plus a few spares<br>\nreset the grind to the timemore’s 1.8.3.</p>\n<p>with the spares, ended up with 17.2 g<br>\ngrounds, so target pour is 275.2 g<br>\npurified water, ended up with 265.5 g<br>\nwater. immersion time was 3:09 with<br>\nthe typical one minute draw-down. much<br>\nlonger than normal; was writing and let it go.</p>\n<h2 id=\"grounds-sniff\">grounds sniff</h2>\n<blockquote style=\"margin:0.85em 0;padding:0.65em 0.85em;border-left:3px solid #8c6b3c;background:#faf6ed;color:#2b2118\"><p style=\"margin:0;font-style:italic;\">earthy sweetness, beets. red.  \nroot-like and sweet.</p><footer style=\"margin-top:0.45em;font-size:0.88em;color:#6b4b36;\">-- <a href=\"https://codekiln.github.io/beans/companion/unicorn/\">🦄</a></footer></blockquote>\n<h2 id=\"let-it-go\">let it go</h2>\n<p>first starbursts: pockets<br>\nunlatching these<br>\nears into<br>\nresonant ‘istening,<br>\na priori pings of<br>\nsuper sensational<br>\nverification<br>\nof injected consciousness,<br>\nplants with caffeine<br>\nknow that other lifes<br>\nlook <code>         </code> at them.</p>\n<h3 id=\"its-their-song-singing\">it’s their song, singing,</h3>\n<blockquote>\n<p>slow, slow down<br>\nslow <code>   </code> way way down<br>\nuntil vim is seen<br>\nacross the frames,<br>\n[not in the chains<br>\nof causal blinks, but]<br>\nin aeons, bound<br>\ntogether in tethers,<br>\nof co-creation</p>\n</blockquote>\n<h2 id=\"listening\">listening</h2>\n<p><em>two</em> by <a href=\"https://rosenausanborn.bandcamp.com/album/two\">rosenau &#x26; sanborn</a>.</p>\n<iframe style=\"border: 0; width: 350px; height: 522px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2161457626/size=large/bgcol=ffffff/linkcol=0687f5/track=3807715725/transparent=true/\" seamless>&#x3C;a href=\"https://rosenausanborn.bandcamp.com/album/two\">Two by Rosenau &#x26;amp; Sanborn&#x3C;/a></iframe>",
+        "text": "grind it’s the last few beans of this delicious, juicy bag of guatemala beans from parable coffee co, roasted on 2026-02-16, so it’s going to be a bit of a stronger cup; measured 16.8 g beans plus a few spares reset the grind to the timemore’s 1.8.3. with the spares, ended up with 17.2 g grounds, so target pour is 275.2 g purified water, ended up with 265.5 g water. immersion time was 3:09 with the typical one minute draw-down. much longer than normal; was writing and let it go. grounds sniff earthy sweetness, beets. red. root-like and sweet. -- 🦄 let it go first starbursts: pockets unlatching these ears into resonant ‘istening, a priori pings of super sensational verification of injected consciousness, plants with caffeine know that other lifes look at them. it’s their song, singing, slow, slow down slow way way down until vim is seen across the frames, [not in the chains of causal blinks, but] in aeons, bound together in tethers, of co-creation listening two by rosenau &#x26; sanborn . &#x3C;a href=\"https://rosenausanborn.bandcamp.com/album/two\">Two by Rosenau &#x26;amp; Sanborn&#x3C;/a>",
+        "markers": {
+          "sectionHeading": true,
+          "inlineComment": true,
+          "imageAlt": true
+        },
+        "hasInlineComment": true,
+        "hasBuddyComment": false,
+        "image": {
+          "src": "/beans/images/2026-03-29-sun-0520.jpg",
+          "alt": "bean log 2026-03-29 sun 0520: handwritten grind notes, unicorn grounds sniff, let it go poem, Rosenau and Sanborn listening note, and guatemala acodihue huehuetenango stamp"
+        },
+        "imageCount": 1
+      },
+      "eilmeldung": {
+        "html": "<p><img src=\"https://codekiln.github.io/beans/images/2026-03-29-sun-0520.jpg\" alt=\"bean log 2026-03-29 sun 0520: handwritten grind notes, unicorn grounds sniff, let it go poem, Rosenau and Sanborn listening note, and guatemala acodihue huehuetenango stamp\"></p>\n<h2 id=\"grind\">grind</h2>\n<p>it’s the last few beans of this delicious,<br>\njuicy bag of guatemala beans from<br>\nparable coffee co, roasted on 2026-02-16,</p>\n<p>so it’s going to be a bit of a stronger cup;<br>\nmeasured 16.8 g beans plus a few spares<br>\nreset the grind to the timemore’s 1.8.3.</p>\n<p>with the spares, ended up with 17.2 g<br>\ngrounds, so target pour is 275.2 g<br>\npurified water, ended up with 265.5 g<br>\nwater. immersion time was 3:09 with<br>\nthe typical one minute draw-down. much<br>\nlonger than normal; was writing and let it go.</p>\n<h2 id=\"grounds-sniff\">grounds sniff</h2>\n<blockquote><p>earthy sweetness, beets. red.  \nroot-like and sweet.</p><footer>-- <a href=\"https://codekiln.github.io/beans/companion/unicorn/\" rel=\"noopener noreferrer\">🦄</a></footer></blockquote>\n<h2 id=\"let-it-go\">let it go</h2>\n<p>first starbursts: pockets<br>\nunlatching these<br>\nears into<br>\nresonant ‘istening,<br>\na priori pings of<br>\nsuper sensational<br>\nverification<br>\nof injected consciousness,<br>\nplants with caffeine<br>\nknow that other lifes<br>\nlook <code>         </code> at them.</p>\n<h3 id=\"its-their-song-singing\">it’s their song, singing,</h3>\n<blockquote>\n<p>slow, slow down<br>\nslow <code>   </code> way way down<br>\nuntil vim is seen<br>\nacross the frames,<br>\n[not in the chains<br>\nof causal blinks, but]<br>\nin aeons, bound<br>\ntogether in tethers,<br>\nof co-creation</p>\n</blockquote>\n<h2 id=\"listening\">listening</h2>\n<p><em>two</em> by <a href=\"https://rosenausanborn.bandcamp.com/album/two\" rel=\"noopener noreferrer\">rosenau &amp; sanborn</a>.</p>\n<iframe src=\"https://bandcamp.com/EmbeddedPlayer/album=2161457626/size=large/bgcol=ffffff/linkcol=0687f5/track=3807715725/transparent=true/\">&#x3C;a href=\"https://rosenausanborn.bandcamp.com/album/two\">Two by Rosenau &#x26;amp; Sanborn&#x3C;/a></iframe>",
+        "summary": "grind it’s the last few beans of this delicious, juicy bag of guatemala beans from parable coffee co, roasted on 2026-02-16, so it’s going to be a bit of a stronger cup; measured 16.8 g beans plus a few spares reset the grind to the timemore’s 1.8.3. with the spares, end",
+        "plainText": "grind it’s the last few beans of this delicious, juicy bag of guatemala beans from parable coffee co, roasted on 2026-02-16, so it’s going to be a bit of a stronger cup; measured 16.8 g beans plus a few spares reset the grind to the timemore’s 1.8.3. with the spares, ended up with 17.2 g grounds, so target pour is 275.2 g purified water, ended up with 265.5 g water. immersion time was 3:09 with the typical one minute draw-down. much longer than normal; was writing and let it go. grounds sniff earthy sweetness, beets. red. root-like and sweet.-- let it go first starbursts: pockets unlatching these ears into resonant ‘istening, a priori pings of super sensational verification of injected consciousness, plants with caffeine know that other lifes look at them. it’s their song, singing, slow, slow down slow way way down until vim is seen across the frames, [not in the chains of causal blinks, but] in aeons, bound together in tethers, of co-creation listening two by rosenau & sanborn. <a href=\"https://rosenausanborn.bandcamp.com/album/two\">Two by Rosenau &amp; Sanborn</a>",
+        "summaryMarkers": {
+          "sectionHeading": false,
+          "inlineComment": false,
+          "imageAlt": false
+        },
+        "plainTextMarkers": {
+          "sectionHeading": true,
+          "inlineComment": true,
+          "imageAlt": false
+        },
+        "hasInlineComment": true,
+        "hasBuddyComment": false,
+        "summaryLength": 271
+      },
+      "compatibility": {
+        "summaryDropsInlineComment": true,
+        "summaryDropsBuddyComment": false,
+        "summaryDropsSectionHeading": true,
+        "previewImageAvailable": true,
+        "contentOrderStartsWithImage": false
+      }
+    },
+    {
+      "id": "buddy-and-inline-march-18",
+      "url": "https://codekiln.github.io/beans/log/2026-03-18/",
+      "title": "peppery today, sour edge",
+      "sourcePath": "src/content/beans/2026-03-18-bean1.mdx",
+      "coverage": [
+        "inline companion comments",
+        "persona/buddy comments",
+        "body images"
+      ],
+      "expected": {
+        "inlineComment": true,
+        "buddyComment": true,
+        "anyImage": true,
+        "noImage": false
+      },
+      "manualObservations": [],
+      "rss": {
+        "html": "<p><img src=\"/beans/images/2026-03-18-wed-0617.jpg\" alt=\"bean log 2026-03-18 wed 0617: brew details, grounds sniff, listening, taste, finca los angeles el salvador stamp\"></p>\n<h2 id=\"grounds-sniff\">grounds sniff</h2>\n<blockquote style=\"margin:0.85em 0;padding:0.65em 0.85em;border-left:3px solid #8c6b3c;background:#faf6ed;color:#2b2118\"><p style=\"margin:0;font-style:italic;\">peppery today</p><footer style=\"margin-top:0.45em;font-size:0.88em;color:#6b4b36;\">-- <a href=\"https://codekiln.github.io/beans/companion/unicorn/\">🦄</a></footer></blockquote>\n<h2 id=\"brew-details\">brew details</h2>\n<p>16.0 g finca grounds, room temp.<br>\nroast date 2026-02-16 — a month out.<br>\ntimemore 1.8.3.<br>\n257.2 g purified water.<br>\n2’45” immersion, 3’50” total.</p>\n<h2 id=\"taste\">taste</h2>\n<p>sour. not the best. how did the room temp shape the brew?</p>\n<p>not feeling the pull these questions normally exert.</p>\n<p>probably the grind too fine at 1.8.3. forgot finca’s sweet spot @ 1.8.1.</p>\n<h2 id=\"listening\">listening</h2>\n<p><strong>vol. 1</strong> by the quebec-based masked math rock duo <strong>angine de poitrine</strong>. too fun. <a href=\"https://www.noizemagazine.com/blog/angine-de-poitrine-a-discussion-with-the-infectious-quebec-band\"><strong>microtonal</strong> scales</a>, hidden identities, <strong>funny masks</strong> with floppy noses. how does a mask/identity change how creativity shows up in a life? avatars are a type of abstraction.</p>\n<iframe data-testid=\"embed-iframe\" style=\"border-radius:12px\" src=\"https://open.spotify.com/embed/album/67AYhGt60AoJa1TVcn5lCn?utm_source=generator&#x26;theme=0\" width=\"100%\" height=\"352\" frameborder=\"0\" allowfullscreen allow=\"autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture\" loading=\"lazy\"></iframe>\n<iframe width=\"560\" height=\"315\" src=\"https://www.youtube-nocookie.com/embed/pRgHYWOtqqc?si=VrQMdbfHeOSzp9tF\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe><aside aria-label=\"Virtual companion note\" style=\"margin:1.5em 0 0;padding:1em;border:1px solid #8c6b3c;background:#f8f1e3;color:#2b2118\"><header><p><strong>[ Virtual companion note ]</strong> This is a virtual companion comment, not the main post body.</p><h2 style=\"margin:0;font-size:1rem;line-height:1.4;\">Coffee buddy comment</h2><p style=\"margin:0.35em 0 0;\"><strong>From:</strong> Rin Vale<br><span>wandering coffee connoisseur</span></p></header><blockquote aria-label=\"Quoted companion comment from Rin Vale\" style=\"margin:0.85em 0 0;padding:0 0 0 0.9em;border-left:3px solid #8c6b3c\"><p>sour and not the best fits a grind that landed too fine at 1.8.3 — finca&#39;s sweet spot in your setup is 1.8.1. next cup: same dose and water, go one click coarser to 1.8.1 and keep immersion at 2:45. room temp grounds might have nudged extraction the wrong way; if you have time, let the dose sit at room temp a few minutes before grinding so you&#39;re not fighting temperature swing.</p></blockquote><p style=\"margin:0.75em 0 0;\"><cite><a href=\"https://codekiln.github.io/beans/companion/rin-vale/\">Virtual companion note by Rin Vale</a></cite></p></aside>",
+        "text": "grounds sniff peppery today -- 🦄 brew details 16.0 g finca grounds, room temp. roast date 2026-02-16 — a month out. timemore 1.8.3. 257.2 g purified water. 2’45” immersion, 3’50” total. taste sour. not the best. how did the room temp shape the brew? not feeling the pull these questions normally exert. probably the grind too fine at 1.8.3. forgot finca’s sweet spot @ 1.8.1. listening vol. 1 by the quebec-based masked math rock duo angine de poitrine . too fun. microtonal scales , hidden identities, funny masks with floppy noses. how does a mask/identity change how creativity shows up in a life? avatars are a type of abstraction. [ Virtual companion note ] This is a virtual companion comment, not the main post body. Coffee buddy comment From: Rin Vale wandering coffee connoisseur sour and not the best fits a grind that landed too fine at 1.8.3 — finca's sweet spot in your setup is 1.8.1. next cup: same dose and water, go one click coarser to 1.8.1 and keep immersion at 2:45. room temp grounds might have nudged extraction the wrong way; if you have time, let the dose sit at room temp a few minutes before grinding so you're not fighting temperature swing. Virtual companion note by Rin Vale",
+        "markers": {
+          "inlineComment": true,
+          "buddyComment": true,
+          "buddyAttribution": true,
+          "imageAlt": true
+        },
+        "hasInlineComment": true,
+        "hasBuddyComment": true,
+        "image": {
+          "src": "/beans/images/2026-03-18-wed-0617.jpg",
+          "alt": "bean log 2026-03-18 wed 0617: brew details, grounds sniff, listening, taste, finca los angeles el salvador stamp"
+        },
+        "imageCount": 1
+      },
+      "eilmeldung": {
+        "html": "<p><img src=\"https://codekiln.github.io/beans/images/2026-03-18-wed-0617.jpg\" alt=\"bean log 2026-03-18 wed 0617: brew details, grounds sniff, listening, taste, finca los angeles el salvador stamp\"></p>\n<h2 id=\"grounds-sniff\">grounds sniff</h2>\n<blockquote><p>peppery today</p><footer>-- <a href=\"https://codekiln.github.io/beans/companion/unicorn/\" rel=\"noopener noreferrer\">🦄</a></footer></blockquote>\n<h2 id=\"brew-details\">brew details</h2>\n<p>16.0 g finca grounds, room temp.<br>\nroast date 2026-02-16 — a month out.<br>\ntimemore 1.8.3.<br>\n257.2 g purified water.<br>\n2’45” immersion, 3’50” total.</p>\n<h2 id=\"taste\">taste</h2>\n<p>sour. not the best. how did the room temp shape the brew?</p>\n<p>not feeling the pull these questions normally exert.</p>\n<p>probably the grind too fine at 1.8.3. forgot finca’s sweet spot @ 1.8.1.</p>\n<h2 id=\"listening\">listening</h2>\n<p><strong>vol. 1</strong> by the quebec-based masked math rock duo <strong>angine de poitrine</strong>. too fun. <a href=\"https://www.noizemagazine.com/blog/angine-de-poitrine-a-discussion-with-the-infectious-quebec-band\" rel=\"noopener noreferrer\"><strong>microtonal</strong> scales</a>, hidden identities, <strong>funny masks</strong> with floppy noses. how does a mask/identity change how creativity shows up in a life? avatars are a type of abstraction.</p>\n<iframe src=\"https://open.spotify.com/embed/album/67AYhGt60AoJa1TVcn5lCn?utm_source=generator&amp;theme=0\"></iframe>\n<iframe src=\"https://www.youtube-nocookie.com/embed/pRgHYWOtqqc?si=VrQMdbfHeOSzp9tF\" title=\"YouTube video player\"></iframe><aside><header><p><strong>[ Virtual companion note ]</strong> This is a virtual companion comment, not the main post body.</p><h2>Coffee buddy comment</h2><p><strong>From:</strong> Rin Vale<br><span>wandering coffee connoisseur</span></p></header><blockquote><p>sour and not the best fits a grind that landed too fine at 1.8.3 — finca's sweet spot in your setup is 1.8.1. next cup: same dose and water, go one click coarser to 1.8.1 and keep immersion at 2:45. room temp grounds might have nudged extraction the wrong way; if you have time, let the dose sit at room temp a few minutes before grinding so you're not fighting temperature swing.</p></blockquote><p><cite><a href=\"https://codekiln.github.io/beans/companion/rin-vale/\" rel=\"noopener noreferrer\">Virtual companion note by Rin Vale</a></cite></p></aside>",
+        "summary": "grounds sniff peppery today-- brew details 16.0 g finca grounds, room temp. roast date 2026-02-16 — a month out. timemore 1.8.3. 257.2 g purified water. 2’45” immersion, 3’50” total. taste sour. not the best. how did the room temp shape the brew? not",
+        "plainText": "grounds sniff peppery today-- brew details 16.0 g finca grounds, room temp. roast date 2026-02-16 — a month out. timemore 1.8.3. 257.2 g purified water. 2’45” immersion, 3’50” total. taste sour. not the best. how did the room temp shape the brew? not feeling the pull these questions normally exert. probably the grind too fine at 1.8.3. forgot finca’s sweet spot @ 1.8.1. listening vol. 1 by the quebec-based masked math rock duo angine de poitrine. too fun. microtonal scales, hidden identities, funny masks with floppy noses. how does a mask/identity change how creativity shows up in a life? avatars are a type of abstraction. [ Virtual companion note ] This is a virtual companion comment, not the main post body. Coffee buddy comment From: Rin Vale wandering coffee connoisseur sour and not the best fits a grind that landed too fine at 1.8.3 — finca's sweet spot in your setup is 1.8.1. next cup: same dose and water, go one click coarser to 1.8.1 and keep immersion at 2:45. room temp grounds might have nudged extraction the wrong way; if you have time, let the dose sit at room temp a few minutes before grinding so you're not fighting temperature swing. Virtual companion note by Rin Vale",
+        "summaryMarkers": {
+          "inlineComment": true,
+          "buddyComment": false,
+          "buddyAttribution": false,
+          "imageAlt": false
+        },
+        "plainTextMarkers": {
+          "inlineComment": true,
+          "buddyComment": true,
+          "buddyAttribution": true,
+          "imageAlt": false
+        },
+        "hasInlineComment": true,
+        "hasBuddyComment": true,
+        "summaryLength": 250
+      },
+      "compatibility": {
+        "summaryDropsInlineComment": false,
+        "summaryDropsBuddyComment": true,
+        "summaryDropsSectionHeading": false,
+        "previewImageAvailable": true,
+        "contentOrderStartsWithImage": false
+      }
+    },
+    {
+      "id": "buddy-and-body-image-march-06",
+      "url": "https://codekiln.github.io/beans/log/2026-03-06/",
+      "title": "friday cup 1, 5:39 am",
+      "sourcePath": "src/content/beans/2026-03-06-bean1.md",
+      "coverage": [
+        "persona/buddy comments",
+        "body images"
+      ],
+      "expected": {
+        "inlineComment": false,
+        "buddyComment": true,
+        "anyImage": true,
+        "noImage": false
+      },
+      "manualObservations": [],
+      "rss": {
+        "html": "<h2 id=\"brew\">brew</h2>\n<p><img src=\"/beans/images/2026-03-06-cup1-notes.png\" alt=\"hand-written notes of the brew from this morning\"></p>\n<p>measured <strong>16.0 g</strong> frozen guatemala beans<br>\nbaseline grind at <strong>1.8.3</strong> on timemore; landed at <strong>15.9 g</strong> grounds.</p>\n<p>preheated with <strong>315 g</strong> water.</p>\n<p>for brew, used <strong>255.8 g</strong> purified water with <strong>2:30</strong> immersion.</p>\n<p>water condition at pour: many bubbles, steaming, but no sizzling.</p>\n<h2 id=\"groundsniff\">groundsniff</h2>\n<p>unicorn sniff:</p>\n<blockquote>\n<p>“woody, like the inside of a tree!” —🦄</p>\n</blockquote>\n<p>very floral.</p>\n<h2 id=\"observe\">observe</h2>\n<h2 id=\"listen\">listen</h2>\n<p>machine a trois, <a href=\"https://www.machine-a-trois.com\">aka mà3</a><br>\n<em>unlearn</em>.<br>\nlaurent warnier [vibraphone]<br>\nrachel xi zhang [marimba]<br>\npascal meyer [piano]</p>\n<iframe data-testid=\"embed-iframe\" style=\"border-radius:12px\" src=\"https://open.spotify.com/embed/album/4DQRRBlhO7yVFAt3Tu7VQk?utm_source=generator&#x26;theme=0\" width=\"100%\" height=\"152\" frameborder=\"0\" allowfullscreen allow=\"autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture\" loading=\"lazy\"></iframe>\n<p>reminded of the japanophilic vibraphone play in <em>breath of the wild</em>.\njigsaw miyazaki<br>\nmontreal jazz memorial<br>\n”nature is our scenery” pops\ncheerful chorus:<br>\n“<em>decompose!</em>”</p>\n<p>wish: spotify liner notes<br>\n@ each track.<br>\nwhy doesn’t it <em>already</em>?<br>\n🧹💨🧐</p>\n<blockquote>\n<p>the written form of improvisation from an oral tradition<br>\n— composer <a href=\"https://luisevolkmann.com\">louise volkmann</a></p>\n</blockquote>\n<h2 id=\"taste\">taste</h2>\n<p>salty rim.<br>\nsour in the back.<br>\nbitterness hiding behind<br>\nbehind acidity, peering into\ninto it, concealment,<br>\nthick oils, so much<br>\nacidity.<br>\nwhere is the bitter laugh?</p><aside aria-label=\"Virtual companion note\" style=\"margin:1.5em 0 0;padding:1em;border:1px solid #8c6b3c;background:#f8f1e3;color:#2b2118\"><header><p><strong>[ Virtual companion note ]</strong> This is a virtual companion comment, not the main post body.</p><h2 style=\"margin:0;font-size:1rem;line-height:1.4;\">Coffee buddy comment</h2><p style=\"margin:0.35em 0 0;\"><strong>From:</strong> Rin Vale<br><span>wandering coffee connoisseur</span></p></header><blockquote aria-label=\"Quoted companion comment from Rin Vale\" style=\"margin:0.85em 0 0;padding:0 0 0 0.9em;border-left:3px solid #8c6b3c\"><p>That profile reads like a near-miss on sweetness: floral aromatics landed, but the cup leaned salty-sour with bitterness tucked behind acidity, which fits a relatively coarse 1.8.3 and only 2:30 at bubbling-but-not-sizzling water. Next run, keep the same dose and water, go 1-2 clicks finer (toward 1.8.1 or 1.8.0), and either extend immersion to 2:45 or pour slightly hotter water so extraction rounds the back-palate sourness and brings that Guatemala chocolate-bitter core forward.</p></blockquote><p style=\"margin:0.75em 0 0;\"><cite><a href=\"https://codekiln.github.io/beans/companion/rin-vale/\">Virtual companion note by Rin Vale</a></cite></p></aside>",
+        "text": "brew measured 16.0 g frozen guatemala beans baseline grind at 1.8.3 on timemore; landed at 15.9 g grounds. preheated with 315 g water. for brew, used 255.8 g purified water with 2:30 immersion. water condition at pour: many bubbles, steaming, but no sizzling. groundsniff unicorn sniff: “woody, like the inside of a tree!” —🦄 very floral. observe listen machine a trois, aka mà3 unlearn . laurent warnier [vibraphone] rachel xi zhang [marimba] pascal meyer [piano] reminded of the japanophilic vibraphone play in breath of the wild . jigsaw miyazaki montreal jazz memorial ”nature is our scenery” pops cheerful chorus: “ decompose! ” wish: spotify liner notes @ each track. why doesn’t it already ? 🧹💨🧐 the written form of improvisation from an oral tradition — composer louise volkmann taste salty rim. sour in the back. bitterness hiding behind behind acidity, peering into into it, concealment, thick oils, so much acidity. where is the bitter laugh? [ Virtual companion note ] This is a virtual companion comment, not the main post body. Coffee buddy comment From: Rin Vale wandering coffee connoisseur That profile reads like a near-miss on sweetness: floral aromatics landed, but the cup leaned salty-sour with bitterness tucked behind acidity, which fits a relatively coarse 1.8.3 and only 2:30 at bubbling-but-not-sizzling water. Next run, keep the same dose and water, go 1-2 clicks finer (toward 1.8.1 or 1.8.0), and either extend immersion to 2:45 or pour slightly hotter water so extraction rounds the back-palate sourness and brings that Guatemala chocolate-bitter core forward. Virtual companion note by Rin Vale",
+        "markers": {
+          "buddyComment": true,
+          "imageAlt": true
+        },
+        "hasInlineComment": false,
+        "hasBuddyComment": true,
+        "image": {
+          "src": "/beans/images/2026-03-06-cup1-notes.png",
+          "alt": "hand-written notes of the brew from this morning"
+        },
+        "imageCount": 1
+      },
+      "eilmeldung": {
+        "html": "<h2 id=\"brew\">brew</h2>\n<p><img src=\"https://codekiln.github.io/beans/images/2026-03-06-cup1-notes.png\" alt=\"hand-written notes of the brew from this morning\"></p>\n<p>measured <strong>16.0 g</strong> frozen guatemala beans<br>\nbaseline grind at <strong>1.8.3</strong> on timemore; landed at <strong>15.9 g</strong> grounds.</p>\n<p>preheated with <strong>315 g</strong> water.</p>\n<p>for brew, used <strong>255.8 g</strong> purified water with <strong>2:30</strong> immersion.</p>\n<p>water condition at pour: many bubbles, steaming, but no sizzling.</p>\n<h2 id=\"groundsniff\">groundsniff</h2>\n<p>unicorn sniff:</p>\n<blockquote>\n<p>“woody, like the inside of a tree!” —🦄</p>\n</blockquote>\n<p>very floral.</p>\n<h2 id=\"observe\">observe</h2>\n<h2 id=\"listen\">listen</h2>\n<p>machine a trois, <a href=\"https://www.machine-a-trois.com\" rel=\"noopener noreferrer\">aka mà3</a><br>\n<em>unlearn</em>.<br>\nlaurent warnier [vibraphone]<br>\nrachel xi zhang [marimba]<br>\npascal meyer [piano]</p>\n<iframe src=\"https://open.spotify.com/embed/album/4DQRRBlhO7yVFAt3Tu7VQk?utm_source=generator&amp;theme=0\"></iframe>\n<p>reminded of the japanophilic vibraphone play in <em>breath of the wild</em>.\njigsaw miyazaki<br>\nmontreal jazz memorial<br>\n”nature is our scenery” pops\ncheerful chorus:<br>\n“<em>decompose!</em>”</p>\n<p>wish: spotify liner notes<br>\n@ each track.<br>\nwhy doesn’t it <em>already</em>?<br>\n🧹💨🧐</p>\n<blockquote>\n<p>the written form of improvisation from an oral tradition<br>\n— composer <a href=\"https://luisevolkmann.com\" rel=\"noopener noreferrer\">louise volkmann</a></p>\n</blockquote>\n<h2 id=\"taste\">taste</h2>\n<p>salty rim.<br>\nsour in the back.<br>\nbitterness hiding behind<br>\nbehind acidity, peering into\ninto it, concealment,<br>\nthick oils, so much<br>\nacidity.<br>\nwhere is the bitter laugh?</p><aside><header><p><strong>[ Virtual companion note ]</strong> This is a virtual companion comment, not the main post body.</p><h2>Coffee buddy comment</h2><p><strong>From:</strong> Rin Vale<br><span>wandering coffee connoisseur</span></p></header><blockquote><p>That profile reads like a near-miss on sweetness: floral aromatics landed, but the cup leaned salty-sour with bitterness tucked behind acidity, which fits a relatively coarse 1.8.3 and only 2:30 at bubbling-but-not-sizzling water. Next run, keep the same dose and water, go 1-2 clicks finer (toward 1.8.1 or 1.8.0), and either extend immersion to 2:45 or pour slightly hotter water so extraction rounds the back-palate sourness and brings that Guatemala chocolate-bitter core forward.</p></blockquote><p><cite><a href=\"https://codekiln.github.io/beans/companion/rin-vale/\" rel=\"noopener noreferrer\">Virtual companion note by Rin Vale</a></cite></p></aside>",
+        "summary": "brew measured 16.0 g frozen guatemala beans baseline grind at 1.8.3 on timemore; landed at 15.9 g grounds. preheated with 315 g water. for brew, used 255.8 g purified water with 2:30 immersion. water condition at pour: many bubbles, steaming, but no sizzling. groundsni",
+        "plainText": "brew measured 16.0 g frozen guatemala beans baseline grind at 1.8.3 on timemore; landed at 15.9 g grounds. preheated with 315 g water. for brew, used 255.8 g purified water with 2:30 immersion. water condition at pour: many bubbles, steaming, but no sizzling. groundsniff unicorn sniff: “woody, like the inside of a tree!” — very floral. observe listen machine a trois, aka mà3 unlearn. laurent warnier [vibraphone] rachel xi zhang [marimba] pascal meyer [piano] reminded of the japanophilic vibraphone play in breath of the wild. jigsaw miyazaki montreal jazz memorial ”nature is our scenery” pops cheerful chorus: “decompose!” wish: spotify liner notes @ each track. why doesn’t it already? 🧹 the written form of improvisation from an oral tradition — composer louise volkmann taste salty rim. sour in the back. bitterness hiding behind behind acidity, peering into into it, concealment, thick oils, so much acidity. where is the bitter laugh? [ Virtual companion note ] This is a virtual companion comment, not the main post body. Coffee buddy comment From: Rin Vale wandering coffee connoisseur That profile reads like a near-miss on sweetness: floral aromatics landed, but the cup leaned salty-sour with bitterness tucked behind acidity, which fits a relatively coarse 1.8.3 and only 2:30 at bubbling-but-not-sizzling water. Next run, keep the same dose and water, go 1-2 clicks finer (toward 1.8.1 or 1.8.0), and either extend immersion to 2:45 or pour slightly hotter water so extraction rounds the back-palate sourness and brings that Guatemala chocolate-bitter core forward. Virtual companion note by Rin Vale",
+        "summaryMarkers": {
+          "buddyComment": false,
+          "imageAlt": false
+        },
+        "plainTextMarkers": {
+          "buddyComment": true,
+          "imageAlt": false
+        },
+        "hasInlineComment": false,
+        "hasBuddyComment": true,
+        "summaryLength": 269
+      },
+      "compatibility": {
+        "summaryDropsInlineComment": false,
+        "summaryDropsBuddyComment": true,
+        "summaryDropsSectionHeading": false,
+        "previewImageAvailable": true,
+        "contentOrderStartsWithImage": false
+      }
+    },
+    {
+      "id": "preview-image-march-21",
+      "url": "https://codekiln.github.io/beans/log/2026-03-21/",
+      "title": "rich, delicious with the lid off",
+      "sourcePath": "src/content/beans/2026-03-21-bean1.mdx",
+      "coverage": [
+        "preview-image behavior"
+      ],
+      "expected": {
+        "inlineComment": false,
+        "buddyComment": false,
+        "anyImage": true,
+        "noImage": false
+      },
+      "manualObservations": [],
+      "rss": {
+        "html": "<figure><img src=\"https://codekiln.github.io/beans/images/2026-03-21-sat-0842.jpg\" alt=\"bean log 2026-03-21 sat 0842: brew, context, taste, guatemala acodihue huehuetenango stamp\"></figure><h2 id=\"brew\">brew</h2>\n<p>310.5 g purified water heated<br>\n16.1 g guatemala beans<br>\n1.8.1 grind setting<br>\n15.9 g grounds + 0.1 g catchup<br>\n2’45” reference immersion<br>\ntime from mar 16 used<br>\n259.1 g purified water poured<br>\nby 1’30”<br>\npatagonia / no dams mug used for<br>\nthe full cycle.</p>\n<h2 id=\"context\">context</h2>\n<p>listening to <a href=\"https://jasmi.news\">jasmine sun</a><br>\nmar 20 hard fork podcast<br>\nhow she uses claude<br>\nas a writing editor,<br>\ndon’t normally listen<br>\nto podcasts during<br>\ncoffee time, but<br>\nthis was thought<br>\nprovoking</p>\n<blockquote>\n<p>“I feel like I really cracked this over the last couple months… if I <strong>make Claude into an editor</strong> that is not just trying to grade and give feedback on my work against some genericized standard of what good writing is, but actually against my personal aspirations for writing, it can give feedback that I find much, much more helpful.</p>\n<p>I <strong>fed Claude my entire Substack archive of the writing that I’ve previously done</strong> … I also personally write retro notes to myself after everything I publish… just a few bullet points about what was good and bad. … I wanted it to learn my taste—what I aspire to be, where I see myself falling short, what I’m proud of.</p>\n<p>From those things, plus a bit more about my audience and goals, <strong>we co-developed a rubric…</strong> [and] it would ask things like: <strong>does this take advantage of your ‘insider anthropologist’ position?</strong> Or it would notice patterns in my writing, like moving between registers or blending policy and personal scenes.</p>\n<p>Then I <strong>split it into phases—ideation, structure, prose, fact-checking</strong>—and told Claude: <strong>your job is to evaluate my drafts based on this criteria, not to do the writing for me, and to prompt better thinking out of me.</strong></p>\n<p>So when I give it a draft, it might say things like: your conclusion is just a summary, and that’s boring. In a previous piece you ended on a scene—why not try that here? And instead of inventing the scene, it asks me questions: what were you thinking in that moment? what did you feel? can you recall a specific conversation?</p>\n<p>That kind of feedback I actually found incredibly useful… it’s about me becoming the best version of myself as a writer, with Claude pushing me to do that.”</p>\n</blockquote>\n<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/Prm_V51XbPg?si=aUxfIaNY2_GXXXVC&#x26;start=2242\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>\n<p>compelling. this morning, used <code>cursor-agent</code> cli<br>\nto be a terminal / cli coach. similarly,<br>\nhad to make it clear what the goals were.<br>\nalignment must be intentional.<br>\nso many discourses about ai<br>\nrevolve around foreclosure<br>\non creative ways<br>\nto use a reflective<br>\npartner.</p>\n<h2 id=\"taste\">taste</h2>\n<p>rich, delicious with<br>\nthe lid off, first sips<br>\nsatisfy, wouldn’t change<br>\na thing</p>\n<h2 id=\"listening\">listening</h2>\n<p>inoyamaland, <em>commissions: 1977-2000</em>.</p>\n<iframe data-testid=\"embed-iframe\" style=\"border-radius:12px\" src=\"https://open.spotify.com/embed/album/4aU6fMcMwZis9rWZdjlpwH?utm_source=generator\" width=\"100%\" height=\"352\" frameborder=\"0\" allowfullscreen allow=\"autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture\" loading=\"lazy\"></iframe>",
+        "text": "brew 310.5 g purified water heated 16.1 g guatemala beans 1.8.1 grind setting 15.9 g grounds + 0.1 g catchup 2’45” reference immersion time from mar 16 used 259.1 g purified water poured by 1’30” patagonia / no dams mug used for the full cycle. context listening to jasmine sun mar 20 hard fork podcast how she uses claude as a writing editor, don’t normally listen to podcasts during coffee time, but this was thought provoking “I feel like I really cracked this over the last couple months… if I make Claude into an editor that is not just trying to grade and give feedback on my work against some genericized standard of what good writing is, but actually against my personal aspirations for writing, it can give feedback that I find much, much more helpful. I fed Claude my entire Substack archive of the writing that I’ve previously done … I also personally write retro notes to myself after everything I publish… just a few bullet points about what was good and bad. … I wanted it to learn my taste—what I aspire to be, where I see myself falling short, what I’m proud of. From those things, plus a bit more about my audience and goals, we co-developed a rubric… [and] it would ask things like: does this take advantage of your ‘insider anthropologist’ position? Or it would notice patterns in my writing, like moving between registers or blending policy and personal scenes. Then I split it into phases—ideation, structure, prose, fact-checking —and told Claude: your job is to evaluate my drafts based on this criteria, not to do the writing for me, and to prompt better thinking out of me. So when I give it a draft, it might say things like: your conclusion is just a summary, and that’s boring. In a previous piece you ended on a scene—why not try that here? And instead of inventing the scene, it asks me questions: what were you thinking in that moment? what did you feel? can you recall a specific conversation? That kind of feedback I actually found incredibly useful… it’s about me becoming the best version of myself as a writer, with Claude pushing me to do that.” compelling. this morning, used cursor-agent cli to be a terminal / cli coach. similarly, had to make it clear what the goals were. alignment must be intentional. so many discourses about ai revolve around foreclosure on creative ways to use a reflective partner. taste rich, delicious with the lid off, first sips satisfy, wouldn’t change a thing listening inoyamaland, commissions: 1977-2000 .",
+        "markers": {
+          "imageAlt": true
+        },
+        "hasInlineComment": false,
+        "hasBuddyComment": false,
+        "image": {
+          "src": "https://codekiln.github.io/beans/images/2026-03-21-sat-0842.jpg",
+          "alt": "bean log 2026-03-21 sat 0842: brew, context, taste, guatemala acodihue huehuetenango stamp"
+        },
+        "imageCount": 1
+      },
+      "eilmeldung": {
+        "html": "<figure><img src=\"https://codekiln.github.io/beans/images/2026-03-21-sat-0842.jpg\" alt=\"bean log 2026-03-21 sat 0842: brew, context, taste, guatemala acodihue huehuetenango stamp\"></figure><h2 id=\"brew\">brew</h2>\n<p>310.5 g purified water heated<br>\n16.1 g guatemala beans<br>\n1.8.1 grind setting<br>\n15.9 g grounds + 0.1 g catchup<br>\n2’45” reference immersion<br>\ntime from mar 16 used<br>\n259.1 g purified water poured<br>\nby 1’30”<br>\npatagonia / no dams mug used for<br>\nthe full cycle.</p>\n<h2 id=\"context\">context</h2>\n<p>listening to <a href=\"https://jasmi.news\" rel=\"noopener noreferrer\">jasmine sun</a><br>\nmar 20 hard fork podcast<br>\nhow she uses claude<br>\nas a writing editor,<br>\ndon’t normally listen<br>\nto podcasts during<br>\ncoffee time, but<br>\nthis was thought<br>\nprovoking</p>\n<blockquote>\n<p>“I feel like I really cracked this over the last couple months… if I <strong>make Claude into an editor</strong> that is not just trying to grade and give feedback on my work against some genericized standard of what good writing is, but actually against my personal aspirations for writing, it can give feedback that I find much, much more helpful.</p>\n<p>I <strong>fed Claude my entire Substack archive of the writing that I’ve previously done</strong> … I also personally write retro notes to myself after everything I publish… just a few bullet points about what was good and bad. … I wanted it to learn my taste—what I aspire to be, where I see myself falling short, what I’m proud of.</p>\n<p>From those things, plus a bit more about my audience and goals, <strong>we co-developed a rubric…</strong> [and] it would ask things like: <strong>does this take advantage of your ‘insider anthropologist’ position?</strong> Or it would notice patterns in my writing, like moving between registers or blending policy and personal scenes.</p>\n<p>Then I <strong>split it into phases—ideation, structure, prose, fact-checking</strong>—and told Claude: <strong>your job is to evaluate my drafts based on this criteria, not to do the writing for me, and to prompt better thinking out of me.</strong></p>\n<p>So when I give it a draft, it might say things like: your conclusion is just a summary, and that’s boring. In a previous piece you ended on a scene—why not try that here? And instead of inventing the scene, it asks me questions: what were you thinking in that moment? what did you feel? can you recall a specific conversation?</p>\n<p>That kind of feedback I actually found incredibly useful… it’s about me becoming the best version of myself as a writer, with Claude pushing me to do that.”</p>\n</blockquote>\n<iframe src=\"https://www.youtube.com/embed/Prm_V51XbPg?si=aUxfIaNY2_GXXXVC&amp;start=2242\" title=\"YouTube video player\"></iframe>\n<p>compelling. this morning, used <code>cursor-agent</code> cli<br>\nto be a terminal / cli coach. similarly,<br>\nhad to make it clear what the goals were.<br>\nalignment must be intentional.<br>\nso many discourses about ai<br>\nrevolve around foreclosure<br>\non creative ways<br>\nto use a reflective<br>\npartner.</p>\n<h2 id=\"taste\">taste</h2>\n<p>rich, delicious with<br>\nthe lid off, first sips<br>\nsatisfy, wouldn’t change<br>\na thing</p>\n<h2 id=\"listening\">listening</h2>\n<p>inoyamaland, <em>commissions: 1977-2000</em>.</p>\n<iframe src=\"https://open.spotify.com/embed/album/4aU6fMcMwZis9rWZdjlpwH?utm_source=generator\"></iframe>",
+        "summary": "brew 310.5 g purified water heated 16.1 g guatemala beans 1.8.1 grind setting 15.9 g grounds + 0.1 g catchup 2’45” reference immersion time from mar 16 used 259.1 g purified water poured by 1’30” patagonia / no dams mug used for the full cycle. context listening",
+        "plainText": "brew 310.5 g purified water heated 16.1 g guatemala beans 1.8.1 grind setting 15.9 g grounds + 0.1 g catchup 2’45” reference immersion time from mar 16 used 259.1 g purified water poured by 1’30” patagonia / no dams mug used for the full cycle. context listening to jasmine sun mar 20 hard fork podcast how she uses claude as a writing editor, don’t normally listen to podcasts during coffee time, but this was thought provoking “I feel like I really cracked this over the last couple months… if I make Claude into an editor that is not just trying to grade and give feedback on my work against some genericized standard of what good writing is, but actually against my personal aspirations for writing, it can give feedback that I find much, much more helpful. I fed Claude my entire Substack archive of the writing that I’ve previously done … I also personally write retro notes to myself after everything I publish… just a few bullet points about what was good and bad. … I wanted it to learn my taste—what I aspire to be, where I see myself falling short, what I’m proud of. From those things, plus a bit more about my audience and goals, we co-developed a rubric… [and] it would ask things like: does this take advantage of your ‘insider anthropologist’ position? Or it would notice patterns in my writing, like moving between registers or blending policy and personal scenes. Then I split it into phases—ideation, structure, prose, fact-checking—and told Claude: your job is to evaluate my drafts based on this criteria, not to do the writing for me, and to prompt better thinking out of me. So when I give it a draft, it might say things like: your conclusion is just a summary, and that’s boring. In a previous piece you ended on a scene—why not try that here? And instead of inventing the scene, it asks me questions: what were you thinking in that moment? what did you feel? can you recall a specific conversation? That kind of feedback I actually found incredibly useful… it’s about me becoming the best version of myself as a writer, with Claude pushing me to do that.” compelling. this morning, used cursor-agent cli to be a terminal / cli coach. similarly, had to make it clear what the goals were. alignment must be intentional. so many discourses about ai revolve around foreclosure on creative ways to use a reflective partner. taste rich, delicious with the lid off, first sips satisfy, wouldn’t change a thing listening inoyamaland, commissions: 1977-2000.",
+        "summaryMarkers": {
+          "imageAlt": false
+        },
+        "plainTextMarkers": {
+          "imageAlt": false
+        },
+        "hasInlineComment": false,
+        "hasBuddyComment": false,
+        "summaryLength": 262
+      },
+      "compatibility": {
+        "summaryDropsInlineComment": false,
+        "summaryDropsBuddyComment": false,
+        "summaryDropsSectionHeading": false,
+        "previewImageAvailable": true,
+        "contentOrderStartsWithImage": true
+      }
+    },
+    {
+      "id": "no-image-january-24",
+      "url": "https://codekiln.github.io/beans/log/2026-01-24/",
+      "title": "Cold walk, music, grounded cup",
+      "sourcePath": "src/content/beans/2026-01-24-bean2.md",
+      "coverage": [
+        "no-image posts"
+      ],
+      "expected": {
+        "inlineComment": false,
+        "buddyComment": false,
+        "anyImage": false,
+        "noImage": true
+      },
+      "manualObservations": [],
+      "rss": {
+        "html": "<h2 id=\"observations\">Observations</h2>\n<ul>\n<li>Walking outside.</li>\n<li>~10°F.</li>\n<li>Pink and purple on the horizon.</li>\n<li>Listening to the final minutes of Rachmaninoff Piano Concerto No. 3.</li>\n<li>Eyes watered while drinking.</li>\n<li>Then Bach: Partita No. 2 in C minor.</li>\n<li>Wanted to sit down and play.</li>\n<li>The cold sharpened everything.</li>\n<li>The coffee felt grounding against the music — less about flavor notes, more about staying present in the body.</li>\n</ul>\n<h2 id=\"brew-log\">Brew log</h2>\n<ul>\n<li>Outdoor brewing, wind shielding with the mug.</li>\n<li>Longer drawdown from cold air.</li>\n</ul>",
+        "text": "Observations Walking outside. ~10°F. Pink and purple on the horizon. Listening to the final minutes of Rachmaninoff Piano Concerto No. 3. Eyes watered while drinking. Then Bach: Partita No. 2 in C minor. Wanted to sit down and play. The cold sharpened everything. The coffee felt grounding against the music — less about flavor notes, more about staying present in the body. Brew log Outdoor brewing, wind shielding with the mug. Longer drawdown from cold air.",
+        "markers": {
+          "text": true
+        },
+        "hasInlineComment": false,
+        "hasBuddyComment": false,
+        "image": null,
+        "imageCount": 0
+      },
+      "eilmeldung": {
+        "html": "<h2 id=\"observations\">Observations</h2>\n<ul>\n<li>Walking outside.</li>\n<li>~10°F.</li>\n<li>Pink and purple on the horizon.</li>\n<li>Listening to the final minutes of Rachmaninoff Piano Concerto No. 3.</li>\n<li>Eyes watered while drinking.</li>\n<li>Then Bach: Partita No. 2 in C minor.</li>\n<li>Wanted to sit down and play.</li>\n<li>The cold sharpened everything.</li>\n<li>The coffee felt grounding against the music — less about flavor notes, more about staying present in the body.</li>\n</ul>\n<h2 id=\"brew-log\">Brew log</h2>\n<ul>\n<li>Outdoor brewing, wind shielding with the mug.</li>\n<li>Longer drawdown from cold air.</li>\n</ul>",
+        "summary": "Observations Walking outside. ~10°F. Pink and purple on the horizon. Listening to the final minutes of Rachmaninoff Piano Concerto No. 3. Eyes watered while drinking. Then Bach: Partita No. 2 in C minor. Wanted to sit down and play. The cold sharpened everything. The coffee fe",
+        "plainText": "Observations Walking outside. ~10°F. Pink and purple on the horizon. Listening to the final minutes of Rachmaninoff Piano Concerto No. 3. Eyes watered while drinking. Then Bach: Partita No. 2 in C minor. Wanted to sit down and play. The cold sharpened everything. The coffee felt grounding against the music — less about flavor notes, more about staying present in the body. Brew log Outdoor brewing, wind shielding with the mug. Longer drawdown from cold air.",
+        "summaryMarkers": {
+          "text": true
+        },
+        "plainTextMarkers": {
+          "text": true
+        },
+        "hasInlineComment": false,
+        "hasBuddyComment": false,
+        "summaryLength": 277
+      },
+      "compatibility": {
+        "summaryDropsInlineComment": false,
+        "summaryDropsBuddyComment": false,
+        "summaryDropsSectionHeading": false,
+        "previewImageAvailable": false,
+        "contentOrderStartsWithImage": false
+      }
+    }
+  ]
+}

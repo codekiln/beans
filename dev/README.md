@@ -11,6 +11,7 @@
 - See `docs/dev/playwright-preview.md` for Playwright install + screenshot instructions.
 - The Playwright flow uses container-local `http://localhost:<port>` and supports full-page captures.
 - See `docs/dev/codex.md` for Codespaces-specific Codex approval defaults.
+- For RSS reader work, refresh the fixture snapshot with `npm run update:rss-reader-harness`, then inspect `/beans/dev/rss-reader-harness/` in the local dev server or with Playwright.
 
 ## Git worktrees in Codespaces
 - Keep the repo root checkout on `main` as an integration-only worktree.
