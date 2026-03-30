@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "playwright": "^1.58.2",
-    "rulesync": "^7.22.0",
+    "rulesync": "^7.23.0",
     "sury": "10.0.4"
   }
 }
