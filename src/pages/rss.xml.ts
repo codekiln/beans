@@ -42,6 +42,46 @@ const inlineCommentStyle = [
 ].join(";");
 const stripMdxFrontmatterImports = (body: string) =>
   body.replace(/^(?:import|export)\s.+$/gm, "").replace(/\n{3,}/g, "\n\n").trim();
+const getHtmlAttribute = (tag: string, attribute: string) =>
+  tag.match(new RegExp(`\\b${attribute}="([^"]*)"`, "i"))?.[1] ?? "";
+const renderPreviewImage = (src: string, alt: string, site: URL) =>
+  `<figure><img src="${escapeHtml(new URL(src, site).toString())}" alt="${escapeHtml(alt)}"></figure>`;
+const extractFirstBodyImage = (html: string, site: URL) => {
+  const imageTag = html.match(/<img\b[^>]*>/i)?.[0];
+
+  if (!imageTag) {
+    return null;
+  }
+
+  const src = getHtmlAttribute(imageTag, "src");
+
+  if (!src) {
+    return null;
+  }
+
+  return {
+    src: new URL(src, site).toString(),
+    alt: getHtmlAttribute(imageTag, "alt")
+  };
+};
+const removePromotedBodyImage = (html: string, promotedImage: { src: string; alt: string }, site: URL) => {
+  const standaloneImage = html.match(/<(p|figure)>\s*(<img\b[^>]*>)\s*<\/\1>/i);
+
+  if (!standaloneImage) {
+    return html;
+  }
+
+  const wrapper = standaloneImage[0];
+  const imageTag = standaloneImage[2];
+  const src = getHtmlAttribute(imageTag, "src");
+  const alt = getHtmlAttribute(imageTag, "alt");
+
+  if (!src || new URL(src, site).toString() !== promotedImage.src || alt !== promotedImage.alt) {
+    return html;
+  }
+
+  return html.replace(wrapper, "").trimStart();
+};
 const renderBuddyComment = async (entry: BeanEntry, site: URL) => {
   if (!entry.data.personaComment) {
     return "";
@@ -122,17 +162,21 @@ export const GET = async () => {
     items: await Promise.all(sortedBeans.map(async (entry) => {
       const bodyWithInlineComments = await transformInlineComments(entry.body, site);
       const content = (await markdown.render(bodyWithInlineComments)).code;
+      const promotedBodyImage = entry.data.image ? null : extractFirstBodyImage(content, site);
+      const descriptionContent = promotedBodyImage
+        ? removePromotedBodyImage(content, promotedBodyImage, site)
+        : content;
 
       return {
         title: entry.data.title,
         pubDate: toDate(entry),
         description: [
           entry.data.image
-            ? `<figure><img src="${new URL(withBase(entry.data.image.src), site)}" alt="${escapeHtml(
-                entry.data.image.alt
-              )}"></figure>`
-            : "",
-          content,
+            ? renderPreviewImage(withBase(entry.data.image.src), entry.data.image.alt, site)
+            : promotedBodyImage
+              ? renderPreviewImage(promotedBodyImage.src, promotedBodyImage.alt, site)
+              : "",
+          descriptionContent,
           await renderBuddyComment(entry, site)
         ].join(""),
         link: withBase(beanRouteInfo.get(entry.slug)?.path ?? `/log/${entry.slug}/`)

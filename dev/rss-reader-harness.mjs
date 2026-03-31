@@ -18,6 +18,7 @@ const fixtureSpecs = [
     expected: {
       inlineComment: true,
       buddyComment: false,
+      leadingPreviewImage: true,
       anyImage: true,
       noImage: false
     },
@@ -44,6 +45,7 @@ const fixtureSpecs = [
     expected: {
       inlineComment: true,
       buddyComment: true,
+      leadingPreviewImage: true,
       anyImage: true,
       noImage: false
     },
@@ -63,6 +65,7 @@ const fixtureSpecs = [
     expected: {
       inlineComment: false,
       buddyComment: true,
+      leadingPreviewImage: true,
       anyImage: true,
       noImage: false
     },
@@ -80,6 +83,7 @@ const fixtureSpecs = [
     expected: {
       inlineComment: false,
       buddyComment: false,
+      leadingPreviewImage: true,
       anyImage: true,
       noImage: false
     },
@@ -96,6 +100,7 @@ const fixtureSpecs = [
     expected: {
       inlineComment: false,
       buddyComment: false,
+      leadingPreviewImage: false,
       anyImage: false,
       noImage: true
     },
@@ -483,6 +488,10 @@ const checkHarness = (data) => {
 
     if (fixture.expected.anyImage && !fixture.rss.image) {
       failures.push(`${fixture.id}: expected at least one image in RSS HTML.`);
+    }
+
+    if (fixture.expected.leadingPreviewImage && !fixture.compatibility.contentOrderStartsWithImage) {
+      failures.push(`${fixture.id}: expected the RSS item to start with a preview image.`);
     }
 
     if (fixture.expected.noImage && fixture.rss.image) {
