@@ -5,7 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
 
-mkdir -p "$tmp_dir/bin" "$tmp_dir/worktrees/beans-open" "$tmp_dir/worktrees/beans-cld" "$tmp_dir/worktrees/beans-c29" "$tmp_dir/worktrees/beans-zpt.1"
+mkdir -p "$tmp_dir/bin" "$tmp_dir/worktrees/beans-open" "$tmp_dir/worktrees/beans-cld" "$tmp_dir/worktrees/beans-c29" "$tmp_dir/worktrees/beans-zpt.1" "$tmp_dir/worktrees/beans-orph"
 cp "$repo_root/dev/beads-prune-closed-worktrees" "$tmp_dir/beads-prune-closed-worktrees"
 
 cat >"$tmp_dir/bin/git" <<EOF
@@ -65,6 +65,7 @@ case "${1:-}" in
 ✓ beans-cld [P2] [task] - Closed issue
 ✓ beans-c29 [P2] [task] - Another closed issue
 ✓ beans-zpt.1 [P2] [task] - Closed dotted issue
+✓ beans-orph [P2] [task] - Closed orphan dir only
 LIST
     exit 0
     ;;
@@ -100,6 +101,16 @@ if [[ "$dry_run_output" != *"$tmp_dir/worktrees/beans-zpt.1"* ]]; then
   exit 1
 fi
 
+if [[ "$dry_run_output" != *"$tmp_dir/worktrees/beans-orph"* ]]; then
+  echo "cleanup script did not report the closed orphan directory during dry run" >&2
+  exit 1
+fi
+
+if [[ "$dry_run_output" != *"Closed-task orphan directories"* ]]; then
+  echo "cleanup script did not label orphan directory cleanup during dry run" >&2
+  exit 1
+fi
+
 run_output="$(
   cd "$tmp_dir"
   PATH="$tmp_dir/bin:$PATH" ./beads-prune-closed-worktrees
@@ -120,6 +131,11 @@ if grep -Fq "worktree remove $tmp_dir/worktrees/beans-open" "$tmp_dir/git.log"; 
   exit 1
 fi
 
+if grep -Fq "worktree remove $tmp_dir/worktrees/beans-orph" "$tmp_dir/git.log"; then
+  echo "cleanup script should rm orphan dirs, not git worktree remove them" >&2
+  exit 1
+fi
+
 if ! grep -Fq "worktree remove $tmp_dir/worktrees/beans-zpt.1" "$tmp_dir/git.log"; then
   echo "cleanup script did not remove the dotted-id closed worktree" >&2
   exit 1
@@ -130,8 +146,13 @@ if ! grep -Fq "worktree prune" "$tmp_dir/git.log"; then
   exit 1
 fi
 
-if [[ "$run_output" != *"Removed 3 closed-task worktree(s)."* ]]; then
+if [[ "$run_output" != *"Removed 4 closed-task worktree(s)."* ]]; then
   echo "cleanup script did not report the removal count" >&2
+  exit 1
+fi
+
+if [[ -d "$tmp_dir/worktrees/beans-orph" ]]; then
+  echo "cleanup script did not remove the closed orphan directory from disk" >&2
   exit 1
 fi
 

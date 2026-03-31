@@ -8,6 +8,10 @@ Usage: dev/beads-prune-closed-worktrees [--dry-run] [--force]
 Removes Beads task worktrees under worktrees/beans-* when the corresponding
 issue is closed in the Beads database.
 
+Paths registered with Git are removed via git worktree remove. Directories
+that still exist on disk for a closed issue but are not Git worktrees
+(orphan fragments) are removed with rm -rf.
+
 Options:
   --dry-run  Print the worktrees that would be removed without removing them
   --force    Pass --force to git worktree remove
@@ -42,7 +46,8 @@ done
 repo_root="$(git rev-parse --show-toplevel)"
 worktree_root="$repo_root/worktrees"
 closed_ids_file="$(mktemp)"
-trap 'rm -f "$closed_ids_file"' EXIT
+registered_paths_file="$(mktemp)"
+trap 'rm -f "$closed_ids_file" "$registered_paths_file"' EXIT
 
 bd list --status closed | grep -oE 'beans-[a-z0-9.]+' | sort -u >"$closed_ids_file" || true
 
@@ -51,29 +56,58 @@ if [[ ! -s "$closed_ids_file" ]]; then
   exit 0
 fi
 
-candidates=()
+git worktree list --porcelain | awk '
+  /^worktree / { print substr($0, 10) }
+' >"$registered_paths_file"
+
+git_candidates=()
 while IFS= read -r path; do
+  [[ -n "$path" ]] || continue
   case "$path" in
     "$worktree_root"/beans-*)
       issue_id="$(basename "$path")"
-      if grep -Fxq "$issue_id" "$closed_ids_file"; then
-        candidates+=("$path")
+      if [[ "$issue_id" =~ ^beans-[a-z0-9.]+$ ]] && grep -Fxq "$issue_id" "$closed_ids_file"; then
+        git_candidates+=("$path")
       fi
       ;;
   esac
-done < <(
-  git worktree list --porcelain | awk '
-    /^worktree / { print substr($0, 10) }
-  '
-)
+done <"$registered_paths_file"
 
-if [[ "${#candidates[@]}" -eq 0 ]]; then
+orphan_candidates=()
+if [[ -d "$worktree_root" ]]; then
+  shopt -s nullglob
+  for path in "$worktree_root"/beans-*; do
+    [[ -d "$path" ]] || continue
+    issue_id="$(basename "$path")"
+    if [[ ! "$issue_id" =~ ^beans-[a-z0-9.]+$ ]]; then
+      continue
+    fi
+    if ! grep -Fxq "$issue_id" "$closed_ids_file"; then
+      continue
+    fi
+    if ! grep -Fxq "$path" "$registered_paths_file"; then
+      orphan_candidates+=("$path")
+    fi
+  done
+  shopt -u nullglob
+fi
+
+total=$((${#git_candidates[@]} + ${#orphan_candidates[@]}))
+
+if [[ "$total" -eq 0 ]]; then
   echo "No closed-task Beads worktrees to remove."
   exit 0
 fi
 
-echo "Closed-task worktrees:"
-printf '%s\n' "${candidates[@]}"
+if [[ "${#git_candidates[@]}" -gt 0 ]]; then
+  echo "Closed-task git worktrees:"
+  printf '%s\n' "${git_candidates[@]}"
+fi
+
+if [[ "${#orphan_candidates[@]}" -gt 0 ]]; then
+  echo "Closed-task orphan directories (not registered as git worktrees):"
+  printf '%s\n' "${orphan_candidates[@]}"
+fi
 
 if [[ "$dry_run" == true ]]; then
   echo "Dry run only; no worktrees removed."
@@ -85,10 +119,14 @@ if [[ "$force" == true ]]; then
   remove_args+=(--force)
 fi
 
-for path in "${candidates[@]}"; do
+for path in "${git_candidates[@]}"; do
   git "${remove_args[@]}" "$path"
+done
+
+for path in "${orphan_candidates[@]}"; do
+  rm -rf "$path"
 done
 
 git worktree prune
 
-echo "Removed ${#candidates[@]} closed-task worktree(s)."
+echo "Removed $total closed-task worktree(s)."
