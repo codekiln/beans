@@ -27,12 +27,13 @@ In Beans, the repo root checkout is the integration-only `main` worktree. Keep a
 11. Merges the current task branch into root `main`, and if that merge conflicts, fails with the unresolved file list.
 12. Pushes `main` to `origin`.
 13. Prunes closed-task Beads worktrees with `dev/beads-prune-closed-worktrees`, including the task worktree that just landed, and fails if that worktree still exists afterward.
-14. Verifies the landed task commit is now reachable from root `main`.
-15. Verifies the task worktree has been pruned and root `main` ends clean and synced with origin.
-16. Reports the landed SHAs for the task branch and root `main`.
-17. Lists untracked files and stashes for cleanup review.
-18. Shows `bd ready`.
-19. Emits a next-session prompt built from the best ready issue, preferring ready task/bug work, then lower priority number, then current ready order.
+14. Deletes the merged task branch locally with `git branch -d`, using the branch that was checked out in the task worktree (not limited to `codex/beans-*`). Skips safely for detached `HEAD` or if the ref is already gone; fails with a clear message if deletion is expected but cannot run.
+15. Verifies the landed task commit is now reachable from root `main`.
+16. Verifies the task worktree has been pruned and root `main` ends clean and synced with origin.
+17. Reports the landed SHAs for the merged task branch and root `main`.
+18. Lists untracked files and stashes for cleanup review.
+19. Shows `bd ready`.
+20. Emits a next-session prompt built from the best ready issue, preferring ready task/bug work, then lower priority number, then current ready order.
 
 ## Defaults and overrides
 
@@ -68,7 +69,7 @@ The helper does prune closed Beads task worktrees automatically after a successf
 
 - Remove debugging artifacts and scratch files only when they are clearly disposable.
 - Drop stashes only when you created them and know they are obsolete.
-- Clean up old branches after the work is merged or intentionally abandoned, not as part of every closeout.
+- The merged task branch for this landing is removed automatically; other stale local branches are still a manual cleanup concern.
 - Leave meaningful local changes alone if they belong to open follow-up work; convert them into a Beads issue instead of silently discarding them.
 
 ## Suggested ritual

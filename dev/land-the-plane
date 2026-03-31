@@ -11,7 +11,8 @@ Runs the Beans session closeout ritual:
   3) Auto-commit tracked task-worktree edits when safe, or fail on ambiguity
   4) Finish and sync the issue through dev/beads-finish
   5) Update root main from origin/main, merge the task branch into main, and push main
-  6) Assert final cleanup state and emit a next-session prompt
+  6) Prune closed task worktrees, then delete the merged task branch locally (any branch name)
+  7) Assert final cleanup state and emit a next-session prompt
 
 Options:
   --check "<command>"   Run this validation command before closeout
@@ -323,6 +324,36 @@ prune_closed_task_worktrees() {
   fi
 }
 
+delete_merged_task_local_branch() {
+  local branch="$current_branch"
+
+  print_section "Removing merged task branch locally:"
+
+  if [[ "$branch" == "main" ]]; then
+    echo "Skipping local branch delete: task worktree was on main (unexpected for this flow)."
+    return 0
+  fi
+
+  if [[ "$branch" == "HEAD" ]]; then
+    echo "Skipping local branch delete: detached HEAD (no branch name)."
+    return 0
+  fi
+
+  if ! git -C "$repo_root" show-ref --verify --quiet "refs/heads/$branch"; then
+    echo "Task branch $branch is already absent locally; nothing to delete."
+    return 0
+  fi
+
+  if ! git -C "$repo_root" branch -d "$branch"; then
+    echo "Expected to delete fully merged task branch \"$branch\" with git branch -d, but it failed." >&2
+    echo "The branch may still be checked out in another worktree, or it is not fully merged into main." >&2
+    echo "Inspect: git -C \"$repo_root\" worktree list" >&2
+    exit 1
+  fi
+
+  echo "Deleted local branch $branch (merged into main)."
+}
+
 assert_task_commit_landed() {
   local task_head="$1"
 
@@ -402,7 +433,7 @@ print_final_state() {
   main_head="$(git -C "$repo_root" rev-parse HEAD)"
 
   print_section "Final landed state:"
-  echo "Task branch: $current_branch @ $task_head"
+  echo "Task branch merged and removed locally: $current_branch @ $task_head"
   echo "Task worktree pruned: $current_worktree"
   echo "Root main: $main_head"
 }
@@ -425,6 +456,7 @@ print_section "Root main review:"
 git -C "$repo_root" status --short --branch
 
 prune_closed_task_worktrees
+delete_merged_task_local_branch
 print_final_state "$task_head"
 
 print_section "Untracked files to review before leaving:"

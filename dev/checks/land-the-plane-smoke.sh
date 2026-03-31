@@ -167,6 +167,18 @@ LIST
       fetch|pull|merge|push)
         exit 0
         ;;
+      show-ref)
+        if [[ "\${2:-}" == "--verify" && "\${3:-}" == "--quiet" && "\${4:-}" == "refs/heads/codex/beans-test" ]]; then
+          exit 0
+        fi
+        exit 1
+        ;;
+      branch)
+        if [[ "\${2:-}" == "-d" && "\${3:-}" == "codex/beans-test" ]]; then
+          exit 0
+        fi
+        exit 1
+        ;;
       merge-base)
         if [[ "\${2:-}" == "--is-ancestor" && "\${3:-}" == "task-head-sha" && "\${4:-}" == "HEAD" ]]; then
           exit 0
@@ -308,6 +320,21 @@ EOF
 
   if ! grep -Fq "worktree remove $task_worktree" "$tmp_dir/git.log"; then
     echo "land-the-plane did not prune the just-closed task worktree" >&2
+    exit 1
+  fi
+
+  if ! grep -Fq -- "-C $tmp_dir show-ref --verify --quiet refs/heads/codex/beans-test" "$tmp_dir/git.log"; then
+    echo "land-the-plane did not verify the merged task branch ref before delete" >&2
+    exit 1
+  fi
+
+  if ! grep -Fq -- "-C $tmp_dir branch -d codex/beans-test" "$tmp_dir/git.log"; then
+    echo "land-the-plane did not delete the merged task branch locally" >&2
+    exit 1
+  fi
+
+  if [[ "$output" != *"Removing merged task branch locally:"* ]]; then
+    echo "land-the-plane did not report the merged branch delete step" >&2
     exit 1
   fi
 
