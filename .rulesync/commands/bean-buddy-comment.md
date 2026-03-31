@@ -27,8 +27,7 @@ $ bean buddy 2026-03-05-bean1
 
 ```yaml
 personaComment:
-  name: "Rin Vale"
-  title: "Campfire Cupping Companion"
+  companion: "rin-vale"
   body: "<generated text>"
 ```
 
@@ -39,7 +38,7 @@ personaComment:
 ## Style and scope
 
 - Keep the comment concise and reflective of the target entry plus relevant prior context.
-- Maintain the fixed persona identity unless explicit user instructions request edits.
+- Maintain the fixed companion identity unless explicit user instructions request edits.
 - Do not write buddy text into the markdown body; frontmatter only.
 - Write in the voice of a trusted expert coffee friend; first-person and second-person language is allowed.
 - Include at least one concrete, actionable brew suggestion tied to the logged variables (grind, ratio, water temp, timing, or process).

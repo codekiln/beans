@@ -8,24 +8,31 @@ Usage: dev/beads-start <issue-id> [branch]
 Starts Beads work quickly:
   1) Claim issue
   2) Warn if the source checkout is dirty
-  2) Ensure worktree at worktrees/<issue-id>
-  3) Ensure branch (default: codex/<issue-id>)
+  3) Ensure worktree at worktrees/beans-<issue-id>
+  4) Ensure branch (default: codex/beans-<issue-id>)
 USAGE
 }
 
 issue_id="${1:-}"
 branch="${2:-}"
+worktree_issue_id=""
 
 if [[ -z "$issue_id" ]]; then
   usage
   exit 1
 fi
 
-if [[ -z "$branch" ]]; then
-  branch="codex/$issue_id"
+if [[ "$issue_id" == beans-* ]]; then
+  worktree_issue_id="$issue_id"
+else
+  worktree_issue_id="beans-$issue_id"
 fi
 
-worktree_path="worktrees/$issue_id"
+if [[ -z "$branch" ]]; then
+  branch="codex/$worktree_issue_id"
+fi
+
+worktree_path="worktrees/$worktree_issue_id"
 gitignore_path=".gitignore"
 worktree_beads_path="$worktree_path/.beads"
 worktree_redirect_path="$worktree_beads_path/redirect"

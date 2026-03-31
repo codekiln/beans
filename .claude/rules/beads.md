@@ -50,7 +50,7 @@ The helper:
 - installs the repo-owned `pre-push` guard
 - warns if the source checkout is already dirty
 - claims the issue and immediately runs `bd dolt push`
-- creates `worktrees/<issue-id>` on `codex/<issue-id>`
+- creates `worktrees/beans-<issue-id>` on `codex/beans-<issue-id>`
 - repairs the worktree-local `.beads/redirect`
 - removes redundant per-worktree `.gitignore` noise if Beads added it
 
@@ -60,7 +60,7 @@ Manual fallback:
 bd show <issue-id>
 bd update <issue-id> --claim
 DOLT_REMOTE_PASSWORD="$(gh auth token)" bd dolt push
-bd worktree create worktrees/<issue-id> --branch codex/<issue-id>
+bd worktree create worktrees/beans-<issue-id> --branch codex/beans-<issue-id>
 ```
 
 ## Finish path
