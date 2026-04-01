@@ -82,6 +82,6 @@ gear:
 
 - Omit optional fields or entire objects when unknown.
 - Keep the primary descriptive content in the markdown body.
-- Images in the markdown body must use the `/beans/images/` path.
+- **Images:** save new assets under **`public/images/`**. In the bean markdown body, link with **`/beans/images/<filename>`** (base + path). Do not use **`public/beans/images/`** on disk.
 - Do not include an inline body preamble like `$ bean log YYYY-MM-DD` or `$ bean log YYYY-MM-DD HHMM`; 
   the entry header already renders the command prompt.

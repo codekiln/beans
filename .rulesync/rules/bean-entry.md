@@ -42,7 +42,12 @@ The markdown body is rendered directly using Astro's content rendering. You can 
 - Links: `[text](url)`
 - Images: `![alt text](/beans/images/filename.png)`
 
-**Important**: Images in the markdown body must use the full `/beans/images/` path prefix, not `/images/`. This is different from frontmatter images which use `/images/` and are handled by the `withBase` utility in the component.
+### Static image files (disk vs markdown)
+
+- **Commit the file at** `public/images/<filename>` (same folder as frontmatter body images).
+- **In the bean markdown body**, use the path that includes the site base: `/beans/images/<filename>` (not a second `beans` segment on disk).
+- **Frontmatter `image.src`** uses `/images/<filename>` without the `/beans/` prefix; `withBase` adds base in components. The asset file is still **`public/images/<filename>`**.
+
 **Important**: Do not add an inline body preamble like `` `$ bean log YYYY-MM-DD` `` or `` `$ bean log YYYY-MM-DD HHMM` `` in the markdown body. The UI renders the bean log command prompt in the entry header.
 
 ## Rin Vale Buddy Comment Frontmatter
@@ -71,5 +76,6 @@ image:
 
 ### Markdown Body Image
 ```markdown
-![Description](/beans/images/example.png)  # Includes /beans/ prefix
+<!-- File on disk: public/images/example.png -->
+![Description](/beans/images/example.png)  <!-- URL includes Astro base /beans/ -->
 ```
