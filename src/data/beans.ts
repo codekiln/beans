@@ -36,6 +36,41 @@ const getTimeToken = (time: string | undefined) =>
     .map((part) => part.padStart(2, "0"))
     .join("");
 
+const stripMdxImports = (body: string) =>
+  body.replace(/^(?:import|export)\s.+$/gm, "").replace(/\n{3,}/g, "\n\n").trim();
+
+const normalizeImagePath = (src: string) => {
+  const base = import.meta.env.BASE_URL || "/";
+  const parsed = src.match(/^https?:\/\//i) ? new URL(src) : new URL(src, "https://beans.local");
+  const normalizedBase = base === "/" ? "" : base.replace(/\/$/, "");
+  const normalizedPath = parsed.pathname.startsWith(normalizedBase + "/")
+    ? parsed.pathname.slice(normalizedBase.length)
+    : parsed.pathname;
+
+  return normalizedPath.replace(/\/{2,}/g, "/");
+};
+
+export const bodyReferencesImage = (body: string, imageSrc: string) => {
+  const normalizedTarget = normalizeImagePath(imageSrc);
+  const source = stripMdxImports(body);
+  const imageSources = new Set<string>();
+  let match: RegExpExecArray | null;
+
+  const markdownImagePattern = /!\[[^\]]*]\(([^)\s]+)(?:\s+["'][^"']*["'])?\)/g;
+
+  while ((match = markdownImagePattern.exec(source)) !== null) {
+    imageSources.add(normalizeImagePath(match[1]));
+  }
+
+  const htmlImagePattern = /<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi;
+
+  while ((match = htmlImagePattern.exec(source)) !== null) {
+    imageSources.add(normalizeImagePath(match[1]));
+  }
+
+  return imageSources.has(normalizedTarget);
+};
+
 export const getBeans = async () => {
   const entries = await getCollection("beans");
   return entries.map((entry) => ({ ...entry, slug: getContentSlug(entry.id) })).sort(compareBeansByDate);

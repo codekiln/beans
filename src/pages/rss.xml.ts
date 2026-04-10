@@ -1,6 +1,6 @@
 import rss from "@astrojs/rss";
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
-import { extractInlineCompanionComments, getBeanRouteInfoMap, getBeans } from "../data/beans";
+import { bodyReferencesImage, extractInlineCompanionComments, getBeanRouteInfoMap, getBeans } from "../data/beans";
 import { getCompanionBySlug, getCompanionPath } from "../data/companions";
 import { withBase } from "../utils/paths";
 
@@ -40,8 +40,6 @@ const inlineCommentStyle = [
   "background:#faf6ed",
   "color:#2b2118"
 ].join(";");
-const stripMdxFrontmatterImports = (body: string) =>
-  body.replace(/^(?:import|export)\s.+$/gm, "").replace(/\n{3,}/g, "\n\n").trim();
 const getHtmlAttribute = (tag: string, attribute: string) =>
   tag.match(new RegExp(`\\b${attribute}="([^"]*)"`, "i"))?.[1] ?? "";
 const renderPreviewImage = (src: string, alt: string, site: URL) =>
@@ -131,7 +129,7 @@ const renderInlineCompanionComment = async (
 };
 
 const transformInlineComments = async (body: string, site: URL) => {
-  const bodyWithoutImports = stripMdxFrontmatterImports(body);
+  const bodyWithoutImports = body.replace(/^(?:import|export)\s.+$/gm, "").replace(/\n{3,}/g, "\n\n").trim();
   const comments = extractInlineCompanionComments(bodyWithoutImports);
   let result = bodyWithoutImports;
 
@@ -162,6 +160,8 @@ export const GET = async () => {
     items: await Promise.all(sortedBeans.map(async (entry) => {
       const bodyWithInlineComments = await transformInlineComments(entry.body, site);
       const content = (await markdown.render(bodyWithInlineComments)).code;
+      const showPreviewImage =
+        entry.data.image && !bodyReferencesImage(entry.body, entry.data.image.src);
       const promotedBodyImage = entry.data.image ? null : extractFirstBodyImage(content, site);
       const descriptionContent = promotedBodyImage
         ? removePromotedBodyImage(content, promotedBodyImage, site)
@@ -171,7 +171,7 @@ export const GET = async () => {
         title: entry.data.title,
         pubDate: toDate(entry),
         description: [
-          entry.data.image
+          showPreviewImage && entry.data.image
             ? renderPreviewImage(withBase(entry.data.image.src), entry.data.image.alt, site)
             : promotedBodyImage
               ? renderPreviewImage(promotedBodyImage.src, promotedBodyImage.alt, site)

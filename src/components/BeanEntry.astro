@@ -3,7 +3,7 @@ import { render } from "astro:content";
 import TagRow from "./TagRow.astro";
 import CoffeeBuddyQuote from "./CoffeeBuddyQuote.astro";
 import { getCompanionBySlug } from "../data/companions";
-import { getBeanRouteInfo, getBeans } from "../data/beans";
+import { bodyReferencesImage, getBeanRouteInfo, getBeans } from "../data/beans";
 import { withBase } from "../utils/paths";
 
 const { bean, routeInfo = null, showBuddyComment = false, showClosingMark = false } = Astro.props;
@@ -12,6 +12,7 @@ const beanRouteInfo = routeInfo ?? getBeanRouteInfo(bean, await getBeans());
 const companion = bean.data.personaComment
   ? await getCompanionBySlug(bean.data.personaComment.companion)
   : null;
+const showHeaderImage = bean.data.image && !bodyReferencesImage(bean.body, bean.data.image.src);
 const logCommand = beanRouteInfo.commandText;
 const command = `$ bean ${logCommand}`;
 const commandLabel = `bean ${logCommand}`;
@@ -111,7 +112,7 @@ const gearItems = [
         <p class="bean-title">{bean.data.title}</p>
       </header>
       <section class="bean-content markdown">
-        {bean.data.image && (
+        {showHeaderImage && bean.data.image && (
           <figure class="bean-observation-media">
             <img src={withBase(bean.data.image.src)} alt={bean.data.image.alt} loading="lazy" />
           </figure>
