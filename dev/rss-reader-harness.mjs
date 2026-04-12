@@ -92,6 +92,40 @@ const fixtureSpecs = [
     }
   },
   {
+    id: "reader-friendly-april-11",
+    url: "https://codekiln.github.io/beans/log/2026-04-11/",
+    sourcePath: "src/content/beans/2026-04-11-bean1.mdx",
+    title: "a continuity of context",
+    coverage: ["reader-friendly companion notes", "table flattening", "embed fallback links"],
+    expected: {
+      inlineComment: false,
+      buddyComment: false,
+      leadingPreviewImage: true,
+      anyImage: true,
+      noImage: false,
+      sectionHeadingsInPlainText: ["bean sniff", "grounds sniff", "evaluate", "listen"],
+      plainTextMarkers: [
+        "Companion note from codekiln",
+        "Companion note from unicorn",
+        "aroma: intensity: 3; preference: 4; notes: rich, wet, nutty",
+        "[embedded media] Open Spotify embed"
+      ],
+      absentRssHtml: ["<table", "<iframe", "<blockquote"],
+      presentRssHtml: [
+        "<li><strong>aroma</strong>: intensity: 3; preference: 4; notes: rich, wet, nutty</li>",
+        "Companion note from <a href=\"https://codekiln.github.io/beans/companion/unicorn/\">🦄 unicorn</a>",
+        "<em>[embedded media]</em> <a href=\"https://open.spotify.com/embed/album/08pbuOsDwHBRjt5UjO5iVa?utm_source=generator\">Open Spotify embed</a>"
+      ]
+    },
+    markers: {
+      sectionHeading: "evaluate",
+      imageAlt: "bean log 2026-04-11 sat 0610",
+      flattenedTable: "aroma: intensity: 3; preference: 4; notes: rich, wet, nutty",
+      companionFallback: "Companion note from unicorn",
+      embedFallback: "[embedded media] Open Spotify embed"
+    }
+  },
+  {
     id: "no-image-january-24",
     url: "https://codekiln.github.io/beans/log/2026-01-24/",
     sourcePath: "src/content/beans/2026-01-24-bean2.md",
@@ -191,7 +225,8 @@ const run = async () => {
       },
       notes: [
         "The browser page renders fixture cards from this JSON snapshot.",
-        "March 29 includes a manual Readwise Reader observation sourced from the task description."
+        "March 29 includes a manual Readwise Reader observation sourced from the task description.",
+        "April 11 tracks reader-friendly fallbacks for companion notes, markdown tables, and embedded media."
       ],
       fixtures: fixtureRows
     };
@@ -469,7 +504,13 @@ const buildFixtureRecord = (fixture, rss, eilmeldung) => {
         rssText.includes(fixture.markers.sectionHeading) &&
         !summary.includes(fixture.markers.sectionHeading),
       previewImageAvailable: Boolean(image?.src),
-      contentOrderStartsWithImage: Boolean(image?.src) && normalizeWhitespace(rss.html).startsWith("<figure><img")
+      contentOrderStartsWithImage: Boolean(image?.src) && normalizeWhitespace(rss.html).startsWith("<figure><img"),
+      missingPlainTextMarkers: (fixture.expected.plainTextMarkers ?? []).filter((marker) => !plainText.includes(marker)),
+      missingSectionHeadingsInPlainText: (fixture.expected.sectionHeadingsInPlainText ?? []).filter(
+        (heading) => !plainText.includes(heading)
+      ),
+      presentForbiddenRssHtml: (fixture.expected.absentRssHtml ?? []).filter((snippet) => rss.html.includes(snippet)),
+      missingRequiredRssHtml: (fixture.expected.presentRssHtml ?? []).filter((snippet) => !rss.html.includes(snippet))
     }
   };
 };
@@ -504,6 +545,30 @@ const checkHarness = (data) => {
 
     if (!fixture.eilmeldung.plainText) {
       failures.push(`${fixture.id}: eilmeldung plain-text capture was empty.`);
+    }
+
+    if (fixture.compatibility.missingPlainTextMarkers.length > 0) {
+      failures.push(
+        `${fixture.id}: eilmeldung plain text is missing expected markers: ${fixture.compatibility.missingPlainTextMarkers.join(", ")}.`
+      );
+    }
+
+    if (fixture.compatibility.missingSectionHeadingsInPlainText.length > 0) {
+      failures.push(
+        `${fixture.id}: eilmeldung plain text is missing expected section headings: ${fixture.compatibility.missingSectionHeadingsInPlainText.join(", ")}.`
+      );
+    }
+
+    if (fixture.compatibility.presentForbiddenRssHtml.length > 0) {
+      failures.push(
+        `${fixture.id}: RSS HTML still contains reader-hostile markup: ${fixture.compatibility.presentForbiddenRssHtml.join(", ")}.`
+      );
+    }
+
+    if (fixture.compatibility.missingRequiredRssHtml.length > 0) {
+      failures.push(
+        `${fixture.id}: RSS HTML is missing expected compatibility markup: ${fixture.compatibility.missingRequiredRssHtml.join(", ")}.`
+      );
     }
   }
 

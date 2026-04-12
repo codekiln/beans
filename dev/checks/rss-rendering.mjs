@@ -58,7 +58,7 @@ if (!xml.includes("This is a virtual companion comment, not the main post body."
 
 if (
   !xml.includes("earthy sweetness, beets. red.") ||
-  !xml.includes("-- &lt;a href=&quot;https://codekiln.github.io/beans/companion/unicorn/&quot;&gt;🦄&lt;/a&gt;")
+  !xml.includes("Companion note from &lt;a href=&quot;https://codekiln.github.io/beans/companion/unicorn/&quot;&gt;🦄&lt;/a&gt;")
 ) {
   throw new Error("RSS feed did not render the inline companion comment into readable HTML.");
 }
@@ -100,6 +100,23 @@ if (
 const january24 = rssItems.get("https://codekiln.github.io/beans/log/2026-01-24/");
 if (!january24 || january24.includes("<img")) {
   throw new Error("RSS feed unexpectedly added an image to the January 24 no-image fixture.");
+}
+
+const april11 = rssItems.get("https://codekiln.github.io/beans/log/2026-04-11/");
+if (!april11 || !april11.includes("<h2 id=\"evaluate\">evaluate</h2>")) {
+  throw new Error("RSS feed dropped the April 11 evaluate section.");
+}
+
+if (!april11.includes("<li><strong>aroma</strong>: intensity: 3; preference: 4; notes: rich, wet, nutty</li>")) {
+  throw new Error("RSS feed did not flatten the April 11 evaluation table into reader-friendly list items.");
+}
+
+if (april11.includes("<table") || april11.includes("<iframe")) {
+  throw new Error("RSS feed leaked raw table or iframe markup for the April 11 item.");
+}
+
+if (!april11.includes("Companion note from codekiln") || !april11.includes("Open Spotify embed")) {
+  throw new Error("RSS feed did not simplify April 11 companion notes or embedded audio for text-oriented readers.");
 }
 
 console.log("rss-rendering check passed");

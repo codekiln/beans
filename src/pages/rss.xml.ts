@@ -1,5 +1,6 @@
 import rss from "@astrojs/rss";
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
+import remarkGfm from "remark-gfm";
 import { bodyReferencesImage, extractInlineCompanionComments, getBeanRouteInfoMap, getBeans } from "../data/beans";
 import { getCompanionBySlug, getCompanionPath } from "../data/companions";
 import { withBase } from "../utils/paths";
@@ -21,6 +22,8 @@ const renderParagraphs = (value: string) =>
     .filter(Boolean)
     .map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`)
     .join("");
+const readableCompanionLabel = (name: string, fallback: string) =>
+  /[\p{L}\p{N}]/u.test(name) ? name : `${name} ${fallback}`.trim();
 const companionShellStyle = [
   "margin:1.5em 0 0",
   "padding:1em",
@@ -44,6 +47,18 @@ const getHtmlAttribute = (tag: string, attribute: string) =>
   tag.match(new RegExp(`\\b${attribute}="([^"]*)"`, "i"))?.[1] ?? "";
 const renderPreviewImage = (src: string, alt: string, site: URL) =>
   `<figure><img src="${escapeHtml(new URL(src, site).toString())}" alt="${escapeHtml(alt)}"></figure>`;
+const toAbsoluteUrl = (value: string, site: URL) => {
+  if (!value || /^(?:[a-z]+:|#|\/\/)/i.test(value)) {
+    return value;
+  }
+
+  return new URL(value, site).toString();
+};
+const absolutizeRelativeUrls = (html: string, site: URL) =>
+  html.replace(/\b(href|src)="([^"]+)"/gi, (_, attribute: string, value: string) => {
+    const absolute = toAbsoluteUrl(value, site);
+    return `${attribute}="${escapeHtml(absolute)}"`;
+  });
 const extractFirstBodyImage = (html: string, site: URL) => {
   const imageTag = html.match(/<img\b[^>]*>/i)?.[0];
 
@@ -80,6 +95,73 @@ const removePromotedBodyImage = (html: string, promotedImage: { src: string; alt
 
   return html.replace(wrapper, "").trimStart();
 };
+const stripTags = (value: string) =>
+  value
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, "\"")
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s*\n\s*/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+const simplifyCompanionBlockquotes = (html: string) =>
+  html.replace(
+    /<blockquote\b[^>]*>\s*<p\b[^>]*>([\s\S]*?)<\/p>\s*<footer\b[^>]*>--\s*([\s\S]*?)<\/footer>\s*<\/blockquote>/gi,
+    (_, body: string, attribution: string) =>
+      `<p><strong>Companion note from ${attribution.trim()}:</strong> <em>${stripTags(body)}</em></p>`
+  );
+const simplifyTables = (html: string) =>
+  html.replace(/<table>([\s\S]*?)<\/table>/gi, (tableMatch: string, tableInner: string) => {
+    const rows = Array.from(tableInner.matchAll(/<tr>([\s\S]*?)<\/tr>/gi)).map((match) => match[1]);
+
+    if (rows.length < 2) {
+      return tableMatch;
+    }
+
+    const headers = Array.from(rows[0].matchAll(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/gi)).map((match) => stripTags(match[1]));
+    const bodyRows = rows.slice(1)
+      .map((row) => Array.from(row.matchAll(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/gi)).map((match) => stripTags(match[1])))
+      .filter((cells) => cells.length > 0);
+
+    if (headers.length === 0 || bodyRows.length === 0) {
+      return tableMatch;
+    }
+
+    const listItems = bodyRows
+      .map((cells) => {
+        const rowLabel = cells[0] ?? "row";
+        const details = headers
+          .slice(1)
+          .map((header, index) => {
+            const value = cells[index + 1] ?? "";
+            return value ? `${header}: ${value}` : "";
+          })
+          .filter(Boolean)
+          .join("; ");
+        return `<li><strong>${escapeHtml(rowLabel)}</strong>${details ? `: ${escapeHtml(details)}` : ""}</li>`;
+      })
+      .join("");
+
+    return `<ul>${listItems}</ul>`;
+  });
+const simplifyEmbeds = (html: string) =>
+  html.replace(/<iframe\b[^>]*\bsrc="([^"]+)"[^>]*>(?:[\s\S]*?)<\/iframe>/gi, (_, src: string) => {
+    const label = /spotify\.com/i.test(src) ? "Open Spotify embed" : "Open embedded media";
+    return `<p><em>[embedded media]</em> <a href="${escapeHtml(src)}">${label}</a></p>`;
+  });
+const simplifyRssHtml = (html: string, site: URL) =>
+  [
+    simplifyCompanionBlockquotes,
+    simplifyTables,
+    simplifyEmbeds,
+    (value: string) => absolutizeRelativeUrls(value, site),
+    (value: string) => value.replace(/\n{3,}/g, "\n\n").trim()
+  ].reduce((value, transform) => transform(value), html);
 const renderBuddyComment = async (entry: BeanEntry, site: URL) => {
   if (!entry.data.personaComment) {
     return "";
@@ -88,6 +170,7 @@ const renderBuddyComment = async (entry: BeanEntry, site: URL) => {
   const { body, companion: companionRef } = entry.data.personaComment;
   const companion = await getCompanionBySlug(companionRef);
   const name = companion?.data.name ?? "Virtual companion";
+  const label = readableCompanionLabel(name, companionRef);
   const title = companion?.data.title ?? "";
   const companionLink = companion
     ? new URL(withBase(getCompanionPath(companion.slug)), site).toString()
@@ -97,12 +180,12 @@ const renderBuddyComment = async (entry: BeanEntry, site: URL) => {
     "<header>",
     "<p><strong>[ Virtual companion note ]</strong> This is a virtual companion comment, not the main post body.</p>",
     "<h2 style=\"margin:0;font-size:1rem;line-height:1.4;\">Coffee buddy comment</h2>",
-    `<p style="margin:0.35em 0 0;"><strong>From:</strong> ${escapeHtml(name)}<br><span>${escapeHtml(title)}</span></p>`,
+    `<p style="margin:0.35em 0 0;"><strong>From:</strong> ${escapeHtml(label)}<br><span>${escapeHtml(title)}</span></p>`,
     "</header>",
     `<blockquote aria-label="Quoted companion comment from ${escapeHtml(name)}" style="${companionBlockquoteStyle}">${renderParagraphs(body)}</blockquote>`,
     companionLink
-      ? `<p style="margin:0.75em 0 0;"><cite><a href="${companionLink}">Virtual companion note by ${escapeHtml(name)}</a></cite></p>`
-      : `<p style="margin:0.75em 0 0;"><cite>Virtual companion note by ${escapeHtml(name)}</cite></p>`,
+      ? `<p style="margin:0.75em 0 0;"><cite><a href="${companionLink}">Virtual companion note by ${escapeHtml(label)}</a></cite></p>`
+      : `<p style="margin:0.75em 0 0;"><cite>Virtual companion note by ${escapeHtml(label)}</cite></p>`,
     "</aside>"
   ].join("");
 };
@@ -114,12 +197,13 @@ const renderInlineCompanionComment = async (
 ) => {
   const companion = await getCompanionBySlug(companionSlug);
   const name = companion?.data.name ?? companionSlug;
+  const label = readableCompanionLabel(name, companionSlug);
   const companionLink = companion
     ? new URL(withBase(getCompanionPath(companion.slug)), site).toString()
     : null;
   const attribution = companionLink
-    ? `<a href="${companionLink}">${escapeHtml(name)}</a>`
-    : escapeHtml(name);
+    ? `<a href="${companionLink}">${escapeHtml(label)}</a>`
+    : escapeHtml(label);
   return [
     `<blockquote style="${inlineCommentStyle}">`,
     `<p style="margin:0;font-style:italic;">${escapeHtml(commentBody)}</p>`,
@@ -147,7 +231,9 @@ const transformInlineComments = async (body: string, site: URL) => {
 };
 
 export const GET = async () => {
-  const markdown = await createMarkdownProcessor();
+  const markdown = await createMarkdownProcessor({
+    remarkPlugins: [remarkGfm]
+  });
   const beans = await getBeans();
   const beanRouteInfo = getBeanRouteInfoMap(beans);
   const sortedBeans = [...beans].sort((a, b) => toDate(b).getTime() - toDate(a).getTime());
@@ -166,6 +252,7 @@ export const GET = async () => {
       const descriptionContent = promotedBodyImage
         ? removePromotedBodyImage(content, promotedBodyImage, site)
         : content;
+      const rssContent = simplifyRssHtml(descriptionContent, site);
 
       return {
         title: entry.data.title,
@@ -176,7 +263,7 @@ export const GET = async () => {
             : promotedBodyImage
               ? renderPreviewImage(promotedBodyImage.src, promotedBodyImage.alt, site)
               : "",
-          descriptionContent,
+          rssContent,
           await renderBuddyComment(entry, site)
         ].join(""),
         link: withBase(beanRouteInfo.get(entry.slug)?.path ?? `/log/${entry.slug}/`)
