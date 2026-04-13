@@ -81,5 +81,7 @@ gear:
 - Omit optional fields or entire objects when unknown.
 - Keep the primary descriptive content in the markdown body.
 - **Images:** save new assets under **`public/images/`**. In the bean markdown body, link with **`/beans/images/<filename>`** (base + path). Do not use **`public/beans/images/`** on disk.
+- If the user supplied images or scans as source material for the bean entry, import those files into `public/images/` and display them in the entry by default. Only omit them when the user explicitly wants a text-only post.
+- For multi-page scans, place each image near the corresponding section of body content and use the clearest page as the frontmatter `image` when appropriate.
 - Do not include an inline body preamble like `$ bean log YYYY-MM-DD` or `$ bean log YYYY-MM-DD HHMM`; 
   the entry header already renders the command prompt.

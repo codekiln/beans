@@ -47,6 +47,7 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - **Bean body images (static files):** add the file under **`public/images/`** in the repo (e.g., `public/images/2026-04-01-scan.jpg`). Astro serves `public/` at the site root and the project `base` is `/beans/`, so that file is reachable at **`/beans/images/...`**. Do **not** nest another `beans` folder (`public/beans/images/` is wrong for this setup).
 - **Bean body markdown:** reference those assets with the full URL path including base, e.g., `![alt](/beans/images/file.png)`.
 - **Frontmatter images:** use `/images/...` without the `/beans/` prefix (components apply `withBase`); the file still lives under **`public/images/`**.
+- When a bean entry is created from user-supplied images or scans, import those files into `public/images/` and display them in the post by default unless the user explicitly requests otherwise.
 - Markdown bodies support all standard markdown features: headings, paragraphs, lists, links, images, code blocks, etc.
 
 ## Code Style

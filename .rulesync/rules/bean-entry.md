@@ -42,6 +42,14 @@ The markdown body is rendered directly using Astro's content rendering. You can 
 - Links: `[text](url)`
 - Images: `![alt text](/beans/images/filename.png)`
 
+### User-supplied source images
+
+- When a user provides one or more source images for a bean entry, treat those images as part of the entry by default.
+- Import the supplied image files into `public/images/` with a date-and-title-based filename that matches nearby bean-entry conventions.
+- Display the imported images in the markdown body with `/beans/images/...` links unless the user explicitly asks for a text-only entry or asks you not to show the images.
+- If the entry uses multiple scanned pages, prefer placing each page image near the related section of transcription or reflection instead of leaving the scans out.
+- If one supplied image is a clear primary page, also set the bean frontmatter `image` to that file unless there is a stronger established cover image.
+
 ### Static image files (disk vs markdown)
 
 - **Commit the file at** `public/images/<filename>` (same folder as frontmatter body images).
