@@ -1,0 +1,20 @@
+{
+  "$schema": "https://github.com/dyoshikawa/rulesync/releases/latest/download/mcp-schema.json",
+  "mcpServers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--caps",
+        "vision",
+        "--headless",
+        "--viewport-size",
+        "1440x900"
+      ],
+      "targets": ["codexcli"],
+      "description": "Browser automation MCP server powered by Playwright"
+    }
+  }
+}

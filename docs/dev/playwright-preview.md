@@ -42,25 +42,13 @@ Notes:
 
 ## MCP vision loop (screenshots + accessibility tree)
 
-Run the Playwright MCP server inside the container so Codex can request screenshots and the accessibility tree.
+For repo-local Codex usage, keep the Playwright MCP server in Rulesync as a `stdio` entry and regenerate:
 
 ```bash
-npx -y @playwright/mcp@latest --port 5173 --viewport-size 1440x900 --caps vision
+npx rulesync generate
 ```
 
-Legacy SSE transport is available at `http://localhost:5173/sse` if your client needs it.
-
-Register it with Codex:
-
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "url": "http://localhost:5173/mcp"
-    }
-  }
-}
-```
+That generates `.codex/config.toml` with a `playwright` MCP server that Codex starts itself via `npx @playwright/mcp@latest`.
 
 Then in Codex:
 
@@ -69,6 +57,14 @@ open http://localhost:4321/beans/log/2026-02-05-bean1/
 screenshot
 accessibilityTree
 ```
+
+If you need the HTTP transport for another client or for manual debugging, you can still run:
+
+```bash
+npx -y @playwright/mcp@latest --port 5173 --viewport-size 1440x900 --caps vision
+```
+
+Legacy SSE transport is available at `http://localhost:5173/sse` and the streamable HTTP endpoint is `http://localhost:5173/mcp`.
 
 ## Codex loop
 

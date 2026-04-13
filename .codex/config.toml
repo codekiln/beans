@@ -1,5 +1,9 @@
 [mcp_servers.playwright]
-url = "http://localhost:5173/mcp"
+type = "stdio"
+command = "npx"
+args = [ "-y", "@playwright/mcp@latest", "--caps", "vision", "--headless", "--viewport-size", "1440x900" ]
+targets = [ "codexcli" ]
+description = "Browser automation MCP server powered by Playwright"
 
 [profiles.codespaces]
 approval_policy = "on-failure"
