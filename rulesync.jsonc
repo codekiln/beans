@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/dyoshikawa/rulesync/refs/heads/main/config-schema.json",
   "targets": ["codexcli", "claudecode", "copilot", "cursor"],
-  "features": ["rules", "commands", "mcp"],
+  "features": ["rules", "skills", "subagents", "mcp"],
   "baseDirs": ["."],
   "delete": true,
   "verbose": false,
