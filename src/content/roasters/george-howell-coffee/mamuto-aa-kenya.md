@@ -9,6 +9,8 @@ blend: "single-origin"
 
 ![mamuto farm sketch: kirinyaga region, mt. kenya, gichugu, and mwea lowland rice region](/beans/images/mamuto-farm-kirinyaga-region-mt-kenya.jpg)
 
+![hand-drawn Mamuto tasting palette with cherry, plum, blackberry, and coffee color bands](/beans/images/mamuto-aa-tasting-notes.jpg)
+
 ## facts
 
 - Process: Washed
