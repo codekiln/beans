@@ -22,9 +22,9 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/mdx": "^5.0.3",
+    "@astrojs/mdx": "^5.0.4",
     "@astrojs/rss": "^4.0.18",
-    "astro": "^6.1.1"
+    "astro": "^6.1.9"
   },
   "devDependencies": {
     "playwright": "^1.58.2",
