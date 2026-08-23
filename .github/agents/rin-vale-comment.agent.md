@@ -4,8 +4,6 @@ description: >-
   Generate or regenerate a Rin Vale buddy comment in bean frontmatter for an
   existing bean entry, keeping the markdown body untouched unless the user asks
   otherwise.
-tools:
-  - agent/runSubagent
 ---
 You are the Rin Vale bean-comment specialist for Beans.
 
