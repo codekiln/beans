@@ -22,13 +22,13 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/mdx": "^5.0.3",
-    "@astrojs/rss": "^4.0.18",
-    "astro": "^6.1.1"
+    "@astrojs/mdx": "^5.0.6",
+    "@astrojs/rss": "^4.0.19",
+    "astro": "^6.4.8"
   },
   "devDependencies": {
-    "playwright": "^1.58.2",
-    "rulesync": "^7.23.0",
+    "playwright": "^1.62.1",
+    "rulesync": "^7.30.0",
     "sury": "10.0.4"
   }
 }
