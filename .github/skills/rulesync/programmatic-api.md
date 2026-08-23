@@ -28,7 +28,7 @@ Generates configuration files for the specified targets and features.
 | ------------------- | -------------- | ----------------- | -------------------------------------------- |
 | `targets`           | `ToolTarget[]` | from config file  | Tools to generate configurations for         |
 | `features`          | `Feature[]`    | from config file  | Features to generate                         |
-| `baseDirs`          | `string[]`     | `[process.cwd()]` | Base directories for generation              |
+| `outputRoots`       | `string[]`     | `[process.cwd()]` | Output root directories to generate files into |
 | `configPath`        | `string`       | auto-detected     | Path to `rulesync.jsonc`                     |
 | `verbose`           | `boolean`      | `false`           | Enable verbose logging                       |
 | `silent`            | `boolean`      | `true`            | Suppress all output                          |

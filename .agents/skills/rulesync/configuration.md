@@ -36,10 +36,10 @@ Example:
   //   "cursor": ["rules", "mcp"],
   // },
 
-  // Base directories for generation.
-  // Basically, you can specify a `["."]` only.
-  // However, for example, if your project is a monorepo and you have to launch the AI agent at each package directory, you can specify multiple base directories.
-  "baseDirs": ["."],
+  // Output root directories to generate files into.
+  // Basically, you can specify `["."]` only.
+  // However, for example, if your project is a monorepo and you have to launch the AI agent at each package directory, you can specify multiple output roots.
+  "outputRoots": ["."],
 
   // Delete existing files before generating
   "delete": true,
