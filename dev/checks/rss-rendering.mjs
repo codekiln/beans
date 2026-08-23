@@ -56,11 +56,18 @@ if (!xml.includes("This is a virtual companion comment, not the main post body."
   throw new Error("RSS feed is missing the companion-note demarcation label.");
 }
 
+if (!xml.includes("earthy sweetness, beets. red.")) {
+  throw new Error("RSS feed did not render the inline companion comment body into readable HTML.");
+}
+
 if (
-  !xml.includes("earthy sweetness, beets. red.") ||
-  !xml.includes("Companion note from &lt;a href=&quot;https://codekiln.github.io/beans/companion/unicorn/&quot;&gt;🦄&lt;/a&gt;")
+  !xml.includes(
+    "Companion note from &lt;a href=&quot;https://codekiln.github.io/beans/companion/unicorn/&quot;&gt;🦄 unicorn&lt;/a&gt;"
+  )
 ) {
-  throw new Error("RSS feed did not render the inline companion comment into readable HTML.");
+  throw new Error(
+    "RSS feed did not render the inline companion attribution link, or dropped the slug that readableCompanionLabel appends to letterless companion names (expected \"🦄 unicorn\")."
+  );
 }
 
 if (xml.includes("<CompanionComment") || xml.includes("import CompanionComment")) {
