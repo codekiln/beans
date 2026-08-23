@@ -22,9 +22,11 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/mdx": "^5.0.6",
+    "@astrojs/markdown-satteri": "^0.3.1",
+    "@astrojs/mdx": "^7.0.7",
     "@astrojs/rss": "^4.0.19",
-    "astro": "^6.4.8"
+    "astro": "^7.2.4",
+    "cookie": "^2.0.1"
   },
   "devDependencies": {
     "playwright": "^1.62.1",
