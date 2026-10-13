@@ -3,36 +3,26 @@ set -euo pipefail
 
 usage() {
   cat <<'USAGE'
-Usage: dev/land-the-plane <issue-id> [notes] [options]
+Usage: dev/land-the-plane <issue-id> [options]
 
 Runs the Beans session closeout ritual:
   1) Run default quality checks unless overridden
-  2) File requested follow-up Beads issues, otherwise assume none
-  3) Auto-commit tracked task-worktree edits when safe, or fail on ambiguity
-  4) Finish and sync the issue through dev/beads-finish
-  5) Update root main from origin/main, merge the task branch into main, and push main
-  6) Prune closed task worktrees, then delete the merged task branch locally (any branch name)
-  7) Assert final cleanup state and emit a next-session prompt
+  2) Auto-commit tracked task-worktree edits when safe, or fail on ambiguity
+  3) Update root main from origin/main, merge the task branch into main, and push main
+  4) Remove the task worktree, then delete the merged task branch locally (any branch name)
+  5) Assert final cleanup state
 
 Options:
   --check "<command>"   Run this validation command before closeout
   --no-checks           Skip default validation commands for this landing
-  --follow-up "<title>" Create a follow-up Beads issue before closing out
-  --no-follow-up        Keep compatibility with old explicit-no-follow-up usage
   --require-checks      Fail unless explicit check commands are provided
-  --require-follow-up   Fail unless explicit follow-up titles are provided
 USAGE
 }
 
 issue_id="${1:-}"
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-notes=""
 checks=()
-follow_ups=()
 no_checks=false
-no_follow_up=false
 require_checks=false
-require_follow_up=false
 current_worktree="$(git rev-parse --show-toplevel)"
 current_branch="$(git rev-parse --abbrev-ref HEAD)"
 git_common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
@@ -45,11 +35,6 @@ fi
 
 shift
 
-if [[ "${1:-}" != "" && "${1:-}" != --* ]]; then
-  notes="$1"
-  shift
-fi
-
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --check)
@@ -60,20 +45,8 @@ while [[ $# -gt 0 ]]; do
       no_checks=true
       shift
       ;;
-    --follow-up)
-      follow_ups+=("${2:-}")
-      shift 2
-      ;;
-    --no-follow-up)
-      no_follow_up=true
-      shift
-      ;;
     --require-checks)
       require_checks=true
-      shift
-      ;;
-    --require-follow-up)
-      require_follow_up=true
       shift
       ;;
     *)
@@ -83,25 +56,6 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
-
-bd_cmd() {
-  bd "$@"
-}
-
-push_beads_dolt() {
-  local dolt_password="${DOLT_REMOTE_PASSWORD:-}"
-
-  if [[ -z "$dolt_password" ]]; then
-    if ! command -v gh >/dev/null 2>&1; then
-      echo "Beads mutation needs a Dolt push, but gh is not available to mint a token." >&2
-      exit 1
-    fi
-
-    dolt_password="$(gh auth token)"
-  fi
-
-  DOLT_REMOTE_PASSWORD="$dolt_password" bd dolt push >/dev/null
-}
 
 print_section() {
   printf "\n%s\n" "$1"
@@ -186,10 +140,6 @@ run_checks() {
   fi
 
   if [[ "${#checks[@]}" -eq 0 && "$no_checks" == false ]]; then
-    if [[ -f package.json ]] && grep -q '"check:beads-start"' package.json; then
-      default_checks+=("npm run check:beads-start")
-    fi
-
     if [[ -f package.json ]] && grep -q '"check:markdown-a11y"' package.json; then
       default_checks+=("npm run check:markdown-a11y")
     fi
@@ -223,28 +173,6 @@ run_checks() {
     require_value "--check" "$check_cmd"
     echo "+ $check_cmd"
     eval "$check_cmd"
-  done
-}
-
-create_follow_ups() {
-  local title
-
-  print_section "Follow-up issues:"
-
-  if [[ "${#follow_ups[@]}" -eq 0 ]]; then
-    if [[ "$require_follow_up" == true ]]; then
-      echo "At least one explicit follow-up title is required for this landing." >&2
-      exit 1
-    fi
-
-    echo "No follow-up issues created."
-    return
-  fi
-
-  for title in "${follow_ups[@]}"; do
-    require_value "--follow-up" "$title"
-    bd_cmd create "$title"
-    push_beads_dolt
   done
 }
 
@@ -312,14 +240,15 @@ land_on_root_main() {
 
 }
 
-prune_closed_task_worktrees() {
-  print_section "Pruning closed task worktrees:"
+remove_task_worktree() {
+  print_section "Removing task worktree:"
 
   cd "$repo_root"
-  "$script_dir/beads-prune-closed-worktrees"
+  git worktree remove "$current_worktree"
+  git worktree prune
 
   if [[ -e "$current_worktree" ]]; then
-    echo "Closed task worktree still exists after prune: $current_worktree" >&2
+    echo "Task worktree still exists after removal: $current_worktree" >&2
     exit 1
   fi
 }
@@ -363,66 +292,12 @@ assert_task_commit_landed() {
   fi
 }
 
-select_next_issue() {
-  local ready_output="$1"
-  local candidates
-  local candidate_id
-  local ready_index=0
-  local details
-  local priority=9
-  local type_name=""
-  local type_rank=1
-  local score_file
-
-  candidates="$(printf "%s\n" "$ready_output" | grep -oE 'beans-[a-z0-9.]+' | awk '!seen[$0]++' || true)"
-
-  if [[ -z "$candidates" ]]; then
-    return
-  fi
-
-  score_file="$(mktemp)"
-
-  while IFS= read -r candidate_id; do
-    [[ -n "$candidate_id" ]] || continue
-    details="$(bd_cmd show "$candidate_id" 2>/dev/null || true)"
-    priority="$(printf "%s\n" "$details" | grep -oE 'P[0-4]' | head -n 1 | tr -d 'P' || true)"
-    type_name="$(
-      printf "%s\n" "$details" |
-        grep -oE 'Type: [A-Za-z]+' |
-        head -n 1 |
-        awk '{ print tolower($2) }'
-    )"
-
-    if [[ -z "$priority" ]]; then
-      priority=9
-    fi
-
-    case "$type_name" in
-      task|bug)
-        type_rank=0
-        ;;
-      epic)
-        type_rank=2
-        ;;
-      *)
-        type_rank=1
-        ;;
-    esac
-
-    printf "%s\t%s\t%s\t%s\n" "$type_rank" "$priority" "$ready_index" "$candidate_id" >>"$score_file"
-    ready_index=$((ready_index + 1))
-  done <<<"$candidates"
-
-  sort -t $'\t' -k1,1n -k2,2n -k3,3n "$score_file" | head -n 1 | cut -f4
-  rm -f "$score_file"
-}
-
 print_final_state() {
   local task_head="$1"
   local main_head
 
   if [[ -e "$current_worktree" ]]; then
-    echo "Closed task worktree should have been pruned during closeout: $current_worktree" >&2
+    echo "Task worktree should have been removed during closeout: $current_worktree" >&2
     exit 1
   fi
 
@@ -442,10 +317,8 @@ ensure_not_running_from_main
 ensure_root_main_policy
 ensure_root_main_clean_before_closeout
 run_checks
-create_follow_ups
 auto_commit_task_worktree_if_safe
 task_head="$(git rev-parse HEAD)"
-"$script_dir/beads-finish" "$issue_id" "$notes"
 land_on_root_main
 git -C "$repo_root" push origin main
 
@@ -455,7 +328,7 @@ git status --short --branch
 print_section "Root main review:"
 git -C "$repo_root" status --short --branch
 
-prune_closed_task_worktrees
+remove_task_worktree
 delete_merged_task_local_branch
 print_final_state "$task_head"
 
@@ -466,17 +339,3 @@ print_or_none "$untracked_files"
 print_section "Git stashes to review before leaving:"
 stash_list="$(git stash list || true)"
 print_or_none "$stash_list"
-
-print_section "Ready Beads work:"
-ready_output="$(bd_cmd ready || true)"
-print_or_none "$ready_output"
-
-next_issue="$(select_next_issue "$ready_output")"
-
-if [[ -n "$next_issue" ]]; then
-  print_section "Suggested next-session prompt:"
-  echo "Heuristic: prefer ready task/bug work, then lower P-number, then existing ready order."
-  cat <<EOF
-Start with dev/beads-start $next_issue, read the issue with bd show $next_issue, confirm the worktree is clean, implement the task, then run dev/land-the-plane $next_issue before handing off.
-EOF
-fi

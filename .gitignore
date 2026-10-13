@@ -18,20 +18,9 @@ pnpm-debug.log*
 *.swp
 .cursor/
 
-# Beads runtime files
-.beads/bd.sock
-.beads/beads.db
-.beads/beads.db-*
-.beads/daemon.*
-.beads/last-touched
-.beads/interactions.jsonl
-# bd worktrees
+# Task worktrees
 worktrees/beans-*/
 !worktrees/README.md
 
 # Playwright preview artifacts
 dev/playwright/*.png
-
-# Dolt database files (added by bd init)
-.dolt/
-*.db

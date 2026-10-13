@@ -16,23 +16,14 @@ run_success_scenario() {
 
   mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$tmp_dir/.git" "$task_worktree" "$my_main_worktree"
   cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
-  cp "$repo_root/dev/beads-prune-closed-worktrees" "$tmp_dir/dev/beads-prune-closed-worktrees"
 
   cat >"$task_worktree/package.json" <<'EOF'
 {
   "scripts": {
-    "check:beads-start": "echo beads-start",
     "check:markdown-a11y": "echo markdown-a11y",
     "build": "echo build"
   }
 }
-EOF
-
-  cat >"$tmp_dir/dev/beads-finish" <<EOF
-#!/usr/bin/env bash
-set -euo pipefail
-
-echo "\$*" >>"$tmp_dir/beads-finish.log"
 EOF
 
   cat >"$tmp_dir/bin/git" <<EOF
@@ -202,11 +193,6 @@ set -euo pipefail
 
 echo "\$*" >>"$tmp_dir/npm.log"
 
-if [[ "\$1" == "run" && "\$2" == "check:beads-start" ]]; then
-  echo "beads-start ok"
-  exit 0
-fi
-
 if [[ "\$1" == "run" && "\$2" == "check:markdown-a11y" ]]; then
   echo "markdown-a11y ok"
   exit 0
@@ -220,63 +206,13 @@ fi
 exit 0
 EOF
 
-  cat >"$tmp_dir/bin/bd" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-
-case "${1:-}" in
-  list)
-    if [[ "${2:-}" == "--status" && "${3:-}" == "closed" ]]; then
-      cat <<'CLOSED'
-✓ beans-test [P2] [task] - Closed issue
-CLOSED
-      exit 0
-    fi
-    ;;
-  ready)
-    cat <<'READY'
-
-📋 Ready work (2 issues with no blockers):
-
-1. [● P1] [epic] beans-nep: Bigger theme
-2. [● P2] [task] beans-ntk: Smaller next step
-READY
-    exit 0
-    ;;
-  show)
-    case "${2:-}" in
-      beans-nep)
-        cat <<'SHOW'
-○ beans-nep · Bigger theme   [● P1 · OPEN]
-Owner: CHANGE_ME · Type: epic
-SHOW
-        ;;
-      beans-ntk)
-        cat <<'SHOW'
-○ beans-ntk · Smaller next step   [● P2 · OPEN]
-Owner: CHANGE_ME · Type: task
-SHOW
-        ;;
-    esac
-    exit 0
-    ;;
-esac
-
-exit 0
-EOF
-
-  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-prune-closed-worktrees" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd" "$tmp_dir/bin/npm"
+  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/bin/git" "$tmp_dir/bin/npm"
   : >"$tmp_dir/task-dirty"
 
   output="$(
     cd "$task_worktree"
-    PATH="$tmp_dir/bin:$PATH" ../..//dev/land-the-plane beans-test "note"
+    PATH="$tmp_dir/bin:$PATH" ../..//dev/land-the-plane beans-test
   )"
-
-  if ! grep -Fq "beans-test note" "$tmp_dir/beads-finish.log"; then
-    echo "land-the-plane did not delegate to beads-finish with issue and notes" >&2
-    exit 1
-  fi
 
   if ! grep -Fq "commit -m chore(land-the-plane): checkpoint beans-test" "$tmp_dir/git.log"; then
     echo "land-the-plane did not auto-commit tracked task worktree changes" >&2
@@ -285,11 +221,6 @@ EOF
 
   if [[ "$output" != *"Task worktree checkpoint:"* ]]; then
     echo "land-the-plane did not report the auto-commit checkpoint" >&2
-    exit 1
-  fi
-
-  if ! grep -Fq "run check:beads-start" "$tmp_dir/npm.log"; then
-    echo "land-the-plane did not run the default Beads startup smoke check" >&2
     exit 1
   fi
 
@@ -319,7 +250,7 @@ EOF
   fi
 
   if ! grep -Fq "worktree remove $task_worktree" "$tmp_dir/git.log"; then
-    echo "land-the-plane did not prune the just-closed task worktree" >&2
+    echo "land-the-plane did not remove the just-landed task worktree" >&2
     exit 1
   fi
 
@@ -344,7 +275,7 @@ EOF
   fi
 
   if [[ -d "$task_worktree" ]]; then
-    echo "land-the-plane left the closed task worktree on disk" >&2
+    echo "land-the-plane left the landed task worktree on disk" >&2
     exit 1
   fi
 
@@ -353,18 +284,8 @@ EOF
     exit 1
   fi
 
-  if [[ "$output" != *"Pruning closed task worktrees:"* ]]; then
-    echo "land-the-plane did not report the prune step" >&2
-    exit 1
-  fi
-
-  if [[ "$output" != *"Heuristic: prefer ready task/bug work, then lower P-number, then existing ready order."* ]]; then
-    echo "land-the-plane did not document the next-task heuristic" >&2
-    exit 1
-  fi
-
-  if [[ "$output" != *"dev/beads-start beans-ntk"* || "$output" != *"bd show beans-ntk"* ]]; then
-    echo "land-the-plane did not print the modern next-session prompt" >&2
+  if [[ "$output" != *"Removing task worktree:"* ]]; then
+    echo "land-the-plane did not report the worktree removal step" >&2
     exit 1
   fi
 }
@@ -380,12 +301,6 @@ run_dirty_root_failure() {
 
   mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$tmp_dir/.git" "$task_worktree"
   cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
-
-  cat >"$tmp_dir/dev/beads-finish" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exit 0
-EOF
 
   cat >"$tmp_dir/bin/git" <<EOF
 #!/usr/bin/env bash
@@ -438,13 +353,7 @@ case "\$1" in
 esac
 EOF
 
-  cat >"$tmp_dir/bin/bd" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exit 0
-EOF
-
-  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd"
+  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/bin/git"
 
   set +e
   output="$(
@@ -476,13 +385,6 @@ run_checkpoint_still_dirty_failure() {
 
   mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$tmp_dir/.git" "$task_worktree"
   cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
-
-  cat >"$tmp_dir/dev/beads-finish" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-echo "beads-finish should not run when checkpoint leaves the task worktree dirty" >&2
-exit 99
-EOF
 
   cat >"$tmp_dir/bin/git" <<EOF
 #!/usr/bin/env bash
@@ -518,7 +420,7 @@ case "\$1" in
     ;;
   status)
     if [[ "\${2:-}" == "--porcelain" ]]; then
-      printf " M docs/dev/beads.md\n"
+      printf " M docs/dev/land-the-plane.md\n"
       exit 0
     fi
     if [[ "\${2:-}" == "--short" && "\${3:-}" == "--branch" ]]; then
@@ -549,13 +451,7 @@ case "\$1" in
 esac
 EOF
 
-  cat >"$tmp_dir/bin/bd" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exit 0
-EOF
-
-  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd"
+  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/bin/git"
 
   set +e
   output="$(
@@ -587,12 +483,6 @@ run_root_merge_conflict_failure() {
 
   mkdir -p "$tmp_dir/bin" "$tmp_dir/dev" "$tmp_dir/.git" "$task_worktree"
   cp "$repo_root/dev/land-the-plane" "$tmp_dir/dev/land-the-plane"
-
-  cat >"$tmp_dir/dev/beads-finish" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exit 0
-EOF
 
   cat >"$tmp_dir/bin/git" <<EOF
 #!/usr/bin/env bash
@@ -659,7 +549,7 @@ case "\$1" in
       exit 1
     fi
     if [[ "\$worktree_path" == "\$repo_root" && "\${1:-}" == "diff" ]]; then
-      printf "docs/dev/beads.md\n"
+      printf "docs/dev/land-the-plane.md\n"
       exit 0
     fi
     exit 0
@@ -670,13 +560,7 @@ case "\$1" in
 esac
 EOF
 
-  cat >"$tmp_dir/bin/bd" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exit 0
-EOF
-
-  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/dev/beads-finish" "$tmp_dir/bin/git" "$tmp_dir/bin/bd"
+  chmod +x "$tmp_dir/dev/land-the-plane" "$tmp_dir/bin/git"
 
   set +e
   output="$(
@@ -696,7 +580,7 @@ EOF
     exit 1
   fi
 
-  if [[ "$output" != *"docs/dev/beads.md"* ]]; then
+  if [[ "$output" != *"docs/dev/land-the-plane.md"* ]]; then
     echo "land-the-plane did not list the conflicting root-main file" >&2
     exit 1
   fi

@@ -16,18 +16,14 @@
 ## Git worktrees in Codespaces
 - Keep the repo root checkout on `main` as an integration-only worktree.
 - Keep personal non-task WIP on `main` in `worktrees/my/main`.
-- Keep Beads task work in `worktrees/beans-<issue-id>`.
+- Keep task work in `worktrees/beans-<issue-id>`.
 - Worktrees should live under `/workspaces/worktrees` so they persist and stay inside the Codespaces workspace.
 - Use the helper script to add/list/prune/remove worktrees:
   - `dev/worktree add feat/my-branch`
   - `dev/worktree list`
   - `dev/worktree prune`
   - `dev/worktree remove /workspaces/worktrees/feat/my-branch`
-- For Beads issue kickoff, use:
-  - `dev/beads-start <issue-id>`
-  - `dev/beads-finish <issue-id> "optional notes"`
-  - `dev/land-the-plane <issue-id> "optional notes"`
-- In this repo, use the modern `bd` CLI shape directly. The helpers push their own Beads mutations with `bd dolt push`, and manual mutations should do the same with `DOLT_REMOTE_PASSWORD="$(gh auth token)" bd dolt push`.
+- To land a finished task, run `dev/land-the-plane <issue-id>` from its worktree.
 - Each worktree needs its own `npm install` before running the dev server.
 
 ## Devcontainer expectations for worktrees

@@ -6,4 +6,4 @@ Use the convention:
 
 Preferred command:
 
-`bd worktree create worktrees/${BRANCH_NAME} --branch ${BRANCH_NAME}`
+`git worktree add worktrees/${BRANCH_NAME} -b ${BRANCH_NAME}`
