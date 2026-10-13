@@ -232,7 +232,9 @@ const transformInlineComments = async (body: string, site: URL) => {
 
 export const GET = async () => {
   const markdown = await createMarkdownProcessor({
-    remarkPlugins: [remarkGfm]
+    remarkPlugins: [remarkGfm],
+    // Match Sätteri on the HTML pages: `--` is an en dash, `---` an em dash.
+    smartypants: { dashes: "oldschool" }
   });
   const beans = await getBeans();
   const beanRouteInfo = getBeanRouteInfoMap(beans);
