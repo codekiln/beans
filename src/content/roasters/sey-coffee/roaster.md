@@ -3,7 +3,7 @@ name: "SEY"
 order: 4
 ---
 
-- Specialty coffee roaster based in Brooklyn, New York.
-- Known for very light roasts and price transparency, printing FOB and DDP
-  pricing on the card that ships with each coffee.
-- Website: [sey.coffee](https://www.sey.coffee/)
+- Micro roastery and cafe at 18 Grattan St in Brooklyn, New York.
+- Roasts light and works directly with producing partners around the world,
+  including the Mbature family at Kamavindi in Kenya.
+- Website: [seycoffee.com](https://www.seycoffee.com/)

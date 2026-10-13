@@ -5,7 +5,7 @@ profile: "rose hips · candied orange · currants"
 blend: "single-origin"
 ---
 
-## Mbature Family, Kamavindi Estate Lot #2 | SEY
+## [Mbature Family, Kamavindi Estate, Lot #2 SL* Washed, Kenya | SEY](https://www.seycoffee.com/products/2026-mbature-family-kamavindi-estate-lot-2-kenya)
 
 ![SEY coffee card for Mbature Family, Kamavindi Estate Lot #2, with processing, family history, and SL* variety notes](/beans/images/2026-10-13-tue-0410-first-cracked-the-puff-p3.jpg)
 
@@ -16,6 +16,7 @@ candied orange, and currants.
 
 ## facts
 
+- Producer: Mbature Family
 - Process: Washed
 - Variety: SL*
 - Roasted: October 5, 2026 ("best after two weeks")
@@ -59,3 +60,7 @@ SEY released this selection last year as SL34. Recent genetic testing on this
 farm and others has challenged assumptions about which varieties are actually
 cultivated in Kenya; SEY now believes this lot comprises SL34 and SL9, and calls
 it an ongoing research project.
+
+## references
+
+- [Mbature Family, Kamavindi Estate, Lot #2 SL* Washed, Kenya | SEY](https://www.seycoffee.com/products/2026-mbature-family-kamavindi-estate-lot-2-kenya)
