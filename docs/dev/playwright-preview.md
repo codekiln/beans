@@ -72,4 +72,4 @@ The intended preview loop is: Codex triggers `dev/playwright/screenshot.mjs`, Pl
 
 ## Codex skill
 
-This repo includes a Codex skill in `.codex/skills/playwright-preview`. To make it available to Codex, add it under your `$CODEX_HOME/skills` (for example via a symlink) so the skill can be discovered.
+This repo includes a Codex skill in `.agents/skills/playwright-preview`. To make it available to Codex, add it under your `$CODEX_HOME/skills` (for example via a symlink) so the skill can be discovered.

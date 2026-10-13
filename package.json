@@ -22,15 +22,15 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/markdown-satteri": "^0.3.1",
-    "@astrojs/mdx": "^7.0.7",
+    "@astrojs/markdown-satteri": "^0.3.8",
+    "@astrojs/mdx": "^7.0.8",
     "@astrojs/rss": "^4.0.19",
-    "astro": "^7.2.4",
+    "astro": "^7.3.8",
     "cookie": "^2.0.1"
   },
   "devDependencies": {
     "playwright": "^1.62.1",
-    "rulesync": "^7.30.0",
+    "rulesync": "^16.15.0",
     "sury": "10.0.4"
   }
 }

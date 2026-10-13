@@ -1,14 +1,13 @@
 {
-  "$schema": "https://raw.githubusercontent.com/dyoshikawa/rulesync/refs/heads/main/config-schema.json",
+  "$schema": "https://github.com/dyoshikawa/rulesync/releases/latest/download/config-schema.json",
   "targets": ["codexcli", "claudecode", "copilot", "cursor"],
   "features": ["rules", "skills", "subagents", "mcp"],
-  "baseDirs": ["."],
+  "outputRoots": ["."],
   "delete": true,
   "verbose": false,
   "silent": false,
   "global": false,
   "simulateCommands": false,
   "simulateSubagents": false,
-  "simulateSkills": false,
-  "modularMcp": false
+  "simulateSkills": false
 }

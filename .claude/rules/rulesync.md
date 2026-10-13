@@ -29,11 +29,11 @@ npx rulesync generate
 - Keep durable AI coding guidance changes in `.rulesync/rules/*.md`.
 - Keep reusable workflow prompts and task abstractions in `.rulesync/skills/*/SKILL.md`.
 - Keep delegated specialist agents in `.rulesync/subagents/*.md`.
-- Generated files like `AGENTS.md`, `.codex/memories/*`, `.cursor/commands/*`, and `.claude/*` should be treated as derived output from Rulesync.
+- Generated files like `AGENTS.md`, `CLAUDE.md`, `.agents/*`, `.cursor/*`, and `.claude/*` should be treated as derived output from Rulesync.
 
 ## Update workflow
 
 1. Edit `.rulesync/rules/*.md` for durable guidance, `.rulesync/skills/*/SKILL.md` for reusable in-context workflows, and `.rulesync/subagents/*.md` for delegated specialist agents.
 2. Run `npx rulesync generate`.
-3. Review the generated diffs in `AGENTS.md`, `.codex/memories/*`, `.codex/skills/*`, `.cursor/*`, `.claude/*`, `.github/*`, and other Rulesync-managed outputs.
+3. Review the generated diffs in `AGENTS.md`, `CLAUDE.md`, `.agents/*`, `.codex/*`, `.cursor/*`, `.claude/*`, `.github/*`, and other Rulesync-managed outputs.
 4. If generated output looks wrong, fix the Rulesync source files and regenerate instead of patching generated files directly.
