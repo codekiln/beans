@@ -42,7 +42,7 @@ Notes:
 
 ## MCP vision loop (screenshots + accessibility tree)
 
-For repo-local Codex usage, keep the Playwright MCP server in Rulesync as a `stdio` entry and regenerate:
+For repo-local Codex usage, keep the Playwright MCP server in Rulesync as a `stdio` entry under the `codexcli.mcpServers` block of `.rulesync/mcp.json` and regenerate:
 
 ```bash
 npx rulesync generate
