@@ -27,8 +27,8 @@
     "astro": "^6.4.8"
   },
   "devDependencies": {
-    "playwright": "^1.62.1",
-    "rulesync": "^16.15.0",
-    "sury": "10.0.4"
+    "playwright": "^1.63.0",
+    "rulesync": "^16.38.0",
+    "sury": "11.0.0"
   }
 }
