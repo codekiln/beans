@@ -126,4 +126,46 @@ if (!april11.includes("Companion note from codekiln") || !april11.includes("Open
   throw new Error("RSS feed did not simplify April 11 companion notes or embedded audio for text-oriented readers.");
 }
 
+// The feed renders Markdown with the same Sätteri processor as the pages, so
+// smart quotes and dashes must come out the same in both. Each pattern captures
+// one typographic character from the page HTML and from the feed item.
+const resolveBeanPagePath = async (slug) => {
+  const candidatePaths = [
+    join(process.cwd(), "dist", "log", slug, "index.html"),
+    join(process.cwd(), "dist", "beans", "log", slug, "index.html")
+  ];
+
+  for (const path of candidatePaths) {
+    try {
+      await access(path);
+      return path;
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error(`Bean detail page output file was not found for ${slug} in dist/.`);
+};
+const typographyCases = [
+  { slug: "2026-02-24", source: "## 'isten", pattern: /<h2 id="isten">(.)isten<\/h2>/u, expected: "’" },
+  { slug: "2026-03-17", source: "'83 book", pattern: /wrote (.)83 book/u, expected: "’" },
+  { slug: "2026-04-05", source: "r.a.t.m.'s", pattern: /r\.a\.t\.m\.(.)s/u, expected: "’" },
+  { slug: "2026-04-10", source: "\"billie jean.\"", pattern: /(.)billie jean\./u, expected: "“" },
+  { slug: "2026-02-09", source: "\"a deep purple nebula\" ---", pattern: /nebula” (.)/u, expected: "—" },
+  { slug: "2026-02-23", source: "bread.” --- Bilbo", pattern: /bread\.” (.) Bilbo/u, expected: "—" }
+];
+
+for (const { slug, source, pattern, expected } of typographyCases) {
+  const pageHtml = await readFile(await resolveBeanPagePath(slug), "utf8");
+  const feedHtml = rssItems.get(`https://codekiln.github.io/beans/log/${slug}/`) ?? "";
+  const pageChar = pageHtml.match(pattern)?.[1];
+  const feedChar = feedHtml.match(pattern)?.[1];
+
+  if (pageChar !== expected || feedChar !== expected) {
+    throw new Error(
+      `Typography for ${JSON.stringify(source)} in ${slug} differs: expected ${JSON.stringify(expected)}, page has ${JSON.stringify(pageChar)}, feed has ${JSON.stringify(feedChar)}.`
+    );
+  }
+}
+
 console.log("rss-rendering check passed");

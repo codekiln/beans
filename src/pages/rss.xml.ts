@@ -1,8 +1,7 @@
 import rss from "@astrojs/rss";
-import { createMarkdownProcessor } from "@astrojs/markdown-remark";
-import remarkGfm from "remark-gfm";
 import { bodyReferencesImage, extractInlineCompanionComments, getBeanRouteInfoMap, getBeans } from "../data/beans";
 import { getCompanionBySlug, getCompanionPath } from "../data/companions";
+import { markdownProcessor } from "../utils/markdown";
 import { withBase } from "../utils/paths";
 
 type BeanEntry = Awaited<ReturnType<typeof getBeans>>[number];
@@ -231,11 +230,9 @@ const transformInlineComments = async (body: string, site: URL) => {
 };
 
 export const GET = async () => {
-  const markdown = await createMarkdownProcessor({
-    remarkPlugins: [remarkGfm],
-    // Match Sätteri on the HTML pages: `--` is an en dash, `---` an em dash.
-    smartypants: { dashes: "oldschool" }
-  });
+  // Same processor as the pages, with no per-feed overrides; astro's markdown
+  // options are all unset in astro.config.mjs, so `{}` resolves to the same defaults.
+  const markdown = await markdownProcessor.createRenderer({});
   const beans = await getBeans();
   const beanRouteInfo = getBeanRouteInfoMap(beans);
   const sortedBeans = [...beans].sort((a, b) => toDate(b).getTime() - toDate(a).getTime());
