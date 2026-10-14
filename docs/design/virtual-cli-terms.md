@@ -1,15 +1,8 @@
-# Design document: virtual CLI for BEATS tasks + Beans terms
+# Design document: virtual CLI for Beans terms
 
 ## Context
 
 This site already simulates command output surfaces such as `bean log` and `bean roaster`. The next command namespace is `term`, with singular lookup usage (for example: `bean term RDT`).
-
-## BEATS task lookup snapshot
-
-Using the BEADS/Beats CLI (`bd`), issue searches for terminology-related work currently return no matching open issues.
-
-- Query intent: terminology section, term namespace, glossary support
-- Suggested next BEATS action: create a new task for term namespace rollout and content backfill
 
 ## Product goals
 

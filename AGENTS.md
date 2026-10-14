@@ -12,18 +12,14 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - Keep content changes in `src/content` and presentation changes in `src/components`, `src/layouts`, or `src/styles`.
 - Keep the primary descriptive content for data models in the markdown body, not frontmatter arrays.
 - When adding new pages, use `.astro` files and include the base layout.
-- For Beads-managed work, prefer `dev/beads-start <issue-id>` so startup uses the repo's Beads worktree flow and cleanup.
-- Prefer `dev/beads-finish <issue-id>` for the close/push path so metadata handling is consistent.
 - Keep the repo root checkout on `main` as an integration-only worktree; do not use it for active feature edits.
 - Personal non-task WIP belongs in `worktrees/my/main`.
 - Task worktrees live at `worktrees/beans-<issue-id>` on branches like `codex/beans-<issue-id>`.
-- Product code changes belong on the task branch/worktree and land on `main`; Beads metadata lives in the shared Dolt runtime under `.beads/dolt`.
-- After every Beads mutation, run `DOLT_REMOTE_PASSWORD="$(gh auth token)" bd dolt push`, or use the repo helpers that already do this for their own Beads writes.
+- Product code changes belong on the task branch/worktree and land on `main`.
 - Do not add per-worktree paths to `.gitignore`; rely on the existing wildcard rule `worktrees/beans-*/`.
 - Unless the user explicitly asks for a branch or PR workflow, land completed work by updating the root `main` checkout from `origin/main`, merging the task branch into root `main` locally, and pushing `main` directly.
 - In this repo, the default handoff should sidestep PR creation entirely; do not treat pushing the task worktree branch as the normal landing path unless the user requests it.
-- Treat `beads-sync`, `.beads/issues.jsonl`, `.beads/beads.db`, `bd --no-daemon`, `bd sync --flush-only`, and `bd import` as migration residue rather than current workflow.
-- A Beads-managed task is not fully landed until `main` is clean and synced with `origin/main`, the task worktree is pruned if it was closed, and the session's Beads mutations have been pushed via Dolt.
+- A task is not fully landed until `main` is clean and synced with `origin/main` and the task worktree is pruned.
 
 ## Content Guidelines
 
@@ -57,140 +53,6 @@ Beans is a CLI-inspired coffee log built with Astro. The site content lives in `
 - Use `.nvmrc` as the single source of truth for the Node version.
 - GitHub Actions and the devcontainer must both read the Node version from `.nvmrc` (do not hardcode version numbers elsewhere).
 
-# [Beads](https://github.com/steveyegge/beads) in Beans
-
-This repo uses modern Beads (`bd`) on the Dolt backend. The runtime source of truth is the shared Dolt project under `.beads/dolt`, with `.beads/metadata.json` describing the active backend and database.
-
-The old JSONL export workflow is migration residue, not the current operating model:
-
-- Do not use top-level `bd --no-daemon`.
-- Do not use `no-db`, `bd sync --flush-only`, or `bd import` for normal repo work.
-- Do not treat `beads-sync`, `.beads/issues.jsonl`, or `.beads/beads.db` as the live issue store.
-
-## Durable mutation rule
-
-Every Beads mutation in this repo must be pushed durably through Dolt:
-
-```bash
-DOLT_REMOTE_PASSWORD="$(gh auth token)" bd dolt push
-```
-
-The repo helpers already do this for the Beads mutations they perform. If you create, update, claim, or close an issue manually, run the Dolt push yourself immediately afterward.
-
-## Where data lives
-
-- `.beads/metadata.json` tells you which backend is active. In this repo it should show `backend: dolt` and database `beans`.
-- `.beads/dolt/` holds the live Beads runtime data for this clone.
-- `.beads/issues.jsonl` may still exist as migration residue or backup material, but it is not the durable source of truth for current operations.
-- `bd context`, `bd list`, `bd ready`, and `bd show` should all work directly against the Dolt backend.
-
-## Worktree pattern
-
-Use Beads-managed worktrees so every task checkout shares the same runtime store through the redirect file.
-
-- The repo root checkout stays on `main` and is integration-only.
-- Personal non-task WIP belongs in `worktrees/my/main`.
-- Beads task work belongs in `worktrees/beans-<issue-id>` on branches like `codex/beans-<issue-id>`.
-
-Preferred startup path:
-
-```bash
-dev/beads-start <issue-id>
-```
-
-The helper:
-
-- shows the target issue
-- refreshes Beads git hooks
-- installs the repo-owned `pre-push` guard
-- warns if the source checkout is already dirty
-- claims the issue and immediately runs `bd dolt push`
-- creates `worktrees/beans-<issue-id>` on `codex/beans-<issue-id>`
-- repairs the worktree-local `.beads/redirect`
-- removes redundant per-worktree `.gitignore` noise if Beads added it
-
-Manual fallback:
-
-```bash
-bd show <issue-id>
-bd update <issue-id> --claim
-DOLT_REMOTE_PASSWORD="$(gh auth token)" bd dolt push
-bd worktree create worktrees/beans-<issue-id> --branch codex/beans-<issue-id>
-```
-
-## Finish path
-
-Use the repo helper from the task worktree:
-
-```bash
-dev/beads-finish <issue-id> ["notes"]
-```
-
-The helper:
-
-- shows the issue
-- closes it, optionally recording notes in the same mutation
-- runs `bd dolt push`
-- prints `git status --short`
-- shows the closed issue JSON for confirmation
-
-Manual fallback:
-
-```bash
-bd update <issue-id> --notes "optional notes" --status closed
-DOLT_REMOTE_PASSWORD="$(gh auth token)" bd dolt push
-git status --short
-bd show <issue-id> --json
-```
-
-## Land-the-plane flow
-
-`dev/land-the-plane <issue-id>` is the repo's named end-of-session closeout ritual.
-
-It:
-
-1. Runs default validation (`npm run check:beads-start`, `npm run check:markdown-a11y`, and `npm run build`) unless overridden.
-2. Creates requested follow-up Beads issues and pushes each one through Dolt.
-3. Auto-commits tracked or untracked task-worktree changes when safe.
-4. Delegates closeout to `dev/beads-finish`.
-5. Updates the root `main` checkout from `origin/main`.
-6. Merges the task branch into root `main`.
-7. Pushes `main`.
-8. Prunes closed task worktrees.
-9. Shows `bd ready` and suggests the next issue.
-
-Successful closeout means:
-
-- the task worktree is clean before prune, or was checkpointed automatically
-- root `main` ends clean and synced with `origin/main`
-- the task worktree is pruned after closeout
-- all Beads mutations created during the session were pushed via Dolt
-
-## Pre-push guard
-
-`dev/beads-start` installs the repo-owned `pre-push` hook wrapper. When you push `main`, the repo guard checks merged `codex/beans-*` branches and blocks the push if their Beads issue is still open.
-
-That guard is status-based now. It no longer relies on the old `beads-sync` JSONL export flow.
-
-## Verification and cleanup
-
-Use these checks when repairing or validating the repo:
-
-```bash
-bd doctor --agent --json
-bd context
-bd ready
-bd list
-```
-
-If `bd doctor --check=artifacts` reports classic artifacts, clean them:
-
-```bash
-bd doctor --check=artifacts --clean -y
-```
-
-That cleanup is safe to rerun. Once the repo is fully migrated, it should converge to a no-op.
-
 # Bean entry command
 
 Use this CLI-style command when creating a new Bean entry:
@@ -217,8 +79,7 @@ Then create a matching file at `src/content/beans/<YYYY-MM-DD>-<beanKey>.md` wit
 
 ## Worktree convention for bean-entry tasks
 
-- Prefer `dev/beads-start <issue-id>` when starting a bean-entry task worktree.
-- Use Beads-managed worktrees under `worktrees/beans-<issue-id>`.
+- Use task worktrees under `worktrees/beans-<issue-id>`.
 - Do not add individual worktree paths to `.gitignore`; this repo already ignores them via `worktrees/beans-*/`.
 
 ## Markdown Body Content

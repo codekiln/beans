@@ -5,7 +5,6 @@
   "postStartCommand": "npx -y @playwright/mcp@latest --port 5173 --viewport-size 1440x900 --caps vision &",
   "features": {
     "ghcr.io/jsburckhardt/devcontainer-features/codex:1": {},
-    "ghcr.io/eitsupi/devcontainer-features/beads-cli:1": {},
     "ghcr.io/duduribeiro/devcontainer-features/neovim:1": {},
     "ghcr.io/duduribeiro/devcontainer-features/tmux:1": {
       "version": "latest"
