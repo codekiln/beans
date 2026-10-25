@@ -3,8 +3,8 @@ name: "nuthatch"
 title: "headfirst down the pine"
 summary: "currently: checking the bark while the kettle warms."
 portrait:
-  src: "/images/nuthatch-portrait.png"
-  darkSrc: "/images/nuthatch-portrait-dark.png"
+  src: "/images/nuthatch-portrait.jpg"
+  darkSrc: "/images/nuthatch-portrait-dark.jpg"
   alt: "Pixel portrait of a blue-gray nuthatch with a rust-colored belly, clinging headfirst to a mossy tree trunk."
 order: 3
 ---
