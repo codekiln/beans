@@ -1,0 +1,50 @@
+---
+interface Props {
+  show: string;
+  title: string;
+  href: string;
+  audio: string;
+  duration?: string;
+}
+
+const { show, title, href, audio, duration } = Astro.props as Props;
+---
+<figure class="podcast-episode">
+  <figcaption class="podcast-episode-caption">
+    <span class="podcast-episode-show">{show}</span>
+    <a href={href}>{title}</a>
+    {duration && <span class="podcast-episode-duration">{duration}</span>}
+  </figcaption>
+  <audio controls preload="none" src={audio}>
+    <a href={audio}>Download the episode</a>
+  </audio>
+</figure>
+
+<style>
+  .podcast-episode {
+    margin: 1rem 0;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-elevated);
+  }
+
+  .podcast-episode-caption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+  }
+
+  .podcast-episode-show,
+  .podcast-episode-duration {
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  .podcast-episode audio {
+    display: block;
+    width: 100%;
+  }
+</style>
